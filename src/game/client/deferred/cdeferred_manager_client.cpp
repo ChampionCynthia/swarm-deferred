@@ -35,7 +35,6 @@ CDeferredManagerClient::~CDeferredManagerClient()
 {
 }
 
-#ifdef DEFERRED_DEV
 void CopyDev()
 {
 	FileFindHandle_t handle;
@@ -46,7 +45,12 @@ void CopyDev()
 	Q_StripLastDir( steamappsPath, sizeof(steamappsPath) );
 	Q_StripLastDir( steamappsPath, sizeof(steamappsPath) );
 
-	const char *pszName = g_pFullFileSystem->FindFirst( VarArgs( "%sshaders\\fxc\\*", pszGameDir ), &handle );
+	char searchPath[MAX_PATH*4];
+	Q_snprintf( searchPath, sizeof(searchPath), "%s\\shaders\\fxc\\*", pszGameDir );
+	Q_FixSlashes( searchPath );
+	Msg( "searching for shaders in: %s\n", searchPath );
+
+	const char *pszName = g_pFullFileSystem->FindFirst( searchPath, &handle );
 
 	while ( pszName != NULL )
 	{
@@ -57,8 +61,10 @@ void CopyDev()
 
 			char filepath_src[MAX_PATH];
 			char filepath_dst[MAX_PATH];
-			Q_snprintf( filepath_src, sizeof( filepath_src ), VarArgs( "%sshaders\\fxc\\%s.vcs\0", pszGameDir ), filename );
-			Q_snprintf( filepath_dst, sizeof( filepath_dst ), VarArgs( "%scommon\\alien swarm\\platform\\shaders\\fxc\\%s.vcs\0", steamappsPath ), filename );
+			Q_snprintf( filepath_src, sizeof( filepath_src ), "%s\\shaders\\fxc\\%s.vcs\0", pszGameDir, filename );
+			Q_snprintf( filepath_dst, sizeof( filepath_dst ), "%s\\common\\alien swarm\\platform\\shaders\\fxc\\%s.vcs\0", steamappsPath, filename );
+			Q_FixSlashes( filepath_src );
+			Q_FixSlashes( filepath_dst );
 
 			Msg( "%s --> %s\n", filepath_src, filepath_dst );
 			engine->CopyFile( filepath_src, filepath_dst );
@@ -69,18 +75,21 @@ void CopyDev()
 
 	g_pFullFileSystem->FindClose( handle );
 }
-#endif
 
 bool CDeferredManagerClient::Init()
 {
-#ifdef DEFERRED_DEV
 	CopyDev();
-#endif
 
 	AssertMsg( g_pCurrentViewRender == NULL, "viewrender already allocated?!" );
 
 	const bool bForceDeferred = CommandLine() && CommandLine()->FindParm("-forcedeferred") != 0;
-	const bool bSM30 = g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 95;
+	bool bSM30 = g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 95;
+
+	if ( !bSM30 )
+	{
+		Warning( "The engine doesn't recognize your GPU to support SM3.0, running deferred anyway...\n" );
+		bSM30 = true;
+	}
 
 	if ( bSM30 || bForceDeferred )
 	{

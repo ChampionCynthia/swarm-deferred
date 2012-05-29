@@ -113,8 +113,10 @@ void CLightingEditor::LevelShutdownPreEntity()
 
 bool CLightingEditor::IsLightingEditorAllowed()
 {
-	static ConVarRef cvarCheats( "sv_cheats" );
-	return cvarCheats.GetBool();
+	//static ConVarRef cvarCheats( "sv_cheats" );
+	//return cvarCheats.GetBool();
+
+	return true;
 }
 
 void CLightingEditor::Update( float ft )

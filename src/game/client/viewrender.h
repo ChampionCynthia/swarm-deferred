@@ -76,6 +76,7 @@ enum view_id_t
 	VIEW_INTRO_CAMERA = 6,
 	VIEW_SHADOW_DEPTH_TEXTURE = 7,
 
+// @Deferred - Biohazard
 	VIEW_DEFERRED_GBUFFER = 8,
 	VIEW_DEFERRED_SHADOW = 9,
 
