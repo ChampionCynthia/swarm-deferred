@@ -86,7 +86,7 @@ static void LeaveGameOkCallback()
 	CBaseModPanel::GetSingleton().OpenFrontScreen();
 }
 
-void ShowPlayerList();
+//void ShowPlayerList();
 
 //=============================================================================
 void InGameMainMenu::OnCommand( const char *command )
@@ -329,7 +329,7 @@ void InGameMainMenu::OnCommand( const char *command )
 			}
 			else
 			{
-				ShowPlayerList();
+				//ShowPlayerList();
 			}
 			engine->ClientCmd("gameui_hide");
 			return;
@@ -408,7 +408,7 @@ void InGameMainMenu::ApplySchemeSettings( vgui::IScheme *pScheme )
 	}
 	else
 	{
-		LoadControlSettings( "Resource/UI/BaseModUI/InGameMainMenu.res" );
+		LoadControlSettings( "Resource/UI/BaseModUI/InGameMainMenu_user.res" );
 	}
 
 	SetPaintBackgroundEnabled( true );

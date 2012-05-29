@@ -271,11 +271,11 @@ void CInput::CAM_Think( void )
 	}
 
 	// If cheats have been disabled, pull us back out of third-person view.
-	if ( sv_cheats && !sv_cheats->GetBool() && !c_thirdpersonshoulder.GetBool() )
-	{
-		CAM_ToFirstPerson();
-		return;
-	}
+	//if ( sv_cheats && !sv_cheats->GetBool() && !c_thirdpersonshoulder.GetBool() )
+	//{
+	//	CAM_ToFirstPerson();
+	//	return;
+	//}
 
 	C_BasePlayer* localPlayer = C_BasePlayer::GetLocalPlayer();
 	// In Maya-mode

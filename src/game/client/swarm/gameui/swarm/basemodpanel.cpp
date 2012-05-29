@@ -506,7 +506,7 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			Assert( 0 );
 			break;
 #else
-			m_Frames[wt] = new VJukebox( this, "Jukebox" );
+			//m_Frames[wt] = new VJukebox( this, "Jukebox" );
 #endif
 			break;
 

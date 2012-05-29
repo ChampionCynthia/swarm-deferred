@@ -5508,7 +5508,7 @@ void C_BaseAnimating::ExtractBbox( int nSequence, Vector &mins, Vector &maxs )
 //=========================================================
 void C_BaseAnimating::StudioFrameAdvance()
 {
-	if ( m_bClientSideAnimation )
+	if ( !m_bClientSideAnimation )
 		return;
 
 	CStudioHdr *hdr = GetModelPtr();

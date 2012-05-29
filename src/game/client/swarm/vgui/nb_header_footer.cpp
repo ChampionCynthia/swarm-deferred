@@ -126,6 +126,8 @@ int CASW_Background_Movie::SetTextureMaterial()
 
 void CASW_Background_Movie::Update()
 {
+	return;
+
 	if ( engine->IsConnected() && ASWGameRules() )
 	{
 		int nGameState = ASWGameRules()->GetGameState();

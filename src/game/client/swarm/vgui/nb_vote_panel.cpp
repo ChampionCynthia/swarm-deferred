@@ -269,11 +269,11 @@ void CNB_Vote_Panel::UpdateVoteLabels()
 		{
 			m_pTitle->SetText( "#asw_vote_mission_title" );
 			m_bVoteMapInstalled = true;
-			if ( missionchooser && missionchooser->LocalMissionSource() )
-			{
-				if ( !missionchooser->LocalMissionSource()->GetMissionDetails( ASWGameRules()->GetCurrentVoteMapName() ) )
-					m_bVoteMapInstalled = false;
-			}
+			//if ( missionchooser && missionchooser->LocalMissionSource() )
+			//{
+			//	if ( !missionchooser->LocalMissionSource()->GetMissionDetails( ASWGameRules()->GetCurrentVoteMapName() ) )
+			//		m_bVoteMapInstalled = false;
+			//}
 
 			if ( m_bVoteMapInstalled )
 			{

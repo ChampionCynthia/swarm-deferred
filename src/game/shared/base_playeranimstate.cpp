@@ -557,11 +557,11 @@ void CBasePlayerAnimState::ComputePlaybackRate()
 	{
 		// When using a 9-way blend, playback rate is always 1 and we just scale the pose params
 		// to speed up or slow down the animation.
-		bool bIsMoving;
-		float flRate = CalcMovementPlaybackRate( &bIsMoving );
-		if ( bIsMoving )
-			GetOuter()->SetPlaybackRate( flRate );
-		else
+		//bool bIsMoving;
+		//float flRate = CalcMovementPlaybackRate( &bIsMoving );
+		//if ( bIsMoving )
+		//	GetOuter()->SetPlaybackRate( flRate );
+		//else
 			GetOuter()->SetPlaybackRate( 1 );
 	}
 }

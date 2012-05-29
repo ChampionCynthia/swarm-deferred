@@ -82,6 +82,7 @@ void CGameConsole::Activate()
 
 	vgui::surface()->RestrictPaintToSinglePanel(NULL);
 	m_pConsole->Activate();
+	m_pConsole->MoveToFront();
 #endif
 }
 

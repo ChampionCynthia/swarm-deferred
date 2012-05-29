@@ -50,7 +50,7 @@ void CNB_Select_Mission_Entry::OnThink()
 {
 	BaseClass::OnThink();
 
-	IASW_Mission_Chooser_Source *pSource = missionchooser ? missionchooser->LocalMissionSource() : NULL;
+	IASW_Mission_Chooser_Source *pSource = NULL; //missionchooser ? missionchooser->LocalMissionSource() : NULL;
 
 	// TODO: If voting, then use:
 	//IASW_Mission_Chooser_Source *pSource = GetVotingMissionSource();
@@ -184,7 +184,7 @@ void CNB_Select_Mission_Entry::OnCommand( const char *command )
 {
 	if ( !Q_stricmp( "MissionClicked", command ) )
 	{
-		IASW_Mission_Chooser_Source *pSource = missionchooser ? missionchooser->LocalMissionSource() : NULL;
+		IASW_Mission_Chooser_Source *pSource = NULL; //missionchooser ? missionchooser->LocalMissionSource() : NULL;
 		if ( pSource )
 		{
 			ASW_Mission_Chooser_Mission *pMission = pSource->GetMission( m_nMissionIndex, true );

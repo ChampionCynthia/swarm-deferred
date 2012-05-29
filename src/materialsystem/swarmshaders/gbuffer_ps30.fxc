@@ -1,0 +1,104 @@
+
+// STATIC:		"ALPHATEST"			"0..1"
+// STATIC:		"BUMPMAP"			"0..1"
+// STATIC:		"NOCULL"			"0..1"
+
+// STATIC:		"PHONGMAP"			"0..1"
+
+
+#include "common_ps_fxc.h"
+#include "common_deferred_fxc.h"
+
+
+#if ALPHATEST
+sampler sAlbedo							: register( s0 );
+
+const float g_flAlphaRef				: register( c0 );
+#endif
+
+
+#if BUMPMAP
+sampler sBumpmap						: register( s1 );
+#endif
+
+#if PHONGMAP
+sampler sPhongmap						: register( s2 );
+#else
+const float2 g_flPhong_scale_exp		: register( c2 );
+#endif
+
+const float2 g_flHalflambert_Litface	: register( c1 );
+
+
+struct PS_INPUT
+{
+	float2 vTexCoord				: TEXCOORD0;
+	float3 worldNormal				: TEXCOORD1;
+
+#if BUMPMAP
+	float3 worldTangentS			: TEXCOORD2;
+	float3 worldTangentT			: TEXCOORD3;
+#endif
+
+	float depth						: TEXCOORD4;
+
+#if NOCULL
+	float vDir						: VFACE;
+#endif
+};
+
+
+struct PS_OUTPUT
+{
+	float4 vColor_0				:	COLOR0;
+	float4 vColor_1				:	COLOR1;
+#if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
+	float4 vColor_2				:	COLOR2;
+#endif
+};
+
+
+PS_OUTPUT main( const PS_INPUT In )
+{
+	PS_OUTPUT Out;
+
+#if ALPHATEST
+	float alpha = tex2D( sAlbedo, In.vTexCoord ).a;
+
+	clip( alpha - g_flAlphaRef );
+#endif
+
+#if BUMPMAP
+	float3 bumpNormal = tex2D( sBumpmap, In.vTexCoord ).rgb;
+	float3 tangentNormal = bumpNormal * 2.0f - 1.0f;
+	float3 worldNormal = Vec3TangentToWorld( tangentNormal, In.worldNormal, In.worldTangentS, In.worldTangentT );
+#else
+	float3 worldNormal = In.worldNormal;
+#endif
+
+#if NOCULL
+	worldNormal *= In.vDir;
+#endif
+
+	worldNormal = worldNormal * 0.5f + 0.5f;
+
+#if ( TRANSLUCENT == 0 )
+#	if PHONGMAP
+	float2 phong_controls = tex2D( sPhongmap, In.vTexCoord ).xy * 7.0f;
+#	else
+	float2 phong_controls = g_flPhong_scale_exp;
+#	endif
+#endif
+
+#if DEFCFG_LIGHTCTRL_PACKING
+	Out.vColor_0 = float4( worldNormal, PackLightingControls( phong_controls.x, phong_controls.y,
+		g_flHalflambert_Litface.x, g_flHalflambert_Litface.y ) );
+#else
+	Out.vColor_0 = float4( worldNormal, 1 );
+	Out.vColor_2 = float4( phong_controls.xy / 7.0f, g_flHalflambert_Litface.xy );
+#endif
+
+	Out.vColor_1 = float4( In.depth, 0, 0, 1 );
+
+	return Out;
+}

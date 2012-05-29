@@ -1,0 +1,92 @@
+
+// STATIC:		"ALPHATEST"			"0..1"
+// STATIC:		"TRANSLUCENT"		"0..1"
+// STATIC:		"READNORMAL"		"0..1"
+// STATIC:		"NOCULL"			"0..1"
+
+// DYNAMIC:		"PIXELFOGTYPE"		"0..1"
+
+// SKIP:		$ALPHATEST && $TRANSLUCENT
+
+#include "common_ps_fxc.h"
+#include "common_deferred_fxc.h"
+
+
+sampler sAlbedo							: register( s0 );
+
+#if ALPHATEST
+const float g_flAlphaRef				: register( c0 );
+#endif
+
+
+#if READNORMAL
+sampler sNormals						: register( s1 );
+#endif
+
+sampler sLightAccum						: register( s2 );
+
+const float2 g_vecHalfScreenTexel		: register( c1 );
+const float4 g_vecFogParams				: register( c2 );
+const float3 g_vecOrigin				: register( c3 );
+
+const float g_flPhongBoost				: register( c4 );
+
+struct PS_INPUT
+{
+	float2 vTexCoord				: TEXCOORD0;
+
+	float3 vProjPosXYW				: TEXCOORD4;
+	float3 vWorldPos				: TEXCOORD5;
+
+#if NOCULL
+	float vDir						: VFACE;
+#endif
+};
+
+
+struct PS_OUTPUT
+{
+	float4 vColor_0				:	COLOR0;
+};
+
+
+PS_OUTPUT main( const PS_INPUT In )
+{
+	PS_OUTPUT Out;
+
+	float4 flAlbedoSample = tex2D( sAlbedo, In.vTexCoord );
+
+#if ALPHATEST
+	clip( flAlbedoSample.a - g_flAlphaRef );
+#endif
+
+#if TRANSLUCENT
+	Out.vColor_0.w = flAlbedoSample.a;
+#else
+	Out.vColor_0.w = 1;
+#endif
+
+	float2 screenPos = GetLightAccumUVs( In.vProjPosXYW, g_vecHalfScreenTexel );
+	float4 flLighting = ReadLighting( tex2D( sLightAccum, screenPos ) );
+
+#if READNORMAL
+	float3 worldNormal = tex2D( sNormals, screenPos );
+#endif
+
+	float flLightScale =
+#if DEFCFG_USE_SRGB_CONVERSION
+		LINEAR_LIGHT_SCALE;
+#else
+		GAMMA_LIGHT_SCALE;
+#endif
+
+	Out.vColor_0.xyz = ( flAlbedoSample + flLighting.w * g_flPhongBoost ) * flLighting.xyz * flLightScale;
+
+#if PIXELFOGTYPE == 0
+	float fogAmt = CalcRangeFog( g_vecOrigin, In.vWorldPos, g_vecFogParams.x, g_vecFogParams.z, g_vecFogParams.w );
+
+	Out.vColor_0.xyz = lerp( Out.vColor_0.xyz, g_LinearFogColor, fogAmt );
+#endif
+
+	return Out;
+}

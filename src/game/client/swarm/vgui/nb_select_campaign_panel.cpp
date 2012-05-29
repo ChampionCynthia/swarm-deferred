@@ -49,7 +49,7 @@ void CNB_Select_Campaign_Panel::OnThink()
 {
 	BaseClass::OnThink();
 
-	IASW_Mission_Chooser_Source *pSource = missionchooser ? missionchooser->LocalMissionSource() : NULL;
+	IASW_Mission_Chooser_Source *pSource = NULL; //missionchooser ? missionchooser->LocalMissionSource() : NULL;
 
 	// TODO: If voting, then use:
 	//IASW_Mission_Chooser_Source *pSource = GetVotingMissionSource();

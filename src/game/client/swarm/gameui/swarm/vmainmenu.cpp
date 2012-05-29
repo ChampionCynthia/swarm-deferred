@@ -89,6 +89,7 @@ MainMenu::~MainMenu()
 
 }
 
+
 //=============================================================================
 void MainMenu::OnCommand( const char *command )
 {
@@ -102,7 +103,23 @@ void MainMenu::OnCommand( const char *command )
 
 	bool bOpeningFlyout = false;
 
-	if ( char const *szQuickMatch = StringAfterPrefix( command, "QuickMatch_" ) )
+	if ( !Q_stricmp( command, "FlmRunA" ) )
+	{
+		engine->ClientCmd( "map test" );
+	}
+	else if ( !Q_stricmp( command, "FlmRunB" ) )
+	{
+		engine->ClientCmd( "map test_cookies" );
+	}
+	else if ( !Q_stricmp( command, "FlmRunC" ) )
+	{
+		engine->ClientCmd( "map test_volumetrics" );
+	}
+	else if ( !Q_stricmp( command, "commandConsole" ) )
+	{
+		engine->ClientCmd( "toggleconsole" );
+	}
+	else if ( char const *szQuickMatch = StringAfterPrefix( command, "QuickMatch_" ) )
 	{
 		if ( CheckAndDisplayErrorIfNotLoggedIn() ||
 			CUIGameData::Get()->CheckAndDisplayErrorIfNotSignedInToLive( this ) )
@@ -1023,7 +1040,7 @@ void MainMenu::ApplySchemeSettings( IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
 
-	const char *pSettings = "Resource/UI/BaseModUI/MainMenu.res";
+	const char *pSettings = "Resource/UI/BaseModUI/MainMenu_user.res";
 
 #if !defined( _X360 )
 	if ( !g_pMatchFramework->GetMatchSystem() )

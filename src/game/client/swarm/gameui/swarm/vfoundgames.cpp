@@ -106,17 +106,17 @@ bool BaseModUI::FoundGameListItem::Info::IsDownloadable() const
 
 	if ( mbInGame && mpGameDetails )
 	{
-		IASW_Mission_Chooser_Source *pSource = missionchooser ? missionchooser->LocalMissionSource() : NULL;
-		if ( pSource )
-		{
-			const char *szMissionName = mpGameDetails->GetString( "game/mission", "" );
-			KeyValues *pMissionKeys = pSource->GetMissionDetails( szMissionName );
-			char const *szWebsite = mpGameDetails->GetString( "game/missioninfo/website", NULL );
-			if ( ( !pMissionKeys || Q_stricmp( pMissionKeys->GetString( "version", "" ),
-				mpGameDetails->GetString( "game/missioninfo/version", "" ) ) )
-				&& ( szWebsite && *szWebsite ) )
-				return true;
-		}
+		//IASW_Mission_Chooser_Source *pSource = missionchooser ? missionchooser->LocalMissionSource() : NULL;
+		//if ( pSource )
+		//{
+		//	const char *szMissionName = mpGameDetails->GetString( "game/mission", "" );
+		//	KeyValues *pMissionKeys = pSource->GetMissionDetails( szMissionName );
+		//	char const *szWebsite = mpGameDetails->GetString( "game/missioninfo/website", NULL );
+		//	if ( ( !pMissionKeys || Q_stricmp( pMissionKeys->GetString( "version", "" ),
+		//		mpGameDetails->GetString( "game/missioninfo/version", "" ) ) )
+		//		&& ( szWebsite && *szWebsite ) )
+		//		return true;
+		//}
 	}
 
 	return false;
@@ -2023,7 +2023,7 @@ void FoundGames::OnItemSelected( const char* panelName )
 		else if( fi.mbInGame )
 		{
 			chapterName = "";
-			IASW_Mission_Chooser_Source *pSource = missionchooser ? missionchooser->LocalMissionSource() : NULL;
+			IASW_Mission_Chooser_Source *pSource = NULL;//missionchooser ? missionchooser->LocalMissionSource() : NULL;
 			const char *szDetailsMissionName = fi.mpGameDetails->GetString( "game/mission", "" );
 			KeyValues *pMissionKeys = NULL;
 			if ( pSource && szDetailsMissionName && szDetailsMissionName[0] )

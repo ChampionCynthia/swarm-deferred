@@ -1,0 +1,120 @@
+
+// STATIC:		"MODEL"					"0..1"
+// STATIC:		"DECAL"					"0..1"
+// STATIC:		"MORPHING_VTEX"			"0..1"
+
+// DYNAMIC:		"COMPRESSED_VERTS"		"0..1"
+// DYNAMIC:		"SKINNING"				"0..1"
+// DYNAMIC:		"MORPHING"				"0..1"
+
+// SKIP:		!$MODEL && $DECAL
+
+#include "common_vs_fxc.h"
+#include "common_deferred_fxc.h"
+
+static const bool g_bSkinning		= SKINNING ? true : false;
+
+#if MODEL
+
+const float3 cMorphTargetTextureDim			: register( SHADER_SPECIFIC_CONST_10 );
+const float4 cMorphSubrect					: register( SHADER_SPECIFIC_CONST_11 );
+sampler2D morphSampler						: register( D3DVERTEXTEXTURESAMPLER0, s0 );
+
+#endif
+
+struct VS_INPUT
+{
+#if MODEL
+	float4 vPos						: POSITION;
+	float4 vNormal					: NORMAL;
+#else
+	float3 vPos						: POSITION;
+
+#endif
+
+	float2 vTexCoord_0				: TEXCOORD0;
+
+#if MODEL
+
+	float4 vBoneWeights				: BLENDWEIGHT;
+	float4 vBoneIndices				: BLENDINDICES;
+	float4 vUserData				: TANGENT;
+
+	float4 vTexCoord2				: TEXCOORD2;
+	float4 vPosFlex					: POSITION1;
+	float4 vNormalFlex				: NORMAL1;
+	float vVertexID					: POSITION2;
+
+#else
+
+	float3 vTangentS				: TANGENT;
+	float3 vTangentT				: BINORMAL;
+
+#endif
+};
+
+struct VS_OUTPUT
+{
+	float4 vProjPos					: POSITION;
+	float2 vTexCoord				: TEXCOORD0;
+
+	float3 vProjPosXYW				: TEXCOORD4;
+	float3 worldPos					: TEXCOORD5;
+};
+
+VS_OUTPUT main( const VS_INPUT In )
+{
+	VS_OUTPUT Out;
+
+	float3 worldPos;
+	float3 worldNormal;
+
+	// unpack stuff (model) &&
+	// morph (model) &&
+	// skin (model) ||
+	// xform to world (not model)
+
+#if MODEL
+	float4 vPos = In.vPos;
+	float3 vNormal = 0;
+
+	DecompressVertex_Normal( In.vNormal, vNormal );
+
+#if MORPHING
+#if !MORPHING_VTEX
+	ApplyMorph( In.vPosFlex, In.vNormalFlex, vPos.xyz, vNormal );
+#else
+	ApplyMorph( morphSampler, cMorphTargetTextureDim, cMorphSubrect,
+		In.vVertexID, In.vTexCoord2, vPos.xyz, vNormal );
+#endif
+#endif
+
+#if DECAL
+	SkinPositionAndNormal( g_bSkinning, vPos, vNormal,
+		In.vBoneWeights, In.vBoneIndices,
+		worldPos, worldNormal );
+#else
+	SkinPosition( g_bSkinning, vPos,
+		In.vBoneWeights, In.vBoneIndices,
+		worldPos );
+#endif
+
+#if DECAL
+	worldNormal = normalize( worldNormal );
+	worldPos += worldNormal * 0.05f * In.vTexCoord2.z;
+#endif
+
+#else // MODEL
+
+	worldPos = mul( float4( In.vPos, 1 ), cModel[0] );
+
+#endif // NOT MODEL
+
+	Out.vProjPos = mul( float4( worldPos, 1 ), cViewProj );
+	Out.vTexCoord = In.vTexCoord_0;
+	Out.vProjPosXYW = Out.vProjPos.xyw;
+
+	Out.worldPos = worldPos;
+
+	return Out;
+}

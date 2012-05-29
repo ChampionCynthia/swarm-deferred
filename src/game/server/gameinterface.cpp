@@ -112,8 +112,9 @@
 #include "asw_gamerules.h"
 #endif
 
-
-
+// @Deferred - Biohazard
+// for cookie string table
+#include "deferred/deferred_shared_common.h"
 
 
 
@@ -793,7 +794,9 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetAchievementSaveRestoreBlockHandler() );
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetVScriptSaveRestoreBlockHandler() );
 
-
+	//filesystem->AddSearchPath("../../../steamapps/common/portal 2/portal2", "GAME");
+	//filesystem->AddSearchPath("../../../steamapps/common/left 4 dead/left4dead", "GAME");
+	//filesystem->AddSearchPath("../../../steamapps/common/left 4 dead 2/left4dead2", "GAME");
 
 	bool bInitSuccess = false;
 	if ( sv_threaded_init.GetBool() )
@@ -1491,13 +1494,18 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 	g_pStringTableInfoPanel = networkstringtable->CreateStringTable( "InfoPanel", MAX_INFOPANEL_STRINGS );
 	g_pStringTableClientSideChoreoScenes = networkstringtable->CreateStringTable( "Scenes", MAX_CHOREO_SCENES_STRINGS, 0, 0, NSF_DICTIONARY_ENABLED );
 
+// @Deferred - Biohazard
+	g_pStringTable_LightCookies = networkstringtable->CreateStringTable( COOKIE_STRINGTBL_NAME, MAX_COOKIE_TEXTURES, 0, 0, NSF_DICTIONARY_ENABLED );
+
 	Assert( g_pStringTableParticleEffectNames &&
 			g_pStringTableEffectDispatch &&
 			g_pStringTableVguiScreen &&
 			g_pStringTableMaterials &&
 			g_pStringTableInfoPanel &&
 			g_pStringTableClientSideChoreoScenes &&
-			g_pStringTableExtraParticleFiles );
+			g_pStringTableExtraParticleFiles &&
+// @Deferred - Biohazard
+			g_pStringTable_LightCookies );
 
 	// Need this so we have the error material always handy
 	PrecacheMaterial( "debug/debugempty" );

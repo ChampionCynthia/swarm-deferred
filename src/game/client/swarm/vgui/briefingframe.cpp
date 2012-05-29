@@ -55,8 +55,8 @@ BriefingFrame::BriefingFrame(Panel *parent, const char *panelName, bool showTask
 	CHudChat *pChat = GET_HUDELEMENT( CHudChat );
 	if (pChat)
 	{
-		pChat->InsertBlankPage();
-		pChat->ShowChatPanel();	// chat up all the time during briefing
+		//pChat->InsertBlankPage();
+		//pChat->ShowChatPanel();	// chat up all the time during briefing
 	}
 
 	if (GetClientModeASW() && GetClientModeASW()->m_bSpectator)

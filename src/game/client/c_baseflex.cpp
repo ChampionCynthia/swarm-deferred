@@ -203,9 +203,9 @@ IClientModelRenderable*	C_BaseFlex::GetClientModelRenderable()
 		return NULL;
 
 	// No flexes allowed for fast path atm
-	CStudioHdr *hdr = GetModelPtr();
-	if ( !hdr || ( hdr->numflexcontrollers() != 0 ) )
-		return NULL;
+	//CStudioHdr *hdr = GetModelPtr();
+	//if ( !hdr || ( hdr->numflexcontrollers() != 0 ) )
+	//	return NULL;
 
 	return this; 
 }
