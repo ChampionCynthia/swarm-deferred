@@ -39,7 +39,14 @@ CDeferredManagerClient::~CDeferredManagerClient()
 void CopyDev()
 {
 	FileFindHandle_t handle;
-	const char *pszName = g_pFullFileSystem->FindFirst( "D:\\Steam\\steamapps\\SourceMods\\SwarmDeferred\\shaders\\fxc\\*", &handle );
+	char steamappsPath[MAX_PATH*4];
+	const char *pszGameDir = engine->GetGameDirectory();
+
+	Q_strcpy( steamappsPath, pszGameDir );
+	Q_StripLastDir( steamappsPath, sizeof(steamappsPath) );
+	Q_StripLastDir( steamappsPath, sizeof(steamappsPath) );
+
+	const char *pszName = g_pFullFileSystem->FindFirst( VarArgs( "%sSourceMods\\SwarmDeferred\\shaders\\fxc\\*", steamappsPath ), &handle );
 
 	while ( pszName != NULL )
 	{
@@ -50,8 +57,8 @@ void CopyDev()
 
 			char filepath_src[MAX_PATH];
 			char filepath_dst[MAX_PATH];
-			Q_snprintf( filepath_src, sizeof( filepath_src ), "D:\\Steam\\steamapps\\SourceMods\\SwarmDeferred\\shaders\\fxc\\%s.vcs\0", filename );
-			Q_snprintf( filepath_dst, sizeof( filepath_dst ), "D:\\Steam\\steamapps\\common\\alien swarm\\platform\\shaders\\fxc\\%s.vcs\0", filename );
+			Q_snprintf( filepath_src, sizeof( filepath_src ), VarArgs( "%sSourceMods\\SwarmDeferred\\shaders\\fxc\\%s.vcs\0", steamappsPath ), filename );
+			Q_snprintf( filepath_dst, sizeof( filepath_dst ), VarArgs( "%scommon\\alien swarm\\platform\\shaders\\fxc\\%s.vcs\0", steamappsPath ), filename );
 
 			Msg( "%s --> %s\n", filepath_src, filepath_dst );
 			engine->CopyFile( filepath_src, filepath_dst );
