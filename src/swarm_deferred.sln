@@ -6,8 +6,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "game\server\swarm_skeleton_server.vcxproj", "{5F66F048-1D65-4D70-A050-12AB030009BE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "game_shader_generic_deferred", "materialsystem\swarmshaders\game_shader_generic_swarm.vcxproj", "{C8D2DC83-E117-7576-7B43-10C844264C51}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1A1149D9-CB1B-BF85-19CA-C9C2996BFDE8} = {1A1149D9-CB1B-BF85-19CA-C9C2996BFDE8}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shaderlib_swarm", "materialsystem\shaderlib\shaderlib_swarm.vcxproj", "{1A1149D9-CB1B-BF85-19CA-C9C2996BFDE8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shaderlib", "materialsystem\shaderlib\shaderlib_swarm.vcxproj", "{1A1149D9-CB1B-BF85-19CA-C9C2996BFDE8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
