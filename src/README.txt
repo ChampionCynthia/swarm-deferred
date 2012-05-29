@@ -21,3 +21,12 @@ src/game/client/clientleafsystem.cpp
 src/game/client/viewrender.cpp		(not all changes have a comment since there are too many, use diff)
 src/game/server/gameinterface.cpp
 src/public/renderparm.h
+
+
+
+Most core tweaks and changes can be done in the following headers:
+
+src/materialsystem/swarmshaders/deferred_global_common.h
+src/game/client/deferred/deferred_client_common.h
+src/game/shared/deferred/deferred_shared_common.h
+src/game/server/deferred/deferred_server_common.h

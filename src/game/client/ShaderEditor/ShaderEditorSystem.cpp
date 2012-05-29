@@ -73,7 +73,7 @@ bool ShaderEditorHandler::Init()
 	bool bCreateEditor = ( CommandLine() != NULL ) && ( CommandLine()->FindParm( "-shaderedit" ) != 0 );
 	SEDIT_SKYMASK_MODE iEnableSkymask = SKYMASK_OFF;
 
-#if 1 //def SHADEREDITOR_FORCE_ENABLED
+#ifdef SHADEREDITOR_FORCE_ENABLED
 	bCreateEditor = true;
 	iEnableSkymask = SKYMASK_QUARTER;
 #endif
