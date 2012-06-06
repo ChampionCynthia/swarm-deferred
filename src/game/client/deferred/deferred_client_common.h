@@ -45,6 +45,7 @@ extern ConVar deferred_override_globalLight_ambient_low;
 
 #include "deferred/viewrender_deferred.h"
 
+#include "deferred/materialsystem_passthru.h"
 
 void OnCookieTableChanged( void *object, INetworkStringTable *stringTable, int stringNumber, const char *newString, void const *newData );
 

@@ -23,6 +23,10 @@ IViewRender *GetViewRenderInstance()
 	return g_pCurrentViewRender;
 }
 
+static CDeferredMaterialSystem g_DeferredMaterialSystem;
+static IMaterialSystem *g_pOldMatSystem;
+
+
 CDeferredManagerClient::CDeferredManagerClient() : BaseClass( "DeferredManagerClient" )
 {
 	m_bDefRenderingEnabled = false;
@@ -97,6 +101,12 @@ bool CDeferredManagerClient::Init()
 
 		if ( bGotDefShaderDll )
 		{
+			g_pOldMatSystem = materials;
+
+			g_DeferredMaterialSystem.InitPassThru( materials );
+			materials = &g_DeferredMaterialSystem;
+			engine->Mat_Stub( &g_DeferredMaterialSystem );
+
 			m_bDefRenderingEnabled = true;
 			GetDeferredExt()->EnableDeferredLighting();
 
@@ -154,17 +164,14 @@ void CDeferredManagerClient::Shutdown()
 	if ( IsDeferredRenderingEnabled() )
 	{
 		materials->RemoveModeChangeCallBack( &DefRTsOnModeChanged );
+
+		materials = g_pOldMatSystem;
+		engine->Mat_Stub( g_pOldMatSystem );
 	}
 
 	delete g_pCurrentViewRender;
 	g_pCurrentViewRender = NULL;
 	view = NULL;
-}
-
-void CDeferredManagerClient::LevelInitPreEntity()
-{
-	if ( m_bDefRenderingEnabled )
-		DoShaderOverride();
 }
 
 ImageFormat CDeferredManagerClient::GetShadowDepthFormat()
@@ -309,180 +316,3 @@ void CDeferredManagerClient::ShutdownDeferredMaterials()
 		m_pKV_Def[ i ] = NULL;
 	}
 }
-
-static void ShaderReplace( const char *szShadername, IMaterial *pMat )
-{
-	const char *pszOldShadername = pMat->GetShaderName();
-	const char *pszMatname = pMat->GetName();
-
-	KeyValues *msg = new KeyValues( szShadername );
-
-	int nParams = pMat->ShaderParamCount();
-	IMaterialVar **pParams = pMat->GetShaderParams();
-
-	char str[ 512 ];
-
-	for ( int i = 0; i < nParams; ++i )
-	{
-		IMaterialVar *pVar = pParams[ i ];
-		const char *pVarName = pVar->GetName();
-
-		if (!stricmp("$flags", pVarName) || 
-			!stricmp("$flags_defined", pVarName) || 
-			!stricmp("$flags2", pVarName) || 
-			!stricmp("$flags_defined2", pVarName) )
-			continue;
-
-		MaterialVarType_t vartype = pVar->GetType();
-		switch ( vartype )
-		{
-		case MATERIAL_VAR_TYPE_FLOAT:
-			msg->SetFloat( pVarName, pVar->GetFloatValue() );
-			break;
-
-		case MATERIAL_VAR_TYPE_INT:
-			msg->SetInt( pVarName, pVar->GetIntValue() );
-			break;
-
-		case MATERIAL_VAR_TYPE_STRING:
-			msg->SetString( pVarName, pVar->GetStringValue() );
-			break;
-
-		case MATERIAL_VAR_TYPE_FOURCC:
-			//Assert( 0 ); // JDTODO
-			break;
-
-		case MATERIAL_VAR_TYPE_VECTOR:
-			{
-				const float *pVal = pVar->GetVecValue();
-				int dim = pVar->VectorSize();
-				switch ( dim )
-				{
-				case 1:
-					V_snprintf( str, sizeof( str ), "[%f]", pVal[ 0 ] );
-					break;
-				case 2:
-					V_snprintf( str, sizeof( str ), "[%f %f]", pVal[ 0 ], pVal[ 1 ] );
-					break;
-				case 3:
-					V_snprintf( str, sizeof( str ), "[%f %f %f]", pVal[ 0 ], pVal[ 1 ], pVal[ 2 ] );
-					break;
-				case 4:
-					V_snprintf( str, sizeof( str ), "[%f %f %f %f]", pVal[ 0 ], pVal[ 1 ], pVal[ 2 ], pVal[ 3 ] );
-					break;
-				default:
-					Assert( 0 );
-					*str = 0;
-				}
-				msg->SetString( pVarName, str );
-			}
-			break;
-
-		case MATERIAL_VAR_TYPE_MATRIX:
-			{
-				const VMatrix &matrix = pVar->GetMatrixValue();
-				const float *pVal = matrix.Base();
-				V_snprintf( str, sizeof( str ),
-					"[%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]",
-					pVal[ 0 ],  pVal[ 1 ],  pVal[ 2 ],  pVal[ 3 ],
-					pVal[ 4 ],  pVal[ 5 ],  pVal[ 6 ],  pVal[ 7 ],
-					pVal[ 8 ],  pVal[ 9 ],  pVal[ 10 ], pVal[ 11 ],
-					pVal[ 12 ], pVal[ 13 ], pVal[ 14 ], pVal[ 15 ] );
-				msg->SetString( pVarName, str );
-			}
-			break;
-
-		case MATERIAL_VAR_TYPE_TEXTURE:
-						msg->SetString( pVarName, pVar->GetTextureValue()->GetName() );
-			break;
-
-		case MATERIAL_VAR_TYPE_MATERIAL:
-						msg->SetString( pVarName, pVar->GetMaterialValue()->GetName() );
-			break;
-		}
-	}
-
-	bool alphaBlending = pMat->IsTranslucent() || pMat->GetMaterialVarFlag( MATERIAL_VAR_TRANSLUCENT );
-	bool translucentOverride = pMat->IsAlphaTested() || pMat->GetMaterialVarFlag( MATERIAL_VAR_ALPHATEST ) || alphaBlending;
-
-	bool bDecal = pszOldShadername != NULL && Q_stristr( pszOldShadername,"decal" ) != NULL ||
-		pszMatname != NULL && Q_stristr( pszMatname, "decal" ) != NULL ||
-		pMat->GetMaterialVarFlag( MATERIAL_VAR_DECAL );
-
-	if ( bDecal )
-	{
-		msg->SetInt( "$decal", 1 );
-
-		if ( alphaBlending )
-			msg->SetInt( "$translucent", 1 );
-	}
-	else if ( translucentOverride )
-	{
-		msg->SetInt( "$alphatest", 1 );
-	}
-
-	if ( pMat->IsTwoSided() )
-	{
-		msg->SetInt( "$nocull", 1 );
-	}
-
-	pMat->SetShaderAndParams(msg);
-
-	pMat->RefreshPreservingMaterialVars();
-
-	msg->deleteThis();
-}
-
-void CDeferredManagerClient::DoShaderOverride()
-{
-#ifndef DEFERRED_DEV
-	for ( static int iBitchCount = 0; iBitchCount < 42; iBitchCount++ )
-		Warning( ":::: YOU ARE PERFORMING THE RUNTIME SHADER OVERRIDE. DO NOT RELEASE THIS WAY. ::::\n" );
-#endif
-	bool bSanityCheck = false;
-
-	for ( MaterialHandle_t hCurMat = materials->FirstMaterial();
-		hCurMat != materials->InvalidMaterial();
-		hCurMat = materials->NextMaterial( hCurMat ) )
-	{
-		IMaterial *pMat = materials->GetMaterial( hCurMat );
-
-		if ( IsErrorMaterial( pMat ) )
-			continue;
-
-		pMat->FindVar( "$basetexture", &bSanityCheck, false );
-		if ( !bSanityCheck )
-			continue;
-
-		const char *pszShadername = pMat->GetShaderName();
-
-		if ( !pszShadername || !Q_strlen( pszShadername ) )
-			continue;
-
-		const char *pszReplace = NULL;
-
-		if ( Q_stristr( pszShadername, "vertexlitgeneric" ) == pszShadername )
-		{
-			pszReplace = "DEFERRED_MODEL";
-		}
-		else if ( Q_stristr( pszShadername, "lightmappedgeneric" ) == pszShadername ||
-			Q_stristr( pszShadername, "worldvertextransition" ) == pszShadername )
-		{
-			pszReplace = "DEFERRED_BRUSH";
-		}
-
-		if ( pszReplace != NULL )
-			ShaderReplace( pszReplace, pMat );
-	}
-
-	materials->UncacheAllMaterials();
-	materials->CacheUsedMaterials();
-	materials->ReloadMaterials();
-}
-
-#ifdef DEFERRED_DEV
-CON_COMMAND( deferred_DoShaderOverride, "" )
-{
-	GetDeferredManager()->DoShaderOverride();
-}
-#endif

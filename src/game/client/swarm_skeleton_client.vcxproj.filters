@@ -1859,6 +1859,9 @@
     <ClCompile Include="deferred\vgui\vgui_particles.cpp">
       <Filter>Source Files\deferred\vgui</Filter>
     </ClCompile>
+    <ClCompile Include="deferred\materialsystem_passthru.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="achievement_notification_panel.h">
@@ -4083,6 +4086,9 @@
     </ClInclude>
     <ClInclude Include="deferred\vgui\vgui_particles.h">
       <Filter>Source Files\deferred\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred\materialsystem_passthru.h">
+      <Filter>Source Files\deferred</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

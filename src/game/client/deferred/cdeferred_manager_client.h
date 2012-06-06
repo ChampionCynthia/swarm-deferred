@@ -40,14 +40,10 @@ public:
 	virtual bool Init();
 	virtual void Shutdown();
 
-	virtual void LevelInitPreEntity();
-
 	inline bool IsDeferredRenderingEnabled();
 
 	ImageFormat GetShadowDepthFormat();
 	ImageFormat GetNullFormat();
-
-	void DoShaderOverride();
 
 	inline IMaterial *GetDeferredMaterial( DEF_MATERIALS mat );
 
