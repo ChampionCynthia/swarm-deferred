@@ -1,13 +1,13 @@
  game_shader_generic_deferred
 
- Timestamp is 4fc4c28c (Tue May 29 14:35:24 2012)
+ Timestamp is 4fca792a (Sat Jun 02 22:35:54 2012)
 
  Preferred load address is 10000000
 
  Start         Length     Name                   Class
- 0001:00000000 00017f8cH .text                   CODE
- 0001:00017f90 00000715H .text$yc                CODE
- 0001:000186b0 0000014eH .text$yd                CODE
+ 0001:00000000 0001803cH .text                   CODE
+ 0001:00018040 00000715H .text$yc                CODE
+ 0001:00018760 0000014eH .text$yd                CODE
  0002:00000000 0000012cH .idata$5                DATA
  0002:0000012c 00000004H .CRT$XCA                DATA
  0002:00000130 000000c4H .CRT$XCU                DATA
@@ -44,672 +44,673 @@
  0000:00000003       ___safe_se_handler_count   00000003     <absolute>
  0000:00000000       ___ImageBase               10000000     <linker-defined>
  0001:00000000       ?SetHWMorphVertexShaderState@CBaseVSShader@@QAEXHHW4VertexTextureSampler_t@@@Z 10001000 f   BaseVSShader.obj
- 0001:00000110       ?OnInitShaderParams@CShader@GAUSSIAN_BLUR_6@@UAEXPAPAVIMaterialVar@@PBD@Z 10001110 f i blur.obj
- 0001:00000110       ?OnInitShaderParams@CShader@DEBUG_SHADOW@@UAEXPAPAVIMaterialVar@@PBD@Z 10001110 f i debug_shadow.obj
- 0001:00000110       ?OnInitShaderParams@CShader@VOLUME_BLEND@@UAEXPAPAVIMaterialVar@@PBD@Z 10001110 f i volume_blend.obj
- 0001:00000110       ?OnInitShaderParams@CShader@VOLUME_PREPASS@@UAEXPAPAVIMaterialVar@@PBD@Z 10001110 f i volume_prepass.obj
- 0001:00000110       ?OnInitShaderParams@CShader@LIGHTING_GLOBAL@@UAEXPAPAVIMaterialVar@@PBD@Z 10001110 f i lighting_global.obj
- 0001:00000110       ?OnInitShaderParams@CShader@DEBUG_LIGHTING_CTRL@@UAEXPAPAVIMaterialVar@@PBD@Z 10001110 f i debug_lightingctrl.obj
- 0001:00000110       ?OnInitShaderParams@CBaseShader@@UAEXPAPAVIMaterialVar@@PBD@Z 10001110 f i blur.obj
- 0001:00000120       ?GetName@CShader@GAUSSIAN_BLUR_6@@UBEPBDXZ 10001120 f i blur.obj
- 0001:00000130       ?GetFlags@CShader@GAUSSIAN_BLUR_6@@UBEHXZ 10001130 f i blur.obj
- 0001:00000140       ?GetFallbackShader@CShader@LIGHTING_WORLD@@UBEPBDPAPAVIMaterialVar@@@Z 10001140 f i lighting_world.obj
- 0001:00000140       ?GetFallbackShader@CShader@DEBUG_SHADOW@@UBEPBDPAPAVIMaterialVar@@@Z 10001140 f i debug_shadow.obj
- 0001:00000140       ?GetFallbackShader@CShader@GAUSSIAN_BLUR_6@@UBEPBDPAPAVIMaterialVar@@@Z 10001140 f i blur.obj
- 0001:00000140       ?GetFallbackShader@CShader@LIGHTING_GLOBAL@@UBEPBDPAPAVIMaterialVar@@@Z 10001140 f i lighting_global.obj
- 0001:00000140       ?GetFallbackShader@CShader@VOLUME_PREPASS@@UBEPBDPAPAVIMaterialVar@@@Z 10001140 f i volume_prepass.obj
- 0001:00000140       ?GetFallbackShader@CBaseShader@@UBEPBDPAPAVIMaterialVar@@@Z 10001140 f i blur.obj
- 0001:00000140       ?GetFallbackShader@CShader@LIGHTING_VOLUME@@UBEPBDPAPAVIMaterialVar@@@Z 10001140 f i lighting_volume.obj
- 0001:00000140       ?GetFallbackShader@CShader@VOLUME_BLEND@@UBEPBDPAPAVIMaterialVar@@@Z 10001140 f i volume_blend.obj
- 0001:00000140       ?GetFallbackShader@CShader@DEBUG_LIGHTING_CTRL@@UBEPBDPAPAVIMaterialVar@@@Z 10001140 f i debug_lightingctrl.obj
- 0001:00000150       ?OnDrawElements@CShader@GAUSSIAN_BLUR_6@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10001150 f i blur.obj
- 0001:00000280       ?GetParamCount@CShader@GAUSSIAN_BLUR_6@@UBEHXZ 10001280 f i blur.obj
- 0001:00000290       ?GetParamInfo@CShader@GAUSSIAN_BLUR_6@@UBEABUShaderParamInfo_t@@H@Z 10001290 f i blur.obj
- 0001:000002c0       ??0CShaderParam@GAUSSIAN_BLUR_6@@QAE@PBDW4ShaderParamType_t@@00H@Z 100012c0 f i blur.obj
- 0001:00000360       ?GetName@CShader@DEBUG_LIGHTING_CTRL@@UBEPBDXZ 10001360 f i debug_lightingctrl.obj
- 0001:00000370       ?GetFlags@CShader@DEBUG_LIGHTING_CTRL@@UBEHXZ 10001370 f i debug_lightingctrl.obj
- 0001:00000380       ?OnInitShaderInstance@CShader@VOLUME_PREPASS@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10001380 f i volume_prepass.obj
- 0001:00000380       ?OnInitShaderInstance@CShader@DEBUG_SHADOW@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10001380 f i debug_shadow.obj
- 0001:00000380       ?OnInitShaderInstance@CShader@LIGHTING_GLOBAL@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10001380 f i lighting_global.obj
- 0001:00000380       ?OnInitShaderInstance@CShader@DEBUG_LIGHTING_CTRL@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10001380 f i debug_lightingctrl.obj
- 0001:00000390       ?OnDrawElements@CShader@DEBUG_LIGHTING_CTRL@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10001390 f i debug_lightingctrl.obj
- 0001:00000490       ?GetParamCount@CShader@DEBUG_LIGHTING_CTRL@@UBEHXZ 10001490 f i debug_lightingctrl.obj
- 0001:000004a0       ?GetParamInfo@CShader@DEBUG_LIGHTING_CTRL@@UBEABUShaderParamInfo_t@@H@Z 100014a0 f i debug_lightingctrl.obj
- 0001:000004d0       ?GetName@CShader@DEBUG_SHADOW@@UBEPBDXZ 100014d0 f i debug_shadow.obj
- 0001:000004e0       ?GetFlags@CShader@DEBUG_SHADOW@@UBEHXZ 100014e0 f i debug_shadow.obj
- 0001:000004f0       ?OnDrawElements@CShader@DEBUG_SHADOW@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 100014f0 f i debug_shadow.obj
- 0001:00000740       ?GetParamCount@CShader@DEBUG_SHADOW@@UBEHXZ 10001740 f i debug_shadow.obj
- 0001:00000750       ?GetParamInfo@CShader@DEBUG_SHADOW@@UBEABUShaderParamInfo_t@@H@Z 10001750 f i debug_shadow.obj
- 0001:00000780       ??_GCBasePerMaterialContextData@@UAEPAXI@Z 10001780 f i deferred_brush.obj
- 0001:00000780       ??_ECBasePerMaterialContextData@@UAEPAXI@Z 10001780 f i deferred_brush.obj
- 0001:000007b0       ??_GCDeferredPerMaterialContextData@@UAEPAXI@Z 100017b0 f i deferred_brush.obj
- 0001:000007b0       ??_ECDeferredPerMaterialContextData@@UAEPAXI@Z 100017b0 f i deferred_brush.obj
- 0001:00000810       ?OnInitShaderParams@CShader@DEFERRED_BRUSH@@UAEXPAPAVIMaterialVar@@PBD@Z 10001810 f i deferred_brush.obj
- 0001:00000950       ?GetName@CShader@DEFERRED_BRUSH@@UBEPBDXZ 10001950 f i deferred_brush.obj
- 0001:00000960       ?GetFlags@CShader@DEFERRED_BRUSH@@UBEHXZ 10001960 f i deferred_brush.obj
- 0001:00000970       ?OnInitShaderInstance@CShader@DEFERRED_BRUSH@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10001970 f i deferred_brush.obj
- 0001:00000a70       ?GetFallbackShader@CShader@DEFERRED_BRUSH@@UBEPBDPAPAVIMaterialVar@@@Z 10001a70 f i deferred_brush.obj
- 0001:00000a90       ?OnDrawElements@CShader@DEFERRED_BRUSH@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10001a90 f i deferred_brush.obj
- 0001:00000c60       ?GetParamCount@CShader@DEFERRED_BRUSH@@UBEHXZ 10001c60 f i deferred_brush.obj
- 0001:00000c70       ?GetParamInfo@CShader@DEFERRED_BRUSH@@UBEABUShaderParamInfo_t@@H@Z 10001c70 f i deferred_brush.obj
- 0001:00000ca0       ??0CShaderParam@DEFERRED_BRUSH@@QAE@PBDW4ShaderParamType_t@@00H@Z 10001ca0 f i deferred_brush.obj
- 0001:00000d40       ?OnInitShaderParams@CShader@DEFERRED_MODEL@@UAEXPAPAVIMaterialVar@@PBD@Z 10001d40 f i deferred_model.obj
- 0001:00000e80       ?GetName@CShader@DEFERRED_MODEL@@UBEPBDXZ 10001e80 f i deferred_model.obj
- 0001:00000e90       ?GetFlags@CShader@DEFERRED_MODEL@@UBEHXZ 10001e90 f i deferred_model.obj
- 0001:00000ea0       ?OnInitShaderInstance@CShader@DEFERRED_MODEL@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10001ea0 f i deferred_model.obj
- 0001:00000fa0       ?GetFallbackShader@CShader@DEFERRED_MODEL@@UBEPBDPAPAVIMaterialVar@@@Z 10001fa0 f i deferred_model.obj
- 0001:00000fc0       ?OnDrawElements@CShader@DEFERRED_MODEL@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10001fc0 f i deferred_model.obj
- 0001:00001190       ?GetParamCount@CShader@DEFERRED_MODEL@@UBEHXZ 10002190 f i deferred_model.obj
- 0001:000011a0       ?Grow@?$CUtlMemory@PAVCShaderParam@GAUSSIAN_BLUR_6@@H@@QAEXH@Z 100021a0 f i blur.obj
- 0001:000011a0       ?Grow@?$CUtlMemory@PAVCShaderParam@DEFERRED_MODEL@@H@@QAEXH@Z 100021a0 f i deferred_model.obj
- 0001:000011a0       ?Grow@?$CUtlMemory@PAVCShaderParam@LIGHTING_VOLUME@@H@@QAEXH@Z 100021a0 f i lighting_volume.obj
- 0001:000011a0       ?Grow@?$CUtlMemory@PAVCShaderParam@LIGHTING_WORLD@@H@@QAEXH@Z 100021a0 f i lighting_world.obj
- 0001:000011a0       ?Grow@?$CUtlMemory@PAVCShaderParam@DEFERRED_BRUSH@@H@@QAEXH@Z 100021a0 f i deferred_brush.obj
- 0001:000011a0       ?Grow@?$CUtlMemory@PAVIShader@@H@@QAEXH@Z 100021a0 f i shaderlib:ShaderDLL.obj
- 0001:00001230       ?GetParamInfo@CShader@DEFERRED_MODEL@@UBEABUShaderParamInfo_t@@H@Z 10002230 f i deferred_model.obj
- 0001:00001260       ??0CShaderParam@DEFERRED_MODEL@@QAE@PBDW4ShaderParamType_t@@00H@Z 10002260 f i deferred_model.obj
- 0001:00001300       ?SetCommands@CDeferredPerMaterialContextData@@QAEXW4DefStage_t@1@PAE@Z 10002300 f i defpass_composite.obj
- 0001:00001390       ?InitParmsComposite@@YAXABUdefParms_composite@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10002390 f   defpass_composite.obj
- 0001:00001420       ?InitPassComposite@@YAXABUdefParms_composite@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10002420 f   defpass_composite.obj
- 0001:00001420       ?InitPassShadowPass@@YAXABUdefParms_shadow@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10002420 f   defpass_shadow.obj
- 0001:00001450       ?DrawPassComposite@@YAXABUdefParms_composite@@PAVCBaseVSShader@@PAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAVCDeferredPerMaterialContextData@@@Z 10002450 f   defpass_composite.obj
- 0001:00001a30       ?InitParmsGBuffer@@YAXABUdefParms_gBuffer@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10002a30 f   defpass_gbuffer.obj
- 0001:00001ae0       ?InitPassGBuffer@@YAXABUdefParms_gBuffer@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10002ae0 f   defpass_gbuffer.obj
- 0001:00001b60       ?UnpackLightingControls@@YAXMAAM000@Z 10002b60 f   defpass_gbuffer.obj
+ 0001:00000110       ?GetName@CShader@GAUSSIAN_BLUR_6@@UBEPBDXZ 10001110 f i blur.obj
+ 0001:00000120       ?GetFlags@CShader@GAUSSIAN_BLUR_6@@UBEHXZ 10001120 f i blur.obj
+ 0001:00000130       ?GetFallbackShader@CShader@VOLUME_PREPASS@@UBEPBDPAPAVIMaterialVar@@@Z 10001130 f i volume_prepass.obj
+ 0001:00000130       ?GetFallbackShader@CBaseShader@@UBEPBDPAPAVIMaterialVar@@@Z 10001130 f i blur.obj
+ 0001:00000130       ?GetFallbackShader@CShader@GAUSSIAN_BLUR_6@@UBEPBDPAPAVIMaterialVar@@@Z 10001130 f i blur.obj
+ 0001:00000130       ?GetFallbackShader@CShader@LIGHTING_GLOBAL@@UBEPBDPAPAVIMaterialVar@@@Z 10001130 f i lighting_global.obj
+ 0001:00000130       ?GetFallbackShader@CShader@LIGHTING_WORLD@@UBEPBDPAPAVIMaterialVar@@@Z 10001130 f i lighting_world.obj
+ 0001:00000130       ?GetFallbackShader@CShader@VOLUME_BLEND@@UBEPBDPAPAVIMaterialVar@@@Z 10001130 f i volume_blend.obj
+ 0001:00000130       ?GetFallbackShader@CShader@DEBUG_SHADOW@@UBEPBDPAPAVIMaterialVar@@@Z 10001130 f i debug_shadow.obj
+ 0001:00000130       ?GetFallbackShader@CShader@DEBUG_LIGHTING_CTRL@@UBEPBDPAPAVIMaterialVar@@@Z 10001130 f i debug_lightingctrl.obj
+ 0001:00000130       ?GetFallbackShader@CShader@LIGHTING_VOLUME@@UBEPBDPAPAVIMaterialVar@@@Z 10001130 f i lighting_volume.obj
+ 0001:00000140       ?OnDrawElements@CShader@GAUSSIAN_BLUR_6@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10001140 f i blur.obj
+ 0001:00000270       ?GetParamCount@CShader@GAUSSIAN_BLUR_6@@UBEHXZ 10001270 f i blur.obj
+ 0001:00000280       ?GetParamInfo@CShader@GAUSSIAN_BLUR_6@@UBEABUShaderParamInfo_t@@H@Z 10001280 f i blur.obj
+ 0001:000002b0       ??0CShaderParam@GAUSSIAN_BLUR_6@@QAE@PBDW4ShaderParamType_t@@00H@Z 100012b0 f i blur.obj
+ 0001:00000350       ?GetName@CShader@DEBUG_LIGHTING_CTRL@@UBEPBDXZ 10001350 f i debug_lightingctrl.obj
+ 0001:00000360       ?GetFlags@CShader@DEBUG_LIGHTING_CTRL@@UBEHXZ 10001360 f i debug_lightingctrl.obj
+ 0001:00000370       ?OnDrawElements@CShader@DEBUG_LIGHTING_CTRL@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10001370 f i debug_lightingctrl.obj
+ 0001:00000470       ?GetParamCount@CShader@DEBUG_LIGHTING_CTRL@@UBEHXZ 10001470 f i debug_lightingctrl.obj
+ 0001:00000480       ?GetParamInfo@CShader@DEBUG_LIGHTING_CTRL@@UBEABUShaderParamInfo_t@@H@Z 10001480 f i debug_lightingctrl.obj
+ 0001:000004b0       ?GetName@CShader@DEBUG_SHADOW@@UBEPBDXZ 100014b0 f i debug_shadow.obj
+ 0001:000004c0       ?GetFlags@CShader@DEBUG_SHADOW@@UBEHXZ 100014c0 f i debug_shadow.obj
+ 0001:000004d0       ?OnInitShaderInstance@CShader@DEBUG_SHADOW@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 100014d0 f i debug_shadow.obj
+ 0001:000004d0       ?OnInitShaderInstance@CShader@VOLUME_PREPASS@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 100014d0 f i volume_prepass.obj
+ 0001:000004d0       ?OnInitShaderInstance@CShader@LIGHTING_GLOBAL@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 100014d0 f i lighting_global.obj
+ 0001:000004d0       ?OnInitShaderInstance@CShader@DEBUG_LIGHTING_CTRL@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 100014d0 f i debug_lightingctrl.obj
+ 0001:000004e0       ?OnDrawElements@CShader@DEBUG_SHADOW@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 100014e0 f i debug_shadow.obj
+ 0001:00000730       ?GetParamCount@CShader@DEBUG_SHADOW@@UBEHXZ 10001730 f i debug_shadow.obj
+ 0001:00000740       ?GetParamInfo@CShader@DEBUG_SHADOW@@UBEABUShaderParamInfo_t@@H@Z 10001740 f i debug_shadow.obj
+ 0001:00000770       ??_ECBasePerMaterialContextData@@UAEPAXI@Z 10001770 f i deferred_brush.obj
+ 0001:00000770       ??_GCBasePerMaterialContextData@@UAEPAXI@Z 10001770 f i deferred_brush.obj
+ 0001:000007a0       ??_ECDeferredPerMaterialContextData@@UAEPAXI@Z 100017a0 f i deferred_brush.obj
+ 0001:000007a0       ??_GCDeferredPerMaterialContextData@@UAEPAXI@Z 100017a0 f i deferred_brush.obj
+ 0001:00000800       ?OnInitShaderParams@CShader@DEFERRED_BRUSH@@UAEXPAPAVIMaterialVar@@PBD@Z 10001800 f i deferred_brush.obj
+ 0001:00000940       ?GetName@CShader@DEFERRED_BRUSH@@UBEPBDXZ 10001940 f i deferred_brush.obj
+ 0001:00000950       ?GetFlags@CShader@DEFERRED_BRUSH@@UBEHXZ 10001950 f i deferred_brush.obj
+ 0001:00000960       ?OnInitShaderInstance@CShader@DEFERRED_BRUSH@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10001960 f i deferred_brush.obj
+ 0001:00000a60       ?GetFallbackShader@CShader@DEFERRED_BRUSH@@UBEPBDPAPAVIMaterialVar@@@Z 10001a60 f i deferred_brush.obj
+ 0001:00000a80       ?OnDrawElements@CShader@DEFERRED_BRUSH@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10001a80 f i deferred_brush.obj
+ 0001:00000c50       ?GetParamCount@CShader@DEFERRED_BRUSH@@UBEHXZ 10001c50 f i deferred_brush.obj
+ 0001:00000c60       ?Grow@?$CUtlMemory@PAVCShaderParam@DEFERRED_BRUSH@@H@@QAEXH@Z 10001c60 f i deferred_brush.obj
+ 0001:00000c60       ?Grow@?$CUtlMemory@PAVCShaderParam@LIGHTING_WORLD@@H@@QAEXH@Z 10001c60 f i lighting_world.obj
+ 0001:00000c60       ?Grow@?$CUtlMemory@PAVCShaderParam@GAUSSIAN_BLUR_6@@H@@QAEXH@Z 10001c60 f i blur.obj
+ 0001:00000c60       ?Grow@?$CUtlMemory@PAVIShader@@H@@QAEXH@Z 10001c60 f i shaderlib:ShaderDLL.obj
+ 0001:00000c60       ?Grow@?$CUtlMemory@PAVCShaderParam@DEFERRED_MODEL@@H@@QAEXH@Z 10001c60 f i deferred_model.obj
+ 0001:00000c60       ?Grow@?$CUtlMemory@PAVCShaderParam@LIGHTING_VOLUME@@H@@QAEXH@Z 10001c60 f i lighting_volume.obj
+ 0001:00000cf0       ?GetParamInfo@CShader@DEFERRED_BRUSH@@UBEABUShaderParamInfo_t@@H@Z 10001cf0 f i deferred_brush.obj
+ 0001:00000d20       ??0CShaderParam@DEFERRED_BRUSH@@QAE@PBDW4ShaderParamType_t@@00H@Z 10001d20 f i deferred_brush.obj
+ 0001:00000dc0       ?OnInitShaderParams@CShader@DEFERRED_MODEL@@UAEXPAPAVIMaterialVar@@PBD@Z 10001dc0 f i deferred_model.obj
+ 0001:00000f00       ?GetName@CShader@DEFERRED_MODEL@@UBEPBDXZ 10001f00 f i deferred_model.obj
+ 0001:00000f10       ?GetFlags@CShader@DEFERRED_MODEL@@UBEHXZ 10001f10 f i deferred_model.obj
+ 0001:00000f20       ?OnInitShaderInstance@CShader@DEFERRED_MODEL@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10001f20 f i deferred_model.obj
+ 0001:00001020       ?GetFallbackShader@CShader@DEFERRED_MODEL@@UBEPBDPAPAVIMaterialVar@@@Z 10002020 f i deferred_model.obj
+ 0001:00001040       ?OnDrawElements@CShader@DEFERRED_MODEL@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10002040 f i deferred_model.obj
+ 0001:00001210       ?GetParamCount@CShader@DEFERRED_MODEL@@UBEHXZ 10002210 f i deferred_model.obj
+ 0001:00001220       ?GetParamInfo@CShader@DEFERRED_MODEL@@UBEABUShaderParamInfo_t@@H@Z 10002220 f i deferred_model.obj
+ 0001:00001250       ??0CShaderParam@DEFERRED_MODEL@@QAE@PBDW4ShaderParamType_t@@00H@Z 10002250 f i deferred_model.obj
+ 0001:000012f0       ?SetCommands@CDeferredPerMaterialContextData@@QAEXW4DefStage_t@1@PAE@Z 100022f0 f i defpass_composite.obj
+ 0001:00001380       ?InitParmsComposite@@YAXABUdefParms_composite@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10002380 f   defpass_composite.obj
+ 0001:00001410       ?InitPassShadowPass@@YAXABUdefParms_shadow@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10002410 f   defpass_shadow.obj
+ 0001:00001410       ?InitPassComposite@@YAXABUdefParms_composite@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10002410 f   defpass_composite.obj
+ 0001:00001440       ?DrawPassComposite@@YAXABUdefParms_composite@@PAVCBaseVSShader@@PAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAVCDeferredPerMaterialContextData@@@Z 10002440 f   defpass_composite.obj
+ 0001:00001a20       ?InitParmsGBuffer@@YAXABUdefParms_gBuffer@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10002a20 f   defpass_gbuffer.obj
+ 0001:00001ad0       ?InitPassGBuffer@@YAXABUdefParms_gBuffer@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10002ad0 f   defpass_gbuffer.obj
+ 0001:00001b50       ?UnpackLightingControls@@YAXMAAM000@Z 10002b50 f   defpass_gbuffer.obj
  0001:00001d40       ?DrawPassGBuffer@@YAXABUdefParms_gBuffer@@PAVCBaseVSShader@@PAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAVCDeferredPerMaterialContextData@@@Z 10002d40 f   defpass_gbuffer.obj
  0001:000024c0       ?InitParmsShadowPass@@YAXABUdefParms_shadow@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 100034c0 f   defpass_shadow.obj
  0001:00002520       ?DrawPassShadowPass@@YAXABUdefParms_shadow@@PAVCBaseVSShader@@PAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAVCDeferredPerMaterialContextData@@@Z 10003520 f   defpass_shadow.obj
- 0001:000029d0       ??_GIBaseInterface@@UAEPAXI@Z 100039d0 f i IDeferredExt.obj
- 0001:000029d0       ??_ECDeferredExtension@@UAEPAXI@Z 100039d0 f i IDeferredExt.obj
- 0001:000029d0       ??_GCDeferredExtension@@UAEPAXI@Z 100039d0 f i IDeferredExt.obj
- 0001:000029d0       ??_EIBaseInterface@@UAEPAXI@Z 100039d0 f i IDeferredExt.obj
- 0001:00002a10       ?EnableDeferredLighting@CDeferredExtension@@UAEXXZ 10003a10 f   IDeferredExt.obj
- 0001:00002a20       ?IsDeferredLightingEnabled@CDeferredExtension@@QAE_NXZ 10003a20 f   IDeferredExt.obj
- 0001:00002a30       ?CommitOrigin@CDeferredExtension@@UAEXABVVector@@@Z 10003a30 f   IDeferredExt.obj
- 0001:00002a50       ?CommitViewForward@CDeferredExtension@@UAEXABVVector@@@Z 10003a50 f   IDeferredExt.obj
- 0001:00002a70       ?CommitZDists@CDeferredExtension@@UAEXABM0@Z 10003a70 f   IDeferredExt.obj
- 0001:00002a90       ?CommitZScale@CDeferredExtension@@UAEXABM@Z 10003a90 f   IDeferredExt.obj
- 0001:00002aa0       ?CommitFrustumDeltas@CDeferredExtension@@UAEXABVVMatrix@@@Z 10003aa0 f   IDeferredExt.obj
- 0001:00002ab0       ??4shadowData_ortho_t@@QAEAAU0@ABU0@@Z 10003ab0 f i IDeferredExt.obj
- 0001:00002b20       ?CommitShadowData_General@CDeferredExtension@@UAEXABUshadowData_general_t@@@Z 10003b20 f   IDeferredExt.obj
- 0001:00002b50       ?CommitVolumeData@CDeferredExtension@@UAEXABUvolumeData_t@@@Z 10003b50 f   IDeferredExt.obj
- 0001:00002b80       ?CommitLightData_Common@CDeferredExtension@@UAEPAMPAMHHHHH@Z 10003b80 f   IDeferredExt.obj
- 0001:00002bd0       ?CommitTexture_General@CDeferredExtension@@UAEXPAVITexture@@00@Z 10003bd0 f   IDeferredExt.obj
- 0001:00002c00       ?CommitTexture_CascadedDepth@CDeferredExtension@@UAEXABHPAVITexture@@@Z 10003c00 f   IDeferredExt.obj
- 0001:00002c20       ?CommitTexture_DualParaboloidDepth@CDeferredExtension@@UAEXABHPAVITexture@@@Z 10003c20 f   IDeferredExt.obj
- 0001:00002c40       ?CommitTexture_ProjectedDepth@CDeferredExtension@@UAEXABHPAVITexture@@@Z 10003c40 f   IDeferredExt.obj
- 0001:00002c60       ?CommitTexture_Cookie@CDeferredExtension@@UAEXABHPAVITexture@@@Z 10003c60 f   IDeferredExt.obj
- 0001:00002c80       ?CommitTexture_VolumePrePass@CDeferredExtension@@UAEXPAVITexture@@@Z 10003c80 f   IDeferredExt.obj
- 0001:00002c90       ?CommitShadowData_Ortho@CDeferredExtension@@UAEXABHABUshadowData_ortho_t@@@Z 10003c90 f   IDeferredExt.obj
- 0001:00002cb0       ?CommitShadowData_Proj@CDeferredExtension@@UAEXABHABUshadowData_proj_t@@@Z 10003cb0 f   IDeferredExt.obj
- 0001:00002d20       ?CommitLightData_Global@CDeferredExtension@@UAEXABUlightData_Global_t@@@Z 10003d20 f   IDeferredExt.obj
- 0001:00002d30       ??0CDeferredExtension@@QAE@XZ 10003d30 f   IDeferredExt.obj
- 0001:00002e70       ?GetName@CShader@LIGHTING_GLOBAL@@UBEPBDXZ 10003e70 f i lighting_global.obj
- 0001:00002e80       ?GetFlags@CShader@LIGHTING_GLOBAL@@UBEHXZ 10003e80 f i lighting_global.obj
- 0001:00002e90       ??0lightData_Global_t@@QAE@ABU0@@Z 10003e90 f i lighting_global.obj
- 0001:00002e90       ??4lightData_Global_t@@QAEAAU0@ABU0@@Z 10003e90 f i IDeferredExt.obj
- 0001:00002f20       ?GetParamCount@CShader@LIGHTING_GLOBAL@@UBEHXZ 10003f20 f i lighting_global.obj
- 0001:00002f30       ?OnDrawElements@CShader@LIGHTING_GLOBAL@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10003f30 f i lighting_global.obj
- 0001:00003270       ?GetParamInfo@CShader@LIGHTING_GLOBAL@@UBEABUShaderParamInfo_t@@H@Z 10004270 f i lighting_global.obj
- 0001:000032a0       ?InitParmsLightPassVolum@@YAXABUlightPassParms@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 100042a0 f   lighting_pass_volum.obj
- 0001:000032a0       ?InitParmsLightPass@@YAXABUlightPassParms@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 100042a0 f   lighting_pass_basic.obj
- 0001:000032e0       ?DrawPassLightPass@@YAXABUlightPassParms@@PAVCBaseVSShader@@PAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@@Z 100042e0 f   lighting_pass_basic.obj
- 0001:00003710       ?InitPassLightPass@@YAXABUlightPassParms@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10004710 f   lighting_pass_basic.obj
- 0001:00003710       ?InitPassLightPassVolum@@YAXABUlightPassParms@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10004710 f   lighting_pass_volum.obj
- 0001:00003720       ?DrawPassLightPassVolum@@YAXABUlightPassParms@@PAVCBaseVSShader@@PAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@@Z 10004720 f   lighting_pass_volum.obj
- 0001:00003a20       ?OnInitShaderParams@CShader@LIGHTING_WORLD@@UAEXPAPAVIMaterialVar@@PBD@Z 10004a20 f i lighting_world.obj
- 0001:00003a70       ?GetName@CShader@LIGHTING_WORLD@@UBEPBDXZ 10004a70 f i lighting_world.obj
- 0001:00003a80       ?GetFlags@CShader@LIGHTING_WORLD@@UBEHXZ 10004a80 f i lighting_world.obj
- 0001:00003a90       ?OnInitShaderInstance@CShader@LIGHTING_WORLD@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10004a90 f i lighting_world.obj
- 0001:00003ae0       ?OnDrawElements@CShader@LIGHTING_WORLD@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10004ae0 f i lighting_world.obj
- 0001:00003b30       ?GetParamCount@CShader@LIGHTING_WORLD@@UBEHXZ 10004b30 f i lighting_world.obj
- 0001:00003b40       ?GetParamInfo@CShader@LIGHTING_WORLD@@UBEABUShaderParamInfo_t@@H@Z 10004b40 f i lighting_world.obj
- 0001:00003b70       ??0CShaderParam@LIGHTING_WORLD@@QAE@PBDW4ShaderParamType_t@@00H@Z 10004b70 f i lighting_world.obj
- 0001:00003c10       ?OnInitShaderParams@CShader@LIGHTING_VOLUME@@UAEXPAPAVIMaterialVar@@PBD@Z 10004c10 f i lighting_volume.obj
- 0001:00003c60       ?GetName@CShader@LIGHTING_VOLUME@@UBEPBDXZ 10004c60 f i lighting_volume.obj
- 0001:00003c70       ?GetFlags@CShader@LIGHTING_VOLUME@@UBEHXZ 10004c70 f i lighting_volume.obj
- 0001:00003c80       ?OnInitShaderInstance@CShader@LIGHTING_VOLUME@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10004c80 f i lighting_volume.obj
- 0001:00003cd0       ?OnDrawElements@CShader@LIGHTING_VOLUME@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10004cd0 f i lighting_volume.obj
- 0001:00003d20       ?GetParamCount@CShader@LIGHTING_VOLUME@@UBEHXZ 10004d20 f i lighting_volume.obj
- 0001:00003d30       ?GetParamInfo@CShader@LIGHTING_VOLUME@@UBEABUShaderParamInfo_t@@H@Z 10004d30 f i lighting_volume.obj
- 0001:00003d60       ??0CShaderParam@LIGHTING_VOLUME@@QAE@PBDW4ShaderParamType_t@@00H@Z 10004d60 f i lighting_volume.obj
- 0001:00003e00       ?GetName@CShader@VOLUME_BLEND@@UBEPBDXZ 10004e00 f i volume_blend.obj
- 0001:00003e10       ?GetFlags@CShader@VOLUME_BLEND@@UBEHXZ 10004e10 f i volume_blend.obj
- 0001:00003e20       ?OnInitShaderInstance@CShader@GAUSSIAN_BLUR_6@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10004e20 f i blur.obj
- 0001:00003e20       ?OnInitShaderInstance@CShader@VOLUME_BLEND@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10004e20 f i volume_blend.obj
- 0001:00003e50       ?OnDrawElements@CShader@VOLUME_BLEND@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10004e50 f i volume_blend.obj
- 0001:00003f20       ?GetParamCount@CShader@VOLUME_BLEND@@UBEHXZ 10004f20 f i volume_blend.obj
- 0001:00003f30       ?GetParamInfo@CShader@VOLUME_BLEND@@UBEABUShaderParamInfo_t@@H@Z 10004f30 f i volume_blend.obj
- 0001:00003f60       ?GetName@CShader@VOLUME_PREPASS@@UBEPBDXZ 10004f60 f i volume_prepass.obj
- 0001:00003f70       ?GetFlags@CShader@VOLUME_PREPASS@@UBEHXZ 10004f70 f i volume_prepass.obj
- 0001:00003f80       ?OnDrawElements@CShader@VOLUME_PREPASS@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10004f80 f i volume_prepass.obj
- 0001:000040a0       ?GetParamCount@CShader@VOLUME_PREPASS@@UBEHXZ 100050a0 f i volume_prepass.obj
- 0001:000040b0       ?GetParamInfo@CShader@VOLUME_PREPASS@@UBEABUShaderParamInfo_t@@H@Z 100050b0 f i volume_prepass.obj
- 0001:000040e0       ?ConVar_Register@@YAXHPAVIConCommandBaseAccessor@@@Z 100050e0 f   tier1:convar.obj
- 0001:00004190       ?ConVar_Unregister@@YAXXZ  10005190 f   tier1:convar.obj
- 0001:000041e0       ?GetDLLIdentifier@ConCommandBase@@UBEHXZ 100051e0 f   tier1:convar.obj
- 0001:000041f0       ?Create@ConCommandBase@@MAEXPBD0H@Z 100051f0 f   tier1:convar.obj
- 0001:00004240       ?Init@ConVar@@EAEXXZ       10005240 f   tier1:convar.obj
- 0001:00004240       ?Init@ConCommandBase@@MAEXXZ 10005240 f   tier1:convar.obj
- 0001:00004260       ?GetName@ConCommandBase@@UBEPBDXZ 10005260 f   tier1:convar.obj
- 0001:00004270       ?IsFlagSet@ConCommandBase@@UBE_NH@Z 10005270 f   tier1:convar.obj
- 0001:00004280       ?AddFlags@ConCommandBase@@UAEXH@Z 10005280 f   tier1:convar.obj
- 0001:00004290       ?RemoveFlags@ConCommandBase@@UAEXH@Z 10005290 f   tier1:convar.obj
- 0001:000042a0       ?GetHelpText@ConCommandBase@@UBEPBDXZ 100052a0 f   tier1:convar.obj
- 0001:000042b0       ?IsRegistered@ConCommandBase@@UBE_NXZ 100052b0 f   tier1:convar.obj
- 0001:000042c0       ?DefaultCompletionFunc@@YAHPBDQAY0EA@D@Z 100052c0 f   tier1:convar.obj
- 0001:000042c0       ?GetSplitScreenPlayerSlot@ConVar@@UBEHXZ 100052c0 f   tier1:convar.obj
- 0001:000042d0       ??0ConCommand@@QAE@PBDP6AXABVCCommand@@@Z0HP6AH0QAY0EA@D@Z@Z 100052d0 f   tier1:convar.obj
- 0001:00004370       ??1ConCommand@@UAE@XZ      10005370 f   tier1:convar.obj
- 0001:00004380       ?IsCommand@ConCommandBase@@UBE_NXZ 10005380 f   tier1:convar.obj
- 0001:00004380       ?IsCommand@ConCommand@@UBE_NXZ 10005380 f   tier1:convar.obj
- 0001:00004390       ?Dispatch@ConCommand@@UAEXABVCCommand@@@Z 10005390 f   tier1:convar.obj
- 0001:000043d0       ?CanAutoComplete@ConCommand@@UAE_NXZ 100053d0 f   tier1:convar.obj
- 0001:000043e0       ?IsFlagSet@ConVar@@UBE_NH@Z 100053e0 f   tier1:convar.obj
- 0001:000043f0       ?GetFlags@ConVar@@UBEHXZ   100053f0 f   tier1:convar.obj
- 0001:00004400       ?GetHelpText@ConVar@@UBEPBDXZ 10005400 f   tier1:convar.obj
- 0001:00004410       ?AddFlags@ConVar@@UAEXH@Z  10005410 f   tier1:convar.obj
- 0001:00004420       ?IsRegistered@ConVar@@UBE_NXZ 10005420 f   tier1:convar.obj
- 0001:00004430       ?GetName@ConVar@@UBEPBDXZ  10005430 f   tier1:convar.obj
- 0001:00004440       ?GetBaseName@ConVar@@UBEPBDXZ 10005440 f   tier1:convar.obj
- 0001:00004450       ?IsCommand@ConVar@@UBE_NXZ 10005450 f   tier1:convar.obj
- 0001:00004460       ?InternalSetColorFromString@ConVar@@AAE_NPBD@Z 10005460 f   tier1:convar.obj
- 0001:00004510       ?InternalSetValue@ConVar@@EAEXPBD@Z 10005510 f   tier1:convar.obj
- 0001:00004640       ?ClampValue@ConVar@@EAE_NAAM@Z 10005640 f   tier1:convar.obj
- 0001:00004680       ?InternalSetFloatValue@ConVar@@EAEXM@Z 10005680 f   tier1:convar.obj
- 0001:00004760       ?InternalSetIntValue@ConVar@@EAEXH@Z 10005760 f   tier1:convar.obj
- 0001:00004830       ?InternalSetColorValue@ConVar@@EAEXVColor@@@Z 10005830 f   tier1:convar.obj
- 0001:00004860       ?SetValue@ConVar@@UAEXPBD@Z 10005860 f   tier1:convar.obj
- 0001:00004870       ?SetValue@ConVar@@UAEXM@Z  10005870 f   tier1:convar.obj
- 0001:00004890       ?SetValue@ConVar@@UAEXH@Z  10005890 f   tier1:convar.obj
- 0001:000048a0       ?SetValue@ConVar@@UAEXVColor@@@Z 100058a0 f   tier1:convar.obj
- 0001:000048b0       ?RegisterConCommandBase@CDefaultAccessor@@UAE_NPAVConCommandBase@@@Z 100058b0 f i tier1:convar.obj
- 0001:000048d0       ??_EConCommand@@UAEPAXI@Z  100058d0 f i tier1:convar.obj
- 0001:000048d0       ??_EConCommandBase@@UAEPAXI@Z 100058d0 f i tier1:convar.obj
- 0001:000048d0       ??_GConCommandBase@@UAEPAXI@Z 100058d0 f i tier1:convar.obj
- 0001:000048d0       ??_GConCommand@@UAEPAXI@Z  100058d0 f i tier1:convar.obj
- 0001:000048f0       ?Grow@?$CUtlMemory@P6AXPAVIConVar@@PBDM@ZH@@QAEXH@Z 100058f0 f i tier1:convar.obj
- 0001:00004980       ?Grow@?$CUtlMemory@VCUtlString@@H@@QAEXH@Z 10005980 f i tier1:convar.obj
- 0001:00004a10       ?ChangeStringValue@ConVar@@EAEXPBDM@Z 10005a10 f   tier1:convar.obj
- 0001:00004ad0       ??1?$CUtlVector@P6AXPAVIConVar@@PBDM@ZV?$CUtlMemory@P6AXPAVIConVar@@PBDM@ZH@@@@QAE@XZ 10005ad0 f i tier1:convar.obj
- 0001:00004ad0       ??1?$CUtlVector@PAVCShaderParam@LIGHTING_WORLD@@V?$CUtlMemory@PAVCShaderParam@LIGHTING_WORLD@@H@@@@QAE@XZ 10005ad0 f i lighting_world.obj
- 0001:00004ad0       ??1?$CUtlVector@PAVCShaderParam@VOLUME_BLEND@@V?$CUtlMemory@PAVCShaderParam@VOLUME_BLEND@@H@@@@QAE@XZ 10005ad0 f i volume_blend.obj
- 0001:00004ad0       ??1?$CUtlVector@PAVCShaderParam@DEFERRED_BRUSH@@V?$CUtlMemory@PAVCShaderParam@DEFERRED_BRUSH@@H@@@@QAE@XZ 10005ad0 f i deferred_brush.obj
- 0001:00004ad0       ??1?$CUtlVector@PAVCShaderParam@DEBUG_SHADOW@@V?$CUtlMemory@PAVCShaderParam@DEBUG_SHADOW@@H@@@@QAE@XZ 10005ad0 f i debug_shadow.obj
- 0001:00004ad0       ??1?$CUtlVector@PAVCShaderParam@DEFERRED_MODEL@@V?$CUtlMemory@PAVCShaderParam@DEFERRED_MODEL@@H@@@@QAE@XZ 10005ad0 f i deferred_model.obj
- 0001:00004ad0       ??1?$CUtlVector@PAVCShaderParam@LIGHTING_VOLUME@@V?$CUtlMemory@PAVCShaderParam@LIGHTING_VOLUME@@H@@@@QAE@XZ 10005ad0 f i lighting_volume.obj
- 0001:00004ad0       ??1?$CUtlVector@PAVCShaderParam@GAUSSIAN_BLUR_6@@V?$CUtlMemory@PAVCShaderParam@GAUSSIAN_BLUR_6@@H@@@@QAE@XZ 10005ad0 f i blur.obj
- 0001:00004ad0       ??1?$CUtlVector@PAVCShaderParam@VOLUME_PREPASS@@V?$CUtlMemory@PAVCShaderParam@VOLUME_PREPASS@@H@@@@QAE@XZ 10005ad0 f i volume_prepass.obj
- 0001:00004ad0       ??1?$CUtlVector@PAVCShaderParam@LIGHTING_GLOBAL@@V?$CUtlMemory@PAVCShaderParam@LIGHTING_GLOBAL@@H@@@@QAE@XZ 10005ad0 f i lighting_global.obj
- 0001:00004ad0       ??1?$CUtlVector@PAVCShaderParam@DEBUG_LIGHTING_CTRL@@V?$CUtlMemory@PAVCShaderParam@DEBUG_LIGHTING_CTRL@@H@@@@QAE@XZ 10005ad0 f i debug_lightingctrl.obj
- 0001:00004b40       ?InsertBefore@?$CUtlVector@P6AXPAVIConVar@@PBDM@ZV?$CUtlMemory@P6AXPAVIConVar@@PBDM@ZH@@@@QAEHHABQ6AXPAVIConVar@@PBDM@Z@Z 10005b40 f i tier1:convar.obj
- 0001:00004bb0       ??1ConVar@@UAE@XZ          10005bb0 f   tier1:convar.obj
- 0001:00004bf0       ?GetName@ConVar@@WBI@BEPBDXZ 10005bf0 f i tier1:convar.obj
- 0001:00004c00       ?IsFlagSet@ConVar@@WBI@BE_NH@Z 10005c00 f i tier1:convar.obj
- 0001:00004c10       ?InsertBefore@?$CUtlVector@VCUtlString@@V?$CUtlMemory@VCUtlString@@H@@@@QAEHHABVCUtlString@@@Z 10005c10 f i tier1:convar.obj
- 0001:00004c80       ??_GCEmptyConVar@@UAEPAXI@Z 10005c80 f i tier1:convar.obj
- 0001:00004c80       ??_GConVar@@UAEPAXI@Z      10005c80 f i tier1:convar.obj
- 0001:00004c80       ??_ECEmptyConVar@@UAEPAXI@Z 10005c80 f i tier1:convar.obj
- 0001:00004c80       ??_EConVar@@UAEPAXI@Z      10005c80 f i tier1:convar.obj
- 0001:00004cd0       ?Create@ConVar@@EAEXPBD0H0_NM1MP6AXPAVIConVar@@0M@Z@Z 10005cd0 f   tier1:convar.obj
- 0001:00004e10       ?AutoCompleteSuggest@ConCommand@@UAEHPBDAAV?$CUtlVector@VCUtlString@@V?$CUtlMemory@VCUtlString@@H@@@@@Z 10005e10 f   tier1:convar.obj
- 0001:00004ef0       ??0ConVar@@QAE@PBD0H@Z     10005ef0 f   tier1:convar.obj
- 0001:00004f60       ?SetValue@CEmptyConVar@@UAEXPBD@Z 10005f60 f i tier1:convar.obj
- 0001:00004f60       ?SetValue@CEmptyConVar@@UAEXH@Z 10005f60 f i tier1:convar.obj
- 0001:00004f60       ?SetValue@CEmptyConVar@@UAEXM@Z 10005f60 f i tier1:convar.obj
- 0001:00004f70       ?GetName@CEmptyConVar@@UBEPBDXZ 10005f70 f i tier1:convar.obj
- 0001:00004f80       ?IsFlagSet@CEmptyConVar@@UBE_NH@Z 10005f80 f i tier1:convar.obj
- 0001:00004f90       ?GetName@CEmptyConVar@@WBI@BEPBDXZ 10005f90 f i tier1:convar.obj
- 0001:00004fa0       ?IsFlagSet@CEmptyConVar@@WBI@BE_NH@Z 10005fa0 f i tier1:convar.obj
- 0001:00004fb0       ?_V_strlen@@YAHPBD@Z       10005fb0 f   tier1:strtools.obj
- 0001:00004fe0       ?_V_strcmp@@YAHPBD0@Z      10005fe0 f   tier1:strtools.obj
- 0001:00005040       ?_V_memset@@YAXPAXHH@Z     10006040 f   tier1:strtools.obj
- 0001:00005070       ?_V_memcpy@@YAXPAXPBXH@Z   10006070 f   tier1:strtools.obj
- 0001:000050a0       ?_V_memmove@@YAXPAXPBXH@Z  100060a0 f   tier1:strtools.obj
- 0001:000050d0       ?V_snprintf@@YAHPADHPBDZZ  100060d0 f   tier1:strtools.obj
- 0001:00005120       ??0InterfaceReg@@QAE@P6APAXXZPBD@Z 10006120 f   tier1:interface.obj
- 0001:00005140       ?CreateInterfaceInternal@@YAPAXPBDPAH@Z 10006140 f   tier1:interface.obj
- 0001:000051b0       _CreateInterface           100061b0 f   tier1:interface.obj
- 0001:000051c0       ?Grow@?$CUtlMemory@EH@@QAEXH@Z 100061c0 f i tier1:utlstring.obj
- 0001:00005250       ?Set@CUtlBinaryBlock@@QAEXPBXH@Z 10006250 f   tier1:utlstring.obj
- 0001:000052c0       ??0CUtlString@@QAE@PBD@Z   100062c0 f   tier1:utlstring.obj
- 0001:00005300       ??0CUtlString@@QAE@ABV0@@Z 10006300 f   tier1:utlstring.obj
- 0001:00005350       ?FindConversion@CUtlCStringConversion@@UAEDPBDPAH@Z 10006350 f   tier1:utlbuffer.obj
- 0001:00005370       ??0CUtlCharConversion@@QAE@DPBDHPAUConversionArray_t@0@@Z 10006370 f   tier1:utlbuffer.obj
- 0001:00005400       ?FindConversion@CUtlCharConversion@@UAEDPBDPAH@Z 10006400 f   tier1:utlbuffer.obj
- 0001:00005460       ?FindConversion@CUtlNoEscConversion@@UAEDPBDPAH@Z 10006460 f i tier1:utlbuffer.obj
- 0001:00005470       ?ReconnectInterface@@YAXP6APAXPBDPAH@Z0PAPAX@Z 10006470 f   interfaces:interfaces.obj
- 0001:000054e0       ?ConnectInterfaces@@YAXPAP6APAXPBDPAH@ZH@Z 100064e0 f   interfaces:interfaces.obj
- 0001:000055e0       ?DisconnectInterfaces@@YAXXZ 100065e0 f   interfaces:interfaces.obj
- 0001:00005620       ?BuildGammaTable@@YAXMMMH@Z 10006620 f   mathlib:color_conversion.obj
- 0001:00005980       ??4VMatrix@@QAEAAV0@ABV0@@Z 10006980 f   mathlib:vmatrix.obj
- 0001:000059f0       ?MatrixSetIdentity@@YAXAAVVMatrix@@@Z 100069f0 f   mathlib:vmatrix.obj
- 0001:00005a50       ?_VectorNormalizeFast@@YIXAAVVector@@@Z 10006a50 f   mathlib:mathlib_base.obj
- 0001:00005ab0       ?MathLib_Init@@YAXMMMH_N000@Z 10006ab0 f   mathlib:mathlib_base.obj
- 0001:00005b50       ?Seed@SIMDRandStreamContext@@QAEXI@Z 10006b50 f i mathlib:randsse.obj
- 0001:00005c40       ?SeedRandSIMD@@YAXI@Z      10006c40 f   mathlib:randsse.obj
- 0001:00005c70       ??_GCBasePerInstanceContextData@@UAEPAXI@Z 10006c70 f i shaderlib:BaseShader.obj
- 0001:00005c70       ??_ECBasePerInstanceContextData@@UAEPAXI@Z 10006c70 f i shaderlib:BaseShader.obj
- 0001:00005ca0       ?SetCommands@CPerInstanceContextData@@QAEXHPAE@Z 10006ca0 f i shaderlib:BaseShader.obj
- 0001:00005d30       ?GetParamCount@CBaseShader@@UBEHXZ 10006d30 f   shaderlib:BaseShader.obj
- 0001:00005d40       ?GetParamInfo@CBaseShader@@UBEABUShaderParamInfo_t@@H@Z 10006d40 f   shaderlib:BaseShader.obj
- 0001:00005d60       ?InitShaderParams@CBaseShader@@UAEXPAPAVIMaterialVar@@PBD@Z 10006d60 f   shaderlib:BaseShader.obj
- 0001:00005d90       ?InitShaderInstance@CBaseShader@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD2@Z 10006d90 f   shaderlib:BaseShader.obj
- 0001:00005de0       ?SetInitialShadowState@CBaseShader@@QAEXXZ 10006de0 f   shaderlib:BaseShader.obj
- 0001:00005eb0       ?LoadTexture@CBaseShader@@QAEXH@Z 10006eb0 f   shaderlib:BaseShader.obj
- 0001:00005f00       ?LoadBumpMap@CBaseShader@@QAEXH@Z 10006f00 f   shaderlib:BaseShader.obj
- 0001:00005f50       ?GetShaderAPITextureBindHandle@CBaseShader@@QAEHHHH@Z 10006f50 f   shaderlib:BaseShader.obj
- 0001:00005fa0       ?NeedsPowerOfTwoFrameBufferTexture@CBaseShader@@UBE_NPAPAVIMaterialVar@@_N@Z 10006fa0 f   shaderlib:BaseShader.obj
- 0001:00005fc0       ?NeedsFullFrameBufferTexture@CBaseShader@@UBE_NPAPAVIMaterialVar@@_N@Z 10006fc0 f   shaderlib:BaseShader.obj
- 0001:00005fe0       ?IsTranslucent@CBaseShader@@UBE_NPAPAVIMaterialVar@@@Z 10006fe0 f   shaderlib:BaseShader.obj
- 0001:00006000       ?EnableAlphaBlending@CBaseShader@@QAEXW4ShaderBlendFactor_t@@0@Z 10007000 f   shaderlib:BaseShader.obj
- 0001:00006040       ?DefaultFog@CBaseShader@@QAEXXZ 10007040 f   shaderlib:BaseShader.obj
- 0001:00006080       ??_ECPerInstanceContextData@@UAEPAXI@Z 10007080 f i shaderlib:BaseShader.obj
- 0001:00006080       ??_GCPerInstanceContextData@@UAEPAXI@Z 10007080 f i shaderlib:BaseShader.obj
- 0001:000060e0       ??0CBaseShader@@QAE@XZ     100070e0 f   shaderlib:BaseShader.obj
- 0001:00006100       ?DrawElements@CBaseShader@@UAEXPAPAVIMaterialVar@@HPAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@PAPAVCBasePerInstanceContextData@@@Z 10007100 f   shaderlib:BaseShader.obj
- 0001:00006190       ?BindTexture@CBaseShader@@QAEXW4Sampler_t@@HH@Z 10007190 f   shaderlib:BaseShader.obj
- 0001:000061e0       ?BindTexture@CBaseShader@@QAEXW4Sampler_t@@PAVITexture@@H@Z 100071e0 f   shaderlib:BaseShader.obj
- 0001:00006200       ?ComputeModulationFlags@CBaseShader@@UAEHPAPAVIMaterialVar@@PAVIShaderDynamicAPI@@@Z 10007200 f   shaderlib:BaseShader.obj
- 0001:00006290       ?PI_EndCommandBuffer@CBaseShader@@QAEXXZ 10007290 f   shaderlib:BaseShader.obj
- 0001:00006370       ?Draw@CBaseShader@@QAEX_N@Z 10007370 f   shaderlib:BaseShader.obj
- 0001:00006470       ?Connect@CShaderDLL@@UAE_NP6APAXPBDPAH@Z_N@Z 10007470 f   shaderlib:ShaderDLL.obj
- 0001:000064f0       ?Disconnect@CShaderDLL@@UAEX_N@Z 100074f0 f   shaderlib:ShaderDLL.obj
- 0001:00006530       ?Connect@CShaderDLL@@UAE_NP6APAXPBDPAH@Z@Z 10007530 f   shaderlib:ShaderDLL.obj
- 0001:00006550       ?Disconnect@CShaderDLL@@UAEXXZ 10007550 f   shaderlib:ShaderDLL.obj
- 0001:00006560       ?ShaderCount@CShaderDLL@@UBEHXZ 10007560 f   shaderlib:ShaderDLL.obj
- 0001:00006560       ?GetFlags@ConCommandBase@@UBEHXZ 10007560 f   tier1:convar.obj
- 0001:00006570       ?GetShader@CShaderDLL@@UAEPAVIShader@@H@Z 10007570 f   shaderlib:ShaderDLL.obj
- 0001:00006590       ??0CShaderDLL@@QAE@XZ      10007590 f   shaderlib:ShaderDLL.obj
- 0001:000065f0       ?GetShaderDLL@@YAPAVIShaderDLL@@XZ 100075f0 f   shaderlib:ShaderDLL.obj
- 0001:00006630       ?GetShaderDLLInternal@@YAPAVIShaderDLLInternal@@XZ 10007630 f   shaderlib:ShaderDLL.obj
- 0001:00006660       ?InsertShader@CShaderDLL@@UAEXPAVIShader@@@Z 10007660 f   shaderlib:ShaderDLL.obj
- 0001:000066c0       ?InitShaderLibCVars@@YAXP6APAXPBDPAH@Z@Z 100076c0 f   shaderlib:shaderlib_cvar.obj
- 0001:000066e0       ?RegisterConCommandBase@CShaderLibConVarAccessor@@UAE_NPAVConCommandBase@@@Z 100076e0 f i shaderlib:shaderlib_cvar.obj
- 0001:00006739       __cfltcvt_init             10007739 f   LIBCMT:_fpinit_.obj
- 0001:00006799       __fpmath                   10007799 f   LIBCMT:_fpinit_.obj
- 0001:000067c0       _fmod                      100077c0 f   LIBCMT:_87fmod_.obj
- 0001:000067ca       __CIfmod                   100077ca f   LIBCMT:_87fmod_.obj
- 0001:000067f0       __ftol2_sse                100077f0 f   LIBCMT:ftol2.obj
- 0001:000067f9       __ftol2_pentium4           100077f9 f   LIBCMT:ftol2.obj
- 0001:0000680c       __ftol2_sse_excpt          1000780c f   LIBCMT:ftol2.obj
- 0001:00006826       __ftol2                    10007826 f   LIBCMT:ftol2.obj
- 0001:00006951       ___onexitinit              10007951 f   LIBCMT:onexit.obj
- 0001:00006982       __onexit                   10007982 f   LIBCMT:onexit.obj
- 0001:000069be       _atexit                    100079be f   LIBCMT:onexit.obj
- 0001:000069d5       ??1type_info@@UAE@XZ       100079d5 f   LIBCMT:typinfo.obj
- 0001:000069e5       ??_Gtype_info@@UAEPAXI@Z   100079e5 f i LIBCMT:typinfo.obj
- 0001:000069e5       ??_Etype_info@@UAEPAXI@Z   100079e5 f i LIBCMT:typinfo.obj
- 0001:00006a06       __purecall                 10007a06 f   LIBCMT:purevirt.obj
- 0001:00006a30       ??3@YAXPAX@Z               10007a30 f   LIBCMT:delete.obj
- 0001:00006a3b       ??1bad_alloc@std@@UAE@XZ   10007a3b f i LIBCMT:new.obj
- 0001:00006a46       ??_Ebad_alloc@std@@UAEPAXI@Z 10007a46 f i LIBCMT:new.obj
- 0001:00006a46       ??_Gbad_alloc@std@@UAEPAXI@Z 10007a46 f i LIBCMT:new.obj
- 0001:00006a6d       ??0bad_alloc@std@@QAE@ABV01@@Z 10007a6d f i LIBCMT:new.obj
- 0001:00006a8a       ??2@YAPAXI@Z               10007a8a f   LIBCMT:new.obj
- 0001:00006b0a       _atol                      10007b0a f   LIBCMT:atox.obj
- 0001:00006b20       _atoi                      10007b20 f   LIBCMT:atox.obj
- 0001:00006b2b       __CRT_INIT@12              10007b2b f   LIBCMT:dllcrt0.obj
- 0001:00006d85       __DllMainCRTStartup@12     10007d85 f   LIBCMT:dllcrt0.obj
- 0001:00006e16       _sscanf                    10007e16 f   LIBCMT:sscanf.obj
- 0001:00006e38       ??0_LocaleUpdate@@QAE@PAUlocaleinfo_struct@@@Z 10007e38 f i LIBCMT:atof.obj
- 0001:00006ebf       __atof_l                   10007ebf f   LIBCMT:atof.obj
- 0001:00006f6a       _atof                      10007f6a f   LIBCMT:atof.obj
- 0001:00006f7d       __vsnprintf_l              10007f7d f   LIBCMT:vsnprint.obj
- 0001:00007029       __vsnprintf                10008029 f   LIBCMT:vsnprint.obj
- 0001:00007050       __alloca_probe             10008050     LIBCMT:chkstk.obj
- 0001:00007050       __chkstk                   10008050 f   LIBCMT:chkstk.obj
- 0001:00007090       _strchr                    10008090 f   LIBCMT:strchr.obj
- 0001:00007096       ___from_strstr_to_strchr   10008096     LIBCMT:strchr.obj
- 0001:00007150       _memcpy                    10008150 f   LIBCMT:memcpy.obj
- 0001:000074c0       __alloca_probe_16          100084c0 f   LIBCMT:alloca16.obj
- 0001:000074d6       __alloca_probe_8           100084d6     LIBCMT:alloca16.obj
- 0001:000074f0       _strstr                    100084f0 f   LIBCMT:strstr.obj
- 0001:00007576       __tolower_l                10008576 f   LIBCMT:tolower.obj
- 0001:0000768b       _tolower                   1000868b f   LIBCMT:tolower.obj
- 0001:000076c0       __allmul                   100086c0 f   LIBCMT:llmul.obj
- 0001:00007700       _strncat                   10008700 f   LIBCMT:strncat.obj
- 0001:00007840       _memset                    10008840 f   LIBCMT:memset.obj
- 0001:000078c0       _memmove                   100088c0 f   LIBCMT:memmove.obj
- 0001:00007c30       _strncpy                   10008c30 f   LIBCMT:strncpy.obj
- 0001:00007d60       __allrem                   10008d60 f   LIBCMT:llrem.obj
- 0001:00007e20       __alldiv                   10008e20 f   LIBCMT:lldiv.obj
- 0001:000080f5       _strtol                    100090f5 f   LIBCMT:strtol.obj
- 0001:00008120       _floor                     10009120 f   LIBCMT:_floor_pentium4_.obj
- 0001:00008160       __floor_pentium4           10009160 f   LIBCMT:_floor_pentium4_.obj
- 0001:00008250       _pow                       10009250 f   LIBCMT:_pow_.obj
- 0001:00008290       __CIpow                    10009290 f   LIBCMT:_pow_.obj
- 0001:000082cb       __CIpow_default            100092cb f   LIBCMT:_pow_.obj
- 0001:000082e4       __pow_default              100092e4     LIBCMT:_pow_.obj
- 0001:000084da       ___libm_sse2_pow           100094da f   LIBCMT:_pow_sse2_.obj
- 0001:00008f60       _acos                      10009f60 f   LIBCMT:_acos_.obj
- 0001:00008fa0       __CIacos                   10009fa0 f   LIBCMT:_acos_.obj
- 0001:00008fdb       __CIacos_default           10009fdb f   LIBCMT:_acos_.obj
- 0001:00008fef       __acos_default             10009fef     LIBCMT:_acos_.obj
- 0001:000090a6       ___libm_sse2_sin           1000a0a6 f   LIBCMT:_sin_sse2_.obj
- 0001:00009260       _asin                      1000a260 f   LIBCMT:_asin_.obj
- 0001:000092a0       __CIasin                   1000a2a0 f   LIBCMT:_asin_.obj
- 0001:000092db       __CIasin_default           1000a2db f   LIBCMT:_asin_.obj
- 0001:000092ef       __asin_default             1000a2ef     LIBCMT:_asin_.obj
- 0001:000093a6       __forcdecpt_l              1000a3a6 f   LIBCMT:cvt.obj
- 0001:0000941a       __cropzeros_l              1000a41a f   LIBCMT:cvt.obj
- 0001:0000949c       __positive                 1000a49c f   LIBCMT:cvt.obj
- 0001:000094b8       __fassign_l                1000a4b8 f   LIBCMT:cvt.obj
- 0001:000094fa       __fassign                  1000a4fa f   LIBCMT:cvt.obj
- 0001:00009533       __forcdecpt                1000a533 f   LIBCMT:cvt.obj
- 0001:00009546       __cropzeros                1000a546 f   LIBCMT:cvt.obj
- 0001:000096ba       __cftoe_l                  1000a6ba f   LIBCMT:cvt.obj
- 0001:00009781       __cftoe                    1000a781 f   LIBCMT:cvt.obj
- 0001:000097a1       __cftoa_l                  1000a7a1 f   LIBCMT:cvt.obj
- 0001:00009c1a       __cftof_l                  1000ac1a f   LIBCMT:cvt.obj
- 0001:00009cdb       __cftog_l                  1000acdb f   LIBCMT:cvt.obj
- 0001:00009dc8       __cfltcvt_l                1000adc8 f   LIBCMT:cvt.obj
- 0001:00009e50       __cfltcvt                  1000ae50 f   LIBCMT:cvt.obj
- 0001:00009e73       __initp_misc_cfltcvt_tab   1000ae73 f   LIBCMT:cmiscdat.obj
- 0001:00009e96       __setdefaultprecision      1000ae96 f   LIBCMT:fp8.obj
- 0001:00009ec0       __cintrindisp2             1000aec0 f   LIBCMT:_87cdisp_.obj
- 0001:00009efe       __cintrindisp1             1000aefe f   LIBCMT:_87cdisp_.obj
- 0001:00009f3b       __ctrandisp2               1000af3b f   LIBCMT:_87cdisp_.obj
- 0001:0000a0ca       __ctrandisp1               1000b0ca f   LIBCMT:_87cdisp_.obj
- 0001:0000a0fd       __fload                    1000b0fd f   LIBCMT:_87cdisp_.obj
- 0001:0000a140       __trandisp1                1000b140 f   LIBCMT:_87disp_.obj
- 0001:0000a1a7       __trandisp2                1000b1a7 f   LIBCMT:_87disp_.obj
- 0001:0000a233       __rttospopde               1000b233     LIBCMT:_87disp_.obj
- 0001:0000a238       __rttospop                 1000b238     LIBCMT:_87disp_.obj
- 0001:0000a23a       __rtnospop                 1000b23a     LIBCMT:_87disp_.obj
- 0001:0000a23c       __rttosnpop                1000b23c     LIBCMT:_87disp_.obj
- 0001:0000a23d       __rtnospopde               1000b23d     LIBCMT:_87disp_.obj
- 0001:0000a244       __rtzeropop                1000b244     LIBCMT:_87disp_.obj
- 0001:0000a246       __rtzeronpop               1000b246     LIBCMT:_87disp_.obj
- 0001:0000a24b       __rtonepop                 1000b24b     LIBCMT:_87disp_.obj
- 0001:0000a24d       __rtonenpop                1000b24d     LIBCMT:_87disp_.obj
- 0001:0000a252       __tosnan1                  1000b252     LIBCMT:_87disp_.obj
- 0001:0000a27d       __nosnan2                  1000b27d     LIBCMT:_87disp_.obj
- 0001:0000a27f       __tosnan2                  1000b27f     LIBCMT:_87disp_.obj
- 0001:0000a2a7       __nan2                     1000b2a7     LIBCMT:_87disp_.obj
- 0001:0000a2e6       __rtindfpop                1000b2e6     LIBCMT:_87disp_.obj
- 0001:0000a2e8       __rtindfnpop               1000b2e8     LIBCMT:_87disp_.obj
- 0001:0000a2f9       __rttosnpopde              1000b2f9     LIBCMT:_87disp_.obj
- 0001:0000a303       __rtchsifneg               1000b303     LIBCMT:_87disp_.obj
- 0001:0000a30a       ___sse2_available_init     1000b30a f   LIBCMT:cpu_disp.obj
- 0001:0000a31a       __malloc_crt               1000b31a f   LIBCMT:crtheap.obj
- 0001:0000a35f       __calloc_crt               1000b35f f   LIBCMT:crtheap.obj
- 0001:0000a3ab       __realloc_crt              1000b3ab f   LIBCMT:crtheap.obj
- 0001:0000a3f9       __recalloc_crt             1000b3f9 f   LIBCMT:crtheap.obj
- 0001:0000a44b       __msize                    1000b44b f   LIBCMT:msize.obj
- 0001:0000a47e       ___crtCorExitProcess       1000b47e f   LIBCMT:crt0dat.obj
- 0001:0000a4a9       ___crtExitProcess          1000b4a9 f   LIBCMT:crt0dat.obj
- 0001:0000a4c1       __lockexit                 1000b4c1 f   LIBCMT:crt0dat.obj
- 0001:0000a4ca       __unlockexit               1000b4ca f   LIBCMT:crt0dat.obj
- 0001:0000a4d3       __init_pointers            1000b4d3 f   LIBCMT:crt0dat.obj
- 0001:0000a506       __initterm_e               1000b506 f   LIBCMT:crt0dat.obj
- 0001:0000a52a       __cinit                    1000b52a f   LIBCMT:crt0dat.obj
- 0001:0000a701       __exit                     1000b701 f   LIBCMT:crt0dat.obj
- 0001:0000a717       __cexit                    1000b717 f   LIBCMT:crt0dat.obj
- 0001:0000a726       __amsg_exit                1000b726 f   LIBCMT:crt0dat.obj
- 0001:0000a750       __SEH_prolog4              1000b750 f   LIBCMT:sehprolg4.obj
- 0001:0000a795       __SEH_epilog4              1000b795 f   LIBCMT:sehprolg4.obj
- 0001:0000a7b0       __except_handler4          1000b7b0 f   LIBCMT:chandler4.obj
- 0001:0000a93f       ?_Type_info_dtor@type_info@@CAXPAV1@@Z 1000b93f f   LIBCMT:typname.obj
- 0001:0000a9b0       _strcmp                    1000b9b0 f   LIBCMT:strcmp.obj
- 0001:0000aa38       _abort                     1000ba38 f   LIBCMT:abort.obj
- 0001:0000aa6b       __set_abort_behavior       1000ba6b f   LIBCMT:abort.obj
- 0001:0000aa8c       __GET_RTERRMSG             1000ba8c f   LIBCMT:crt0msg.obj
- 0001:0000aab2       __NMSG_WRITE               1000bab2 f   LIBCMT:crt0msg.obj
- 0001:0000ac61       __FF_MSGBANNER             1000bc61 f   LIBCMT:crt0msg.obj
- 0001:0000ac9a       __initp_misc_purevirt      1000bc9a f   LIBCMT:inithelp.obj
- 0001:0000aca9       _free                      1000bca9 f   LIBCMT:free.obj
- 0001:0000ace3       ??0exception@std@@QAE@ABQBDH@Z 1000bce3 f   LIBCMT:stdexcpt.obj
- 0001:0000ad00       ?what@exception@std@@UBEPBDXZ 1000bd00 f   LIBCMT:stdexcpt.obj
- 0001:0000ad0d       ?_Copy_str@exception@std@@AAEXPBD@Z 1000bd0d f   LIBCMT:stdexcpt.obj
- 0001:0000ad4d       ?_Tidy@exception@std@@AAEXXZ 1000bd4d f   LIBCMT:stdexcpt.obj
- 0001:0000ad6b       ??4exception@std@@QAEAAV01@ABV01@@Z 1000bd6b f   LIBCMT:stdexcpt.obj
- 0001:0000ada0       ??1exception@std@@UAE@XZ   1000bda0 f   LIBCMT:stdexcpt.obj
- 0001:0000adab       ??_Gexception@std@@UAEPAXI@Z 1000bdab f i LIBCMT:stdexcpt.obj
- 0001:0000adab       ??_Eexception@std@@UAEPAXI@Z 1000bdab f i LIBCMT:stdexcpt.obj
- 0001:0000add2       ??0exception@std@@QAE@ABV01@@Z 1000bdd2 f   LIBCMT:stdexcpt.obj
- 0001:0000adf7       _malloc                    1000bdf7 f   LIBCMT:malloc.obj
- 0001:0000ae8b       __initp_heap_handler       1000be8b f   LIBCMT:handler.obj
- 0001:0000ae9a       __callnewh                 1000be9a f   LIBCMT:handler.obj
- 0001:0000aec2       __CxxThrowException@8      1000bec2 f   LIBCMT:throw.obj
- 0001:0000af0e       __encoded_null             1000bf0e f   LIBCMT:tidtable.obj
- 0001:0000af17       ___crtTlsAlloc@4           1000bf17 f   LIBCMT:tidtable.obj
- 0001:0000af20       ___set_flsgetvalue         1000bf20 f   LIBCMT:tidtable.obj
- 0001:0000af54       __mtterm                   1000bf54 f   LIBCMT:tidtable.obj
- 0001:0000af91       __initptd                  1000bf91 f   LIBCMT:tidtable.obj
- 0001:0000b045       __getptd_noexit            1000c045 f   LIBCMT:tidtable.obj
- 0001:0000b0be       __getptd                   1000c0be f   LIBCMT:tidtable.obj
- 0001:0000b0d8       __freefls@4                1000c0d8 f   LIBCMT:tidtable.obj
- 0001:0000b207       __freeptd                  1000c207 f   LIBCMT:tidtable.obj
- 0001:0000b275       __mtinit                   1000c275 f   LIBCMT:tidtable.obj
- 0001:0000b3f0       __ioinit                   1000c3f0 f   LIBCMT:ioinit.obj
- 0001:0000b635       __ioterm                   1000c635 f   LIBCMT:ioinit.obj
- 0001:0000b688       __setenvp                  1000c688 f   LIBCMT:stdenvp.obj
- 0001:0000b8fe       __setargv                  1000c8fe f   LIBCMT:stdargv.obj
- 0001:0000b9b9       ___crtGetEnvironmentStringsA 1000c9b9 f   LIBCMT:a_env.obj
- 0001:0000ba50       __RTC_Initialize           1000ca50 f   LIBCMT:_initsect_.obj
- 0001:0000ba76       __RTC_Terminate            1000ca76 f   LIBCMT:_initsect_.obj
- 0001:0000ba9c       __heap_init                1000ca9c f   LIBCMT:heapinit.obj
- 0001:0000baba       __heap_term                1000caba f   LIBCMT:heapinit.obj
- 0001:0000bace       __XcptFilter               1000cace f   LIBCMT:winxfltr.obj
- 0001:0000bc18       ___CppXcptFilter           1000cc18 f   LIBCMT:winxfltr.obj
- 0001:0000bc38       _DllMain@12                1000cc38 f   LIBCMT:dllmain.obj
- 0001:0000bc3e       ___security_init_cookie    1000cc3e f   LIBCMT:gs_support.obj
- 0001:0000bce0       _strlen                    1000cce0 f   LIBCMT:strlen.obj
- 0001:0000bd6b       __initp_misc_invarg        1000cd6b f   LIBCMT:invarg.obj
- 0001:0000bd7a       __call_reportfault         1000cd7a f   LIBCMT:invarg.obj
- 0001:0000bea3       __invoke_watson            1000cea3 f   LIBCMT:invarg.obj
- 0001:0000bec8       __invalid_parameter        1000cec8 f   LIBCMT:invarg.obj
- 0001:0000bef5       __invalid_parameter_noinfo 1000cef5 f   LIBCMT:invarg.obj
- 0001:0000bf05       __get_errno_from_oserr     1000cf05 f   LIBCMT:dosmap.obj
- 0001:0000bf47       __errno                    1000cf47 f   LIBCMT:dosmap.obj
- 0001:0000bf5a       ___doserrno                1000cf5a f   LIBCMT:dosmap.obj
- 0001:0000bf6d       __dosmaperr                1000cf6d f   LIBCMT:dosmap.obj
- 0001:0000c047       __input_l                  1000d047 f   LIBCMT:input.obj
- 0001:0000d26e       ___updatetmbcinfo          1000e26e f   LIBCMT:mbctype.obj
- 0001:0000d38e       __setmbcp_nolock           1000e38e f   LIBCMT:mbctype.obj
- 0001:0000d577       __setmbcp                  1000e577 f   LIBCMT:mbctype.obj
- 0001:0000d711       ___initmbctable            1000e711 f   LIBCMT:mbctype.obj
- 0001:0000d72f       ___addlocaleref            1000e72f f   LIBCMT:localref.obj
- 0001:0000d7be       ___removelocaleref         1000e7be f   LIBCMT:localref.obj
- 0001:0000d857       ___freetlocinfo            1000e857 f   LIBCMT:localref.obj
- 0001:0000d9a2       __updatetlocinfoEx_nolock  1000e9a2 f   LIBCMT:localref.obj
- 0001:0000d9ef       ___updatetlocinfo          1000e9ef f   LIBCMT:localref.obj
- 0001:0000da68       __fltin2                   1000ea68 f   LIBCMT:_cfin_.obj
- 0001:0000db0f       __isctype_l                1000eb0f f   LIBCMT:isctype.obj
- 0001:0000dbc7       @__security_check_cookie@4 1000ebc7 f   LIBCMT:secchk.obj
- 0001:0000dbd6       ___strgtold12_l            1000ebd6 f   LIBCMT:_strgtold_.obj
- 0001:0000e2b2       __flsbuf                   1000f2b2 f   LIBCMT:_flsbuf.obj
- 0001:0000e4ab       __output_l                 1000f4ab f   LIBCMT:output.obj
- 0001:0000f0b3       __VEC_memcpy               100100b3 f   LIBCMT:p4_memcpy.obj
- 0001:0000f1b6       __freea                    100101b6 f i LIBCMT:a_map.obj
- 0001:0000f3bd       ___crtLCMapStringA         100103bd f   LIBCMT:a_map.obj
- 0001:0000f403       __isleadbyte_l             10010403 f i LIBCMT:_wctype.obj
- 0001:0000f43b       _isleadbyte                1001043b f i LIBCMT:_wctype.obj
- 0001:0000f44e       __VEC_memzero              1001044e f   LIBCMT:p4_memset.obj
- 0001:0000f508       __mtinitlocks              10010508 f   LIBCMT:mlock.obj
- 0001:0000f552       __mtdeletelocks            10010552 f   LIBCMT:mlock.obj
- 0001:0000f5a9       __unlock                   100105a9 f   LIBCMT:mlock.obj
- 0001:0000f5c0       __mtinitlocknum            100105c0 f   LIBCMT:mlock.obj
- 0001:0000f682       __lock                     10010682 f   LIBCMT:mlock.obj
- 0001:0000f6c0       __aulldvrm                 100106c0 f   LIBCMT:ulldvrm.obj
- 0001:0000f760       ___libm_error_support      10010760 f   LIBCMT:_libm_error_.obj
- 0001:0000fa2c       __sse2_mathfcns_init       10010a2c f   LIBCMT:_mathfcns_.obj
- 0001:0000fa3c       __floor_default            10010a3c f   LIBCMT:_floor_.obj
- 0001:0000fb20       __CIpow_pentium4           10010b20 f   LIBCMT:_pow_pentium4_.obj
- 0001:0000fb39       __pow_pentium4             10010b39     LIBCMT:_pow_pentium4_.obj
- 0001:00010691       __fFEXP                    10011691     LIBCMT:_87tran_.obj
- 0001:000106e8       __rtinfpopse               100116e8     LIBCMT:_87tran_.obj
- 0001:000106ea       __rtinfnpopse              100116ea     LIBCMT:_87tran_.obj
- 0001:000106fa       __fFLN                     100116fa     LIBCMT:_87tran_.obj
- 0001:000107af       __rtinfpop                 100117af     LIBCMT:_87tran_.obj
- 0001:000107b1       __rtinfnpop                100117b1     LIBCMT:_87tran_.obj
- 0001:000107ce       __ffexpm1                  100117ce     LIBCMT:_87tran_.obj
- 0001:00010880       __startTwoArgErrorHandling 10011880 f   LIBCMT:_genexcep_.obj
- 0001:00010897       __startOneArgErrorHandling 10011897 f   LIBCMT:_genexcep_.obj
- 0001:000108e0       __twoToTOS                 100118e0 f   LIBCMT:_common_.obj
- 0001:000108f5       __load_CW                  100118f5 f   LIBCMT:_common_.obj
- 0001:0001090c       __convertTOStoQNaN         1001190c f   LIBCMT:_common_.obj
- 0001:00010925       __fload_withFB             10011925 f   LIBCMT:_common_.obj
- 0001:00010968       __checkTOS_withFB          10011968 f   LIBCMT:_common_.obj
- 0001:0001097e       __fast_exit                1001197e f   LIBCMT:_common_.obj
- 0001:0001098b       __math_exit                1001198b f   LIBCMT:_common_.obj
- 0001:000109b5       __check_overflow_exit      100119b5 f   LIBCMT:_common_.obj
- 0001:000109c9       __check_range_exit         100119c9 f   LIBCMT:_common_.obj
- 0001:00010a6c       __d_inttype                10011a6c f   LIBCMT:_powhlp_.obj
- 0001:00010ad6       __powhlp                   10011ad6 f   LIBCMT:_powhlp_.obj
- 0001:00010c10       __CIacos_pentium4          10011c10 f   LIBCMT:_acos_pentium4_.obj
- 0001:00010c28       __acos_pentium4            10011c28     LIBCMT:_acos_pentium4_.obj
- 0001:00011170       _cos                       10012170 f   LIBCMT:_cos_.obj
- 0001:000111b0       __CIcos                    100121b0 f   LIBCMT:_cos_.obj
- 0001:000111eb       __CIcos_default            100121eb f   LIBCMT:_cos_.obj
- 0001:000111ff       __cos_default              100121ff     LIBCMT:_cos_.obj
- 0001:000112a0       _sin                       100122a0 f   LIBCMT:_sin_.obj
- 0001:000112e0       __CIsin                    100122e0 f   LIBCMT:_sin_.obj
- 0001:0001131b       __CIsin_default            1001231b f   LIBCMT:_sin_.obj
- 0001:0001132f       __sin_default              1001232f     LIBCMT:_sin_.obj
- 0001:000113d0       _tan                       100123d0 f   LIBCMT:_tan_.obj
- 0001:00011410       __CItan                    10012410 f   LIBCMT:_tan_.obj
- 0001:0001144b       __CItan_default            1001244b f   LIBCMT:_tan_.obj
- 0001:0001145f       __tan_default              1001245f     LIBCMT:_tan_.obj
- 0001:00011500       __CIasin_pentium4          10012500 f   LIBCMT:_asin_pentium4_.obj
- 0001:00011518       __asin_pentium4            10012518     LIBCMT:_asin_pentium4_.obj
- 0001:00011a80       _strrchr                   10012a80 f   LIBCMT:strrchr.obj
- 0001:00011aad       __isdigit_l                10012aad f i LIBCMT:_ctype.obj
- 0001:00011afe       _isdigit                   10012afe f i LIBCMT:_ctype.obj
- 0001:00011b2c       __isxdigit_l               10012b2c f i LIBCMT:_ctype.obj
- 0001:00011b82       _isxdigit                  10012b82 f i LIBCMT:_ctype.obj
- 0001:00011bb2       __isspace_l                10012bb2 f i LIBCMT:_ctype.obj
- 0001:00011c03       _isspace                   10012c03 f i LIBCMT:_ctype.obj
- 0001:00011c31       __atodbl_l                 10012c31 f   LIBCMT:atodbl.obj
- 0001:00011cd9       __atoflt_l                 10012cd9 f   LIBCMT:atodbl.obj
- 0001:00011d81       _strcpy_s                  10012d81 f   LIBCMT:strcpy_s.obj
- 0001:00011de0       __fptostr                  10012de0 f   LIBCMT:_fptostr.obj
- 0001:00011e93       ___dtold                   10012e93 f   LIBCMT:_cfout_.obj
- 0001:00011f46       __fltout2                  10012f46 f   LIBCMT:_cfout_.obj
- 0001:00011fe0       __alldvrm                  10012fe0 f   LIBCMT:lldvrm.obj
- 0001:000120c0       __aullshr                  100130c0 f   LIBCMT:ullshr.obj
- 0001:000120df       __fptrap                   100130df f   LIBCMT:crt0fp.obj
- 0001:000120e8       __controlfp_s              100130e8 f   LIBCMT:_contrlfp_.obj
- 0001:00012147       __87except                 10013147 f   LIBCMT:_87except_.obj
- 0001:00012286       __calloc_impl              10013286 f   LIBCMT:calloc_impl.obj
- 0001:00012308       _realloc                   10013308 f   LIBCMT:realloc.obj
- 0001:000123b5       __recalloc                 100133b5 f   LIBCMT:recalloc.obj
- 0001:00012423       ?terminate@@YAXXZ          10013423 f   LIBCMT:hooks.obj
- 0001:0001245c       __initp_eh_hooks           1001345c f   LIBCMT:hooks.obj
- 0001:0001246d       __initp_misc_winsig        1001346d f   LIBCMT:winsig.obj
- 0001:000124c2       ___get_sigabrt             100134c2 f   LIBCMT:winsig.obj
- 0001:000124cf       _raise                     100134cf f   LIBCMT:winsig.obj
- 0001:00012672       __initp_misc_rand_s        10013672 f   LIBCMT:rand_s.obj
- 0001:00012690       __ValidateImageBase        10013690 f   LIBCMT:pesect.obj
- 0001:000126d0       __FindPESection            100136d0 f   LIBCMT:pesect.obj
- 0001:00012720       __IsNonwritableInCurrentImage 10013720 f   LIBCMT:pesect.obj
- 0001:000127e0       __local_unwind4            100137e0 f   LIBCMT:exsup4.obj
- 0001:000128b6       __seh_longjmp_unwind4@4    100138b6 f   LIBCMT:exsup4.obj
- 0001:000128d2       @_EH4_CallFilterFunc@8     100138d2 f   LIBCMT:exsup4.obj
- 0001:000128e9       @_EH4_TransferToHandler@8  100138e9 f   LIBCMT:exsup4.obj
- 0001:00012902       @_EH4_GlobalUnwind2@8      10013902 f   LIBCMT:exsup4.obj
- 0001:0001291b       @_EH4_LocalUnwind@16       1001391b f   LIBCMT:exsup4.obj
- 0001:00012932       ___crtMessageBoxW          10013932 f   LIBCMT:crtmboxw.obj
- 0001:00012a9e       _wcscat_s                  10013a9e f   LIBCMT:wcscat_s.obj
- 0001:00012b13       _wcsncpy_s                 10013b13 f   LIBCMT:wcsncpy_s.obj
- 0001:00012be0       _wcslen                    10013be0 f   LIBCMT:wcslen.obj
- 0001:00012bfb       _wcscpy_s                  10013bfb f   LIBCMT:wcscpy_s.obj
- 0001:00012c5e       __set_error_mode           10013c5e f   LIBCMT:errmode.obj
- 0001:00012cf0       __ismbblead                10013cf0 f   LIBCMT:ismbbyte.obj
- 0001:00012d08       __crt_debugger_hook        10013d08 f   LIBCMT:dbghook.obj
- 0001:00012d10       __filbuf                   10013d10 f   LIBCMT:_filbuf.obj
- 0001:00012e32       __ungetc_nolock            10013e32 f   LIBCMT:ungetc.obj
- 0001:00012f15       __mbtowc_l                 10013f15 f   LIBCMT:mbtowc.obj
- 0001:0001302b       _mbtowc                    1001402b f   LIBCMT:mbtowc.obj
- 0001:00013045       __fileno                   10014045 f   LIBCMT:fileno.obj
- 0001:00013152       ___crtGetStringTypeA       10014152 f   LIBCMT:a_str.obj
- 0001:00013192       ___free_lc_time            10014192 f   LIBCMT:inittime.obj
- 0001:00013509       ___free_lconv_num          10014509 f   LIBCMT:initnum.obj
- 0001:00013572       ___free_lconv_mon          10014572 f   LIBCMT:initmon.obj
- 0001:00013670       __ld12tod                  10014670 f   LIBCMT:_intrncvt_.obj
- 0001:00013bc1       __ld12tof                  10014bc1 f   LIBCMT:_intrncvt_.obj
- 0001:00014112       ___report_gsfailure        10015112 f   LIBCMT:gs_report.obj
- 0001:00014218       ___mtold12                 10015218 f   LIBCMT:_mantold_.obj
- 0001:000143fc       __lseeki64_nolock          100153fc f   LIBCMT:lseeki64.obj
- 0001:00014481       __lseeki64                 10015481 f   LIBCMT:lseeki64.obj
- 0001:0001456b       __write_nolock             1001556b f   LIBCMT:write.obj
- 0001:00014c68       __write                    10015c68 f   LIBCMT:write.obj
- 0001:00014d3c       __getbuf                   10015d3c f   LIBCMT:_getbuf.obj
- 0001:00014d85       __isatty                   10015d85 f   LIBCMT:isatty.obj
- 0001:00014ddb       ___iob_func                10015ddb f   LIBCMT:_file.obj
- 0001:00014de1       ___initstdio               10015de1 f   LIBCMT:_file.obj
- 0001:00014e92       ___endstdio                10015e92 f   LIBCMT:_file.obj
- 0001:00014eb2       __lock_file                10015eb2 f   LIBCMT:_file.obj
- 0001:00014ef3       __lock_file2               10015ef3 f   LIBCMT:_file.obj
- 0001:00014f25       __unlock_file              10015f25 f   LIBCMT:_file.obj
- 0001:00014f61       __unlock_file2             10015f61 f   LIBCMT:_file.obj
- 0001:00014f90       __get_printf_count_output  10015f90 f   LIBCMT:printf.obj
- 0001:00014fa6       __wctomb_s_l               10015fa6 f   LIBCMT:wctomb.obj
- 0001:000150fb       _wctomb_s                  100160fb f   LIBCMT:wctomb.obj
- 0001:00015120       _strcspn                   10016120 f   LIBCMT:strcspn.obj
- 0001:00015170       _strpbrk                   10016170 f   LIBCMT:strpbrk.obj
- 0001:000151b0       __SEH_prolog4_GS           100161b0 f   LIBCMT:sehprolg4gs.obj
- 0001:000151f8       __SEH_epilog4_GS           100161f8 f   LIBCMT:sehprolg4gs.obj
- 0001:00015207       __matherr                  10016207 f   LIBCMT:_matherr_.obj
- 0001:0001520a       __raise_exc_ex             1001620a f   LIBCMT:_fpexcept_.obj
- 0001:000154e6       __raise_exc                100164e6 f   LIBCMT:_fpexcept_.obj
- 0001:00015509       __handle_exc               10016509 f   LIBCMT:_fpexcept_.obj
- 0001:000156ed       __set_errno_from_matherr   100166ed f   LIBCMT:_fpexcept_.obj
- 0001:0001571a       __errcode                  1001671a f   LIBCMT:_fpexcept_.obj
- 0001:0001574e       __umatherr                 1001674e f   LIBCMT:_fpexcept_.obj
- 0001:000157ee       __handle_qnan1             100167ee f   LIBCMT:_fpexcept_.obj
- 0001:00015843       __except1                  10016843 f   LIBCMT:_fpexcept_.obj
- 0001:0001590d       __frnd                     1001690d f   LIBCMT:_frnd_.obj
- 0001:00015921       __set_exp                  10016921 f   LIBCMT:_util_.obj
- 0001:0001594e       __sptype                   1001694e f   LIBCMT:_util_.obj
- 0001:000159b4       __decomp                   100169b4 f   LIBCMT:_util_.obj
- 0001:00015a77       __statfp                   10016a77 f   LIBCMT:_fpctrl_.obj
- 0001:00015a87       __clrfp                    10016a87 f   LIBCMT:_fpctrl_.obj
- 0001:00015a98       __ctrlfp                   10016a98 f   LIBCMT:_fpctrl_.obj
- 0001:00015ac3       __set_statfp               10016ac3 f   LIBCMT:_fpctrl_.obj
- 0001:00015b1b       ___set_fpsr_sse2           10016b1b f   LIBCMT:_fpctrl_.obj
- 0001:00015b8d       __fpclass                  10016b8d f   LIBCMT:_ieeemisc_.obj
- 0001:00015c30       __CIcos_pentium4           10016c30 f   LIBCMT:_cos_pentium4_.obj
- 0001:00015c48       __cos_pentium4             10016c48     LIBCMT:_cos_pentium4_.obj
- 0001:00015de0       __CIsin_pentium4           10016de0 f   LIBCMT:_sin_pentium4_.obj
- 0001:00015df8       __sin_pentium4             10016df8     LIBCMT:_sin_pentium4_.obj
- 0001:00015fd0       __CItan_pentium4           10016fd0 f   LIBCMT:_tan_pentium4_.obj
- 0001:00015fe8       __tan_pentium4             10016fe8     LIBCMT:_tan_pentium4_.obj
- 0001:00016230       _$I10_OUTPUT               10017230 f   LIBCMT:_x10fout_.obj
- 0001:00016c56       __control87                10017c56 f i LIBCMT:_ieee87_.obj
- 0001:00016f70       __global_unwind2           10017f70 f   LIBCMT:exsup.obj
- 0001:00016fd5       __local_unwind2            10017fd5 f   LIBCMT:exsup.obj
- 0001:00017059       __abnormal_termination     10018059 f   LIBCMT:exsup.obj
- 0001:0001707c       __NLG_Notify1              1001807c f   LIBCMT:exsup.obj
- 0001:00017085       __NLG_Notify               10018085 f   LIBCMT:exsup.obj
- 0001:0001709c       __NLG_Dispatch             1001809c     LIBCMT:exsup.obj
- 0001:0001709c       __NLG_Dispatch2            1001809c     LIBCMT:exsup.obj
- 0001:000170a4       __NLG_Call                 100180a4 f   LIBCMT:exsup.obj
- 0001:000170a6       __NLG_Return2              100180a6     LIBCMT:exsup.obj
- 0001:000170a7       __read_nolock              100180a7 f   LIBCMT:read.obj
- 0001:0001765e       __read                     1001865e f   LIBCMT:read.obj
- 0001:00017754       __free_osfhnd              10018754 f   LIBCMT:osfinfo.obj
- 0001:000177da       __get_osfhandle            100187da f   LIBCMT:osfinfo.obj
- 0001:00017843       ___lock_fhandle            10018843 f   LIBCMT:osfinfo.obj
- 0001:000178e2       __unlock_fhandle           100188e2 f   LIBCMT:osfinfo.obj
- 0001:00017909       __putwch_nolock            10018909 f   LIBCMT:putwch.obj
- 0001:0001794b       __fcloseall                1001894b f   LIBCMT:closeall.obj
- 0001:000179e7       __flush                    100189e7 f   LIBCMT:fflush.obj
- 0001:00017a4f       __fflush_nolock            10018a4f f   LIBCMT:fflush.obj
- 0001:00017b71       __flushall                 10018b71 f   LIBCMT:fflush.obj
- 0001:00017b7a       ___initconout              10018b7a f   LIBCMT:initcon.obj
- 0001:00017b99       ___termconout              10018b99 f   LIBCMT:initcon.obj
- 0001:00017bb0       __fclose_nolock            10018bb0 f   LIBCMT:fclose.obj
- 0001:00017c1d       _fclose                    10018c1d f   LIBCMT:fclose.obj
- 0001:00017c91       __commit                   10018c91 f   LIBCMT:commit.obj
- 0001:00017d70       ___ascii_strnicmp          10018d70 f   LIBCMT:_strnicm.obj
- 0001:00017dd1       __close_nolock             10018dd1 f   LIBCMT:close.obj
- 0001:00017e6d       __close                    10018e6d f   LIBCMT:close.obj
- 0001:00017f31       __freebuf                  10018f31 f   LIBCMT:_freebuf.obj
- 0001:00017f70       ?ConnectTier1Libraries@@YAXPAP6APAXPBDPAH@ZH@Z 10018f70 f   tier1:tier1.obj
- 0001:00017f80       ?DisconnectTier1Libraries@@YAXXZ 10018f80 f   tier1:tier1.obj
- 0001:00017f86       _RtlUnwind@16              10018f86 f   kernel32:KERNEL32.dll
+ 0001:00002a30       ?EnableDeferredLighting@CDeferredExtension@@UAEXXZ 10003a30 f   IDeferredExt.obj
+ 0001:00002a40       ?IsDeferredLightingEnabled@CDeferredExtension@@QAE_NXZ 10003a40 f   IDeferredExt.obj
+ 0001:00002a50       ?CommitOrigin@CDeferredExtension@@UAEXABVVector@@@Z 10003a50 f   IDeferredExt.obj
+ 0001:00002a70       ?CommitViewForward@CDeferredExtension@@UAEXABVVector@@@Z 10003a70 f   IDeferredExt.obj
+ 0001:00002a90       ?CommitZDists@CDeferredExtension@@UAEXABM0@Z 10003a90 f   IDeferredExt.obj
+ 0001:00002ab0       ?CommitZScale@CDeferredExtension@@UAEXABM@Z 10003ab0 f   IDeferredExt.obj
+ 0001:00002ac0       ?CommitFrustumDeltas@CDeferredExtension@@UAEXABVVMatrix@@@Z 10003ac0 f   IDeferredExt.obj
+ 0001:00002ad0       ??4shadowData_ortho_t@@QAEAAU0@ABU0@@Z 10003ad0 f i IDeferredExt.obj
+ 0001:00002b40       ?CommitShadowData_General@CDeferredExtension@@UAEXABUshadowData_general_t@@@Z 10003b40 f   IDeferredExt.obj
+ 0001:00002b70       ?CommitVolumeData@CDeferredExtension@@UAEXABUvolumeData_t@@@Z 10003b70 f   IDeferredExt.obj
+ 0001:00002ba0       ?CommitLightData_Common@CDeferredExtension@@UAEPAMPAMHHHHH@Z 10003ba0 f   IDeferredExt.obj
+ 0001:00002bf0       ?CommitTexture_General@CDeferredExtension@@UAEXPAVITexture@@00@Z 10003bf0 f   IDeferredExt.obj
+ 0001:00002c20       ?CommitTexture_CascadedDepth@CDeferredExtension@@UAEXABHPAVITexture@@@Z 10003c20 f   IDeferredExt.obj
+ 0001:00002c40       ?CommitTexture_DualParaboloidDepth@CDeferredExtension@@UAEXABHPAVITexture@@@Z 10003c40 f   IDeferredExt.obj
+ 0001:00002c60       ?CommitTexture_ProjectedDepth@CDeferredExtension@@UAEXABHPAVITexture@@@Z 10003c60 f   IDeferredExt.obj
+ 0001:00002c80       ?CommitTexture_Cookie@CDeferredExtension@@UAEXABHPAVITexture@@@Z 10003c80 f   IDeferredExt.obj
+ 0001:00002ca0       ?CommitTexture_VolumePrePass@CDeferredExtension@@UAEXPAVITexture@@@Z 10003ca0 f   IDeferredExt.obj
+ 0001:00002cb0       ?CommitShadowData_Ortho@CDeferredExtension@@UAEXABHABUshadowData_ortho_t@@@Z 10003cb0 f   IDeferredExt.obj
+ 0001:00002cd0       ?CommitShadowData_Proj@CDeferredExtension@@UAEXABHABUshadowData_proj_t@@@Z 10003cd0 f   IDeferredExt.obj
+ 0001:00002d40       ?CommitLightData_Global@CDeferredExtension@@UAEXABUlightData_Global_t@@@Z 10003d40 f   IDeferredExt.obj
+ 0001:00002d50       ??0CDeferredExtension@@QAE@XZ 10003d50 f   IDeferredExt.obj
+ 0001:00002e90       ??_GIBaseInterface@@UAEPAXI@Z 10003e90 f i IDeferredExt.obj
+ 0001:00002e90       ??_ECDeferredExtension@@UAEPAXI@Z 10003e90 f i IDeferredExt.obj
+ 0001:00002e90       ??_GCDeferredExtension@@UAEPAXI@Z 10003e90 f i IDeferredExt.obj
+ 0001:00002e90       ??_EIBaseInterface@@UAEPAXI@Z 10003e90 f i IDeferredExt.obj
+ 0001:00002ec0       ?GetName@CShader@LIGHTING_GLOBAL@@UBEPBDXZ 10003ec0 f i lighting_global.obj
+ 0001:00002ed0       ?GetFlags@CShader@LIGHTING_GLOBAL@@UBEHXZ 10003ed0 f i lighting_global.obj
+ 0001:00002ee0       ??0lightData_Global_t@@QAE@ABU0@@Z 10003ee0 f i lighting_global.obj
+ 0001:00002ee0       ??4lightData_Global_t@@QAEAAU0@ABU0@@Z 10003ee0 f i IDeferredExt.obj
+ 0001:00002f70       ?GetParamCount@CShader@LIGHTING_GLOBAL@@UBEHXZ 10003f70 f i lighting_global.obj
+ 0001:00002f80       ?OnDrawElements@CShader@LIGHTING_GLOBAL@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10003f80 f i lighting_global.obj
+ 0001:000032c0       ?GetParamInfo@CShader@LIGHTING_GLOBAL@@UBEABUShaderParamInfo_t@@H@Z 100042c0 f i lighting_global.obj
+ 0001:000032f0       ?InitPassLightPass@@YAXABUlightPassParms@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 100042f0 f   lighting_pass_basic.obj
+ 0001:000032f0       ?InitPassLightPassVolum@@YAXABUlightPassParms@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 100042f0 f   lighting_pass_volum.obj
+ 0001:00003300       ?DrawPassLightPass@@YAXABUlightPassParms@@PAVCBaseVSShader@@PAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@@Z 10004300 f   lighting_pass_basic.obj
+ 0001:00003730       ?InitParmsLightPass@@YAXABUlightPassParms@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10004730 f   lighting_pass_basic.obj
+ 0001:00003730       ?InitParmsLightPassVolum@@YAXABUlightPassParms@@PAVCBaseVSShader@@PAPAVIMaterialVar@@@Z 10004730 f   lighting_pass_volum.obj
+ 0001:00003770       ?DrawPassLightPassVolum@@YAXABUlightPassParms@@PAVCBaseVSShader@@PAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@@Z 10004770 f   lighting_pass_volum.obj
+ 0001:00003a70       ?OnInitShaderParams@CShader@LIGHTING_WORLD@@UAEXPAPAVIMaterialVar@@PBD@Z 10004a70 f i lighting_world.obj
+ 0001:00003ac0       ?GetName@CShader@LIGHTING_WORLD@@UBEPBDXZ 10004ac0 f i lighting_world.obj
+ 0001:00003ad0       ?GetFlags@CShader@LIGHTING_WORLD@@UBEHXZ 10004ad0 f i lighting_world.obj
+ 0001:00003ae0       ?OnInitShaderInstance@CShader@LIGHTING_WORLD@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10004ae0 f i lighting_world.obj
+ 0001:00003b30       ?OnDrawElements@CShader@LIGHTING_WORLD@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10004b30 f i lighting_world.obj
+ 0001:00003b80       ?GetParamCount@CShader@LIGHTING_WORLD@@UBEHXZ 10004b80 f i lighting_world.obj
+ 0001:00003b90       ?GetParamInfo@CShader@LIGHTING_WORLD@@UBEABUShaderParamInfo_t@@H@Z 10004b90 f i lighting_world.obj
+ 0001:00003bc0       ??0CShaderParam@LIGHTING_WORLD@@QAE@PBDW4ShaderParamType_t@@00H@Z 10004bc0 f i lighting_world.obj
+ 0001:00003c60       ?OnInitShaderParams@CShader@LIGHTING_VOLUME@@UAEXPAPAVIMaterialVar@@PBD@Z 10004c60 f i lighting_volume.obj
+ 0001:00003cb0       ?GetName@CShader@LIGHTING_VOLUME@@UBEPBDXZ 10004cb0 f i lighting_volume.obj
+ 0001:00003cc0       ?GetFlags@CShader@LIGHTING_VOLUME@@UBEHXZ 10004cc0 f i lighting_volume.obj
+ 0001:00003cd0       ?OnInitShaderInstance@CShader@LIGHTING_VOLUME@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10004cd0 f i lighting_volume.obj
+ 0001:00003d20       ?OnDrawElements@CShader@LIGHTING_VOLUME@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10004d20 f i lighting_volume.obj
+ 0001:00003d70       ?GetParamCount@CShader@LIGHTING_VOLUME@@UBEHXZ 10004d70 f i lighting_volume.obj
+ 0001:00003d80       ?GetParamInfo@CShader@LIGHTING_VOLUME@@UBEABUShaderParamInfo_t@@H@Z 10004d80 f i lighting_volume.obj
+ 0001:00003db0       ??1?$CUtlVector@PAVCShaderParam@VOLUME_BLEND@@V?$CUtlMemory@PAVCShaderParam@VOLUME_BLEND@@H@@@@QAE@XZ 10004db0 f i volume_blend.obj
+ 0001:00003db0       ??1?$CUtlVector@PAVCShaderParam@GAUSSIAN_BLUR_6@@V?$CUtlMemory@PAVCShaderParam@GAUSSIAN_BLUR_6@@H@@@@QAE@XZ 10004db0 f i blur.obj
+ 0001:00003db0       ??1?$CUtlVector@PAVCShaderParam@VOLUME_PREPASS@@V?$CUtlMemory@PAVCShaderParam@VOLUME_PREPASS@@H@@@@QAE@XZ 10004db0 f i volume_prepass.obj
+ 0001:00003db0       ??1?$CUtlVector@PAVCShaderParam@DEFERRED_MODEL@@V?$CUtlMemory@PAVCShaderParam@DEFERRED_MODEL@@H@@@@QAE@XZ 10004db0 f i deferred_model.obj
+ 0001:00003db0       ??1?$CUtlVector@PAVCShaderParam@DEBUG_SHADOW@@V?$CUtlMemory@PAVCShaderParam@DEBUG_SHADOW@@H@@@@QAE@XZ 10004db0 f i debug_shadow.obj
+ 0001:00003db0       ??1?$CUtlVector@PAVCShaderParam@DEBUG_LIGHTING_CTRL@@V?$CUtlMemory@PAVCShaderParam@DEBUG_LIGHTING_CTRL@@H@@@@QAE@XZ 10004db0 f i debug_lightingctrl.obj
+ 0001:00003db0       ??1?$CUtlVector@PAVCShaderParam@LIGHTING_VOLUME@@V?$CUtlMemory@PAVCShaderParam@LIGHTING_VOLUME@@H@@@@QAE@XZ 10004db0 f i lighting_volume.obj
+ 0001:00003db0       ??1?$CUtlVector@PAVCShaderParam@LIGHTING_GLOBAL@@V?$CUtlMemory@PAVCShaderParam@LIGHTING_GLOBAL@@H@@@@QAE@XZ 10004db0 f i lighting_global.obj
+ 0001:00003db0       ??1?$CUtlVector@P6AXPAVIConVar@@PBDM@ZV?$CUtlMemory@P6AXPAVIConVar@@PBDM@ZH@@@@QAE@XZ 10004db0 f i tier1:convar.obj
+ 0001:00003db0       ??1?$CUtlVector@PAVCShaderParam@DEFERRED_BRUSH@@V?$CUtlMemory@PAVCShaderParam@DEFERRED_BRUSH@@H@@@@QAE@XZ 10004db0 f i deferred_brush.obj
+ 0001:00003db0       ??1?$CUtlVector@PAVCShaderParam@LIGHTING_WORLD@@V?$CUtlMemory@PAVCShaderParam@LIGHTING_WORLD@@H@@@@QAE@XZ 10004db0 f i lighting_world.obj
+ 0001:00003e20       ??0CShaderParam@LIGHTING_VOLUME@@QAE@PBDW4ShaderParamType_t@@00H@Z 10004e20 f i lighting_volume.obj
+ 0001:00003ec0       ?GetName@CShader@VOLUME_BLEND@@UBEPBDXZ 10004ec0 f i volume_blend.obj
+ 0001:00003ed0       ?GetFlags@CShader@VOLUME_BLEND@@UBEHXZ 10004ed0 f i volume_blend.obj
+ 0001:00003ee0       ?OnInitShaderInstance@CShader@GAUSSIAN_BLUR_6@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10004ee0 f i blur.obj
+ 0001:00003ee0       ?OnInitShaderInstance@CShader@VOLUME_BLEND@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD@Z 10004ee0 f i volume_blend.obj
+ 0001:00003f10       ?OnDrawElements@CShader@VOLUME_BLEND@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10004f10 f i volume_blend.obj
+ 0001:00003fe0       ?GetParamCount@CShader@VOLUME_BLEND@@UBEHXZ 10004fe0 f i volume_blend.obj
+ 0001:00003ff0       ?GetParamInfo@CShader@VOLUME_BLEND@@UBEABUShaderParamInfo_t@@H@Z 10004ff0 f i volume_blend.obj
+ 0001:00004020       ?OnInitShaderParams@CBaseShader@@UAEXPAPAVIMaterialVar@@PBD@Z 10005020 f i blur.obj
+ 0001:00004020       ?OnInitShaderParams@CShader@VOLUME_PREPASS@@UAEXPAPAVIMaterialVar@@PBD@Z 10005020 f i volume_prepass.obj
+ 0001:00004020       ?OnInitShaderParams@CShader@GAUSSIAN_BLUR_6@@UAEXPAPAVIMaterialVar@@PBD@Z 10005020 f i blur.obj
+ 0001:00004020       ?OnInitShaderParams@CShader@DEBUG_SHADOW@@UAEXPAPAVIMaterialVar@@PBD@Z 10005020 f i debug_shadow.obj
+ 0001:00004020       ?OnInitShaderParams@CShader@LIGHTING_GLOBAL@@UAEXPAPAVIMaterialVar@@PBD@Z 10005020 f i lighting_global.obj
+ 0001:00004020       ?OnInitShaderParams@CShader@VOLUME_BLEND@@UAEXPAPAVIMaterialVar@@PBD@Z 10005020 f i volume_blend.obj
+ 0001:00004020       ?OnInitShaderParams@CShader@DEBUG_LIGHTING_CTRL@@UAEXPAPAVIMaterialVar@@PBD@Z 10005020 f i debug_lightingctrl.obj
+ 0001:00004030       ?GetName@CShader@VOLUME_PREPASS@@UBEPBDXZ 10005030 f i volume_prepass.obj
+ 0001:00004040       ?GetFlags@CShader@VOLUME_PREPASS@@UBEHXZ 10005040 f i volume_prepass.obj
+ 0001:00004050       ?OnDrawElements@CShader@VOLUME_PREPASS@@UAEXPAPAVIMaterialVar@@PAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@@Z 10005050 f i volume_prepass.obj
+ 0001:00004170       ?GetParamCount@CShader@VOLUME_PREPASS@@UBEHXZ 10005170 f i volume_prepass.obj
+ 0001:00004180       ?GetParamInfo@CShader@VOLUME_PREPASS@@UBEABUShaderParamInfo_t@@H@Z 10005180 f i volume_prepass.obj
+ 0001:000041b0       ?ConVar_Register@@YAXHPAVIConCommandBaseAccessor@@@Z 100051b0 f   tier1:convar.obj
+ 0001:00004260       ?ConVar_Unregister@@YAXXZ  10005260 f   tier1:convar.obj
+ 0001:000042b0       ?GetDLLIdentifier@ConCommandBase@@UBEHXZ 100052b0 f   tier1:convar.obj
+ 0001:000042c0       ?Create@ConCommandBase@@MAEXPBD0H@Z 100052c0 f   tier1:convar.obj
+ 0001:00004310       ?GetName@ConCommandBase@@UBEPBDXZ 10005310 f   tier1:convar.obj
+ 0001:00004320       ?IsFlagSet@ConCommandBase@@UBE_NH@Z 10005320 f   tier1:convar.obj
+ 0001:00004330       ?AddFlags@ConCommandBase@@UAEXH@Z 10005330 f   tier1:convar.obj
+ 0001:00004340       ?RemoveFlags@ConCommandBase@@UAEXH@Z 10005340 f   tier1:convar.obj
+ 0001:00004350       ?GetHelpText@ConCommandBase@@UBEPBDXZ 10005350 f   tier1:convar.obj
+ 0001:00004360       ?IsRegistered@ConCommandBase@@UBE_NXZ 10005360 f   tier1:convar.obj
+ 0001:00004370       ?DefaultCompletionFunc@@YAHPBDQAY0EA@D@Z 10005370 f   tier1:convar.obj
+ 0001:00004370       ?GetSplitScreenPlayerSlot@ConVar@@UBEHXZ 10005370 f   tier1:convar.obj
+ 0001:00004380       ??0ConCommand@@QAE@PBDP6AXABVCCommand@@@Z0HP6AH0QAY0EA@D@Z@Z 10005380 f   tier1:convar.obj
+ 0001:00004420       ??1ConCommand@@UAE@XZ      10005420 f   tier1:convar.obj
+ 0001:00004430       ?IsCommand@ConCommand@@UBE_NXZ 10005430 f   tier1:convar.obj
+ 0001:00004430       ?IsCommand@ConCommandBase@@UBE_NXZ 10005430 f   tier1:convar.obj
+ 0001:00004440       ?Dispatch@ConCommand@@UAEXABVCCommand@@@Z 10005440 f   tier1:convar.obj
+ 0001:00004480       ?CanAutoComplete@ConCommand@@UAE_NXZ 10005480 f   tier1:convar.obj
+ 0001:00004490       ?IsFlagSet@ConVar@@UBE_NH@Z 10005490 f   tier1:convar.obj
+ 0001:000044a0       ?GetFlags@ConVar@@UBEHXZ   100054a0 f   tier1:convar.obj
+ 0001:000044b0       ?GetHelpText@ConVar@@UBEPBDXZ 100054b0 f   tier1:convar.obj
+ 0001:000044c0       ?AddFlags@ConVar@@UAEXH@Z  100054c0 f   tier1:convar.obj
+ 0001:000044d0       ?IsRegistered@ConVar@@UBE_NXZ 100054d0 f   tier1:convar.obj
+ 0001:000044e0       ?GetName@ConVar@@UBEPBDXZ  100054e0 f   tier1:convar.obj
+ 0001:000044f0       ?GetBaseName@ConVar@@UBEPBDXZ 100054f0 f   tier1:convar.obj
+ 0001:00004500       ?IsCommand@ConVar@@UBE_NXZ 10005500 f   tier1:convar.obj
+ 0001:00004510       ?Init@ConCommandBase@@MAEXXZ 10005510 f   tier1:convar.obj
+ 0001:00004510       ?Init@ConVar@@EAEXXZ       10005510 f   tier1:convar.obj
+ 0001:00004530       ?InternalSetColorFromString@ConVar@@AAE_NPBD@Z 10005530 f   tier1:convar.obj
+ 0001:000045e0       ?InternalSetValue@ConVar@@EAEXPBD@Z 100055e0 f   tier1:convar.obj
+ 0001:00004710       ?ClampValue@ConVar@@EAE_NAAM@Z 10005710 f   tier1:convar.obj
+ 0001:00004750       ?InternalSetFloatValue@ConVar@@EAEXM@Z 10005750 f   tier1:convar.obj
+ 0001:00004830       ?InternalSetIntValue@ConVar@@EAEXH@Z 10005830 f   tier1:convar.obj
+ 0001:00004900       ?InternalSetColorValue@ConVar@@EAEXVColor@@@Z 10005900 f   tier1:convar.obj
+ 0001:00004930       ?SetValue@ConVar@@UAEXPBD@Z 10005930 f   tier1:convar.obj
+ 0001:00004940       ?SetValue@ConVar@@UAEXM@Z  10005940 f   tier1:convar.obj
+ 0001:00004960       ?SetValue@ConVar@@UAEXH@Z  10005960 f   tier1:convar.obj
+ 0001:00004970       ?SetValue@ConVar@@UAEXVColor@@@Z 10005970 f   tier1:convar.obj
+ 0001:00004980       ?RegisterConCommandBase@CDefaultAccessor@@UAE_NPAVConCommandBase@@@Z 10005980 f i tier1:convar.obj
+ 0001:000049a0       ??_EConCommandBase@@UAEPAXI@Z 100059a0 f i tier1:convar.obj
+ 0001:000049a0       ??_EConCommand@@UAEPAXI@Z  100059a0 f i tier1:convar.obj
+ 0001:000049a0       ??_GConCommandBase@@UAEPAXI@Z 100059a0 f i tier1:convar.obj
+ 0001:000049a0       ??_GConCommand@@UAEPAXI@Z  100059a0 f i tier1:convar.obj
+ 0001:000049c0       ?Grow@?$CUtlMemory@P6AXPAVIConVar@@PBDM@ZH@@QAEXH@Z 100059c0 f i tier1:convar.obj
+ 0001:00004a50       ?Grow@?$CUtlMemory@VCUtlString@@H@@QAEXH@Z 10005a50 f i tier1:convar.obj
+ 0001:00004ae0       ?ChangeStringValue@ConVar@@EAEXPBDM@Z 10005ae0 f   tier1:convar.obj
+ 0001:00004ba0       ?InsertBefore@?$CUtlVector@P6AXPAVIConVar@@PBDM@ZV?$CUtlMemory@P6AXPAVIConVar@@PBDM@ZH@@@@QAEHHABQ6AXPAVIConVar@@PBDM@Z@Z 10005ba0 f i tier1:convar.obj
+ 0001:00004c10       ??1ConVar@@UAE@XZ          10005c10 f   tier1:convar.obj
+ 0001:00004c50       ?GetName@ConVar@@WBI@BEPBDXZ 10005c50 f i tier1:convar.obj
+ 0001:00004c60       ?IsFlagSet@ConVar@@WBI@BE_NH@Z 10005c60 f i tier1:convar.obj
+ 0001:00004c70       ?InsertBefore@?$CUtlVector@VCUtlString@@V?$CUtlMemory@VCUtlString@@H@@@@QAEHHABVCUtlString@@@Z 10005c70 f i tier1:convar.obj
+ 0001:00004ce0       ?Create@ConVar@@EAEXPBD0H0_NM1MP6AXPAVIConVar@@0M@Z@Z 10005ce0 f   tier1:convar.obj
+ 0001:00004e20       ?AutoCompleteSuggest@ConCommand@@UAEHPBDAAV?$CUtlVector@VCUtlString@@V?$CUtlMemory@VCUtlString@@H@@@@@Z 10005e20 f   tier1:convar.obj
+ 0001:00004f00       ??0ConVar@@QAE@PBD0H@Z     10005f00 f   tier1:convar.obj
+ 0001:00004f70       ?SetValue@CEmptyConVar@@UAEXM@Z 10005f70 f i tier1:convar.obj
+ 0001:00004f70       ?SetValue@CEmptyConVar@@UAEXH@Z 10005f70 f i tier1:convar.obj
+ 0001:00004f70       ?SetValue@CEmptyConVar@@UAEXPBD@Z 10005f70 f i tier1:convar.obj
+ 0001:00004f80       ?GetName@CEmptyConVar@@UBEPBDXZ 10005f80 f i tier1:convar.obj
+ 0001:00004f90       ?IsFlagSet@CEmptyConVar@@UBE_NH@Z 10005f90 f i tier1:convar.obj
+ 0001:00004fa0       ?GetName@CEmptyConVar@@WBI@BEPBDXZ 10005fa0 f i tier1:convar.obj
+ 0001:00004fb0       ?IsFlagSet@CEmptyConVar@@WBI@BE_NH@Z 10005fb0 f i tier1:convar.obj
+ 0001:00004fc0       ??_GCEmptyConVar@@UAEPAXI@Z 10005fc0 f i tier1:convar.obj
+ 0001:00004fc0       ??_GConVar@@UAEPAXI@Z      10005fc0 f i tier1:convar.obj
+ 0001:00004fc0       ??_ECEmptyConVar@@UAEPAXI@Z 10005fc0 f i tier1:convar.obj
+ 0001:00004fc0       ??_EConVar@@UAEPAXI@Z      10005fc0 f i tier1:convar.obj
+ 0001:00005010       ?_V_strlen@@YAHPBD@Z       10006010 f   tier1:strtools.obj
+ 0001:00005040       ?_V_strcmp@@YAHPBD0@Z      10006040 f   tier1:strtools.obj
+ 0001:000050a0       ?_V_memset@@YAXPAXHH@Z     100060a0 f   tier1:strtools.obj
+ 0001:000050d0       ?_V_memcpy@@YAXPAXPBXH@Z   100060d0 f   tier1:strtools.obj
+ 0001:00005100       ?_V_memmove@@YAXPAXPBXH@Z  10006100 f   tier1:strtools.obj
+ 0001:00005130       ?V_snprintf@@YAHPADHPBDZZ  10006130 f   tier1:strtools.obj
+ 0001:00005180       ??0InterfaceReg@@QAE@P6APAXXZPBD@Z 10006180 f   tier1:interface.obj
+ 0001:000051a0       ?CreateInterfaceInternal@@YAPAXPBDPAH@Z 100061a0 f   tier1:interface.obj
+ 0001:00005210       _CreateInterface           10006210 f   tier1:interface.obj
+ 0001:00005220       ?Grow@?$CUtlMemory@EH@@QAEXH@Z 10006220 f i tier1:utlstring.obj
+ 0001:000052b0       ?Set@CUtlBinaryBlock@@QAEXPBXH@Z 100062b0 f   tier1:utlstring.obj
+ 0001:00005320       ??0CUtlString@@QAE@PBD@Z   10006320 f   tier1:utlstring.obj
+ 0001:00005360       ??0CUtlString@@QAE@ABV0@@Z 10006360 f   tier1:utlstring.obj
+ 0001:000053b0       ?FindConversion@CUtlCStringConversion@@UAEDPBDPAH@Z 100063b0 f   tier1:utlbuffer.obj
+ 0001:000053d0       ??0CUtlCharConversion@@QAE@DPBDHPAUConversionArray_t@0@@Z 100063d0 f   tier1:utlbuffer.obj
+ 0001:00005460       ?FindConversion@CUtlCharConversion@@UAEDPBDPAH@Z 10006460 f   tier1:utlbuffer.obj
+ 0001:000054c0       ?FindConversion@CUtlNoEscConversion@@UAEDPBDPAH@Z 100064c0 f i tier1:utlbuffer.obj
+ 0001:000054d0       ?ReconnectInterface@@YAXP6APAXPBDPAH@Z0PAPAX@Z 100064d0 f   interfaces:interfaces.obj
+ 0001:00005540       ?ConnectInterfaces@@YAXPAP6APAXPBDPAH@ZH@Z 10006540 f   interfaces:interfaces.obj
+ 0001:00005640       ?DisconnectInterfaces@@YAXXZ 10006640 f   interfaces:interfaces.obj
+ 0001:00005680       ?BuildGammaTable@@YAXMMMH@Z 10006680 f   mathlib:color_conversion.obj
+ 0001:000059e0       ??4VMatrix@@QAEAAV0@ABV0@@Z 100069e0 f   mathlib:vmatrix.obj
+ 0001:00005a50       ?MatrixSetIdentity@@YAXAAVVMatrix@@@Z 10006a50 f   mathlib:vmatrix.obj
+ 0001:00005ab0       ?Transpose@VMatrix@@QBE?AV1@XZ 10006ab0 f   mathlib:vmatrix.obj
+ 0001:00005b20       ?_VectorNormalizeFast@@YIXAAVVector@@@Z 10006b20 f   mathlib:mathlib_base.obj
+ 0001:00005b80       ?MathLib_Init@@YAXMMMH_N000@Z 10006b80 f   mathlib:mathlib_base.obj
+ 0001:00005c20       ?Seed@SIMDRandStreamContext@@QAEXI@Z 10006c20 f i mathlib:randsse.obj
+ 0001:00005d10       ?SeedRandSIMD@@YAXI@Z      10006d10 f   mathlib:randsse.obj
+ 0001:00005d40       ??_GCBasePerInstanceContextData@@UAEPAXI@Z 10006d40 f i shaderlib:BaseShader.obj
+ 0001:00005d40       ??_ECBasePerInstanceContextData@@UAEPAXI@Z 10006d40 f i shaderlib:BaseShader.obj
+ 0001:00005d70       ?SetCommands@CPerInstanceContextData@@QAEXHPAE@Z 10006d70 f i shaderlib:BaseShader.obj
+ 0001:00005e00       ?GetParamCount@CBaseShader@@UBEHXZ 10006e00 f   shaderlib:BaseShader.obj
+ 0001:00005e10       ?GetParamInfo@CBaseShader@@UBEABUShaderParamInfo_t@@H@Z 10006e10 f   shaderlib:BaseShader.obj
+ 0001:00005e30       ?InitShaderParams@CBaseShader@@UAEXPAPAVIMaterialVar@@PBD@Z 10006e30 f   shaderlib:BaseShader.obj
+ 0001:00005e60       ?InitShaderInstance@CBaseShader@@UAEXPAPAVIMaterialVar@@PAVIShaderInit@@PBD2@Z 10006e60 f   shaderlib:BaseShader.obj
+ 0001:00005eb0       ?SetInitialShadowState@CBaseShader@@QAEXXZ 10006eb0 f   shaderlib:BaseShader.obj
+ 0001:00005f80       ?LoadTexture@CBaseShader@@QAEXH@Z 10006f80 f   shaderlib:BaseShader.obj
+ 0001:00005fd0       ?LoadBumpMap@CBaseShader@@QAEXH@Z 10006fd0 f   shaderlib:BaseShader.obj
+ 0001:00006020       ?GetShaderAPITextureBindHandle@CBaseShader@@QAEHHHH@Z 10007020 f   shaderlib:BaseShader.obj
+ 0001:00006070       ?NeedsPowerOfTwoFrameBufferTexture@CBaseShader@@UBE_NPAPAVIMaterialVar@@_N@Z 10007070 f   shaderlib:BaseShader.obj
+ 0001:00006090       ?NeedsFullFrameBufferTexture@CBaseShader@@UBE_NPAPAVIMaterialVar@@_N@Z 10007090 f   shaderlib:BaseShader.obj
+ 0001:000060b0       ?IsTranslucent@CBaseShader@@UBE_NPAPAVIMaterialVar@@@Z 100070b0 f   shaderlib:BaseShader.obj
+ 0001:000060d0       ?EnableAlphaBlending@CBaseShader@@QAEXW4ShaderBlendFactor_t@@0@Z 100070d0 f   shaderlib:BaseShader.obj
+ 0001:00006110       ?DefaultFog@CBaseShader@@QAEXXZ 10007110 f   shaderlib:BaseShader.obj
+ 0001:00006150       ??_ECPerInstanceContextData@@UAEPAXI@Z 10007150 f i shaderlib:BaseShader.obj
+ 0001:00006150       ??_GCPerInstanceContextData@@UAEPAXI@Z 10007150 f i shaderlib:BaseShader.obj
+ 0001:000061b0       ??0CBaseShader@@QAE@XZ     100071b0 f   shaderlib:BaseShader.obj
+ 0001:000061d0       ?DrawElements@CBaseShader@@UAEXPAPAVIMaterialVar@@HPAVIShaderShadow@@PAVIShaderDynamicAPI@@W4VertexCompressionType_t@@PAPAVCBasePerMaterialContextData@@PAPAVCBasePerInstanceContextData@@@Z 100071d0 f   shaderlib:BaseShader.obj
+ 0001:00006260       ?BindTexture@CBaseShader@@QAEXW4Sampler_t@@HH@Z 10007260 f   shaderlib:BaseShader.obj
+ 0001:000062b0       ?BindTexture@CBaseShader@@QAEXW4Sampler_t@@PAVITexture@@H@Z 100072b0 f   shaderlib:BaseShader.obj
+ 0001:000062d0       ?ComputeModulationFlags@CBaseShader@@UAEHPAPAVIMaterialVar@@PAVIShaderDynamicAPI@@@Z 100072d0 f   shaderlib:BaseShader.obj
+ 0001:00006360       ?PI_EndCommandBuffer@CBaseShader@@QAEXXZ 10007360 f   shaderlib:BaseShader.obj
+ 0001:00006440       ?Draw@CBaseShader@@QAEX_N@Z 10007440 f   shaderlib:BaseShader.obj
+ 0001:00006540       ?Connect@CShaderDLL@@UAE_NP6APAXPBDPAH@Z_N@Z 10007540 f   shaderlib:ShaderDLL.obj
+ 0001:000065c0       ?Disconnect@CShaderDLL@@UAEX_N@Z 100075c0 f   shaderlib:ShaderDLL.obj
+ 0001:00006600       ?Connect@CShaderDLL@@UAE_NP6APAXPBDPAH@Z@Z 10007600 f   shaderlib:ShaderDLL.obj
+ 0001:00006620       ?Disconnect@CShaderDLL@@UAEXXZ 10007620 f   shaderlib:ShaderDLL.obj
+ 0001:00006630       ?GetFlags@ConCommandBase@@UBEHXZ 10007630 f   tier1:convar.obj
+ 0001:00006630       ?ShaderCount@CShaderDLL@@UBEHXZ 10007630 f   shaderlib:ShaderDLL.obj
+ 0001:00006640       ?GetShader@CShaderDLL@@UAEPAVIShader@@H@Z 10007640 f   shaderlib:ShaderDLL.obj
+ 0001:00006660       ??0CShaderDLL@@QAE@XZ      10007660 f   shaderlib:ShaderDLL.obj
+ 0001:000066c0       ?GetShaderDLL@@YAPAVIShaderDLL@@XZ 100076c0 f   shaderlib:ShaderDLL.obj
+ 0001:00006700       ?GetShaderDLLInternal@@YAPAVIShaderDLLInternal@@XZ 10007700 f   shaderlib:ShaderDLL.obj
+ 0001:00006730       ?InsertShader@CShaderDLL@@UAEXPAVIShader@@@Z 10007730 f   shaderlib:ShaderDLL.obj
+ 0001:00006790       ?InitShaderLibCVars@@YAXP6APAXPBDPAH@Z@Z 10007790 f   shaderlib:shaderlib_cvar.obj
+ 0001:000067b0       ?RegisterConCommandBase@CShaderLibConVarAccessor@@UAE_NPAVConCommandBase@@@Z 100077b0 f i shaderlib:shaderlib_cvar.obj
+ 0001:00006809       __cfltcvt_init             10007809 f   LIBCMT:_fpinit_.obj
+ 0001:00006869       __fpmath                   10007869 f   LIBCMT:_fpinit_.obj
+ 0001:00006890       _fmod                      10007890 f   LIBCMT:_87fmod_.obj
+ 0001:0000689a       __CIfmod                   1000789a f   LIBCMT:_87fmod_.obj
+ 0001:000068c0       __ftol2_sse                100078c0 f   LIBCMT:ftol2.obj
+ 0001:000068c9       __ftol2_pentium4           100078c9 f   LIBCMT:ftol2.obj
+ 0001:000068dc       __ftol2_sse_excpt          100078dc f   LIBCMT:ftol2.obj
+ 0001:000068f6       __ftol2                    100078f6 f   LIBCMT:ftol2.obj
+ 0001:00006a21       ___onexitinit              10007a21 f   LIBCMT:onexit.obj
+ 0001:00006a52       __onexit                   10007a52 f   LIBCMT:onexit.obj
+ 0001:00006a8e       _atexit                    10007a8e f   LIBCMT:onexit.obj
+ 0001:00006aa5       ??1type_info@@UAE@XZ       10007aa5 f   LIBCMT:typinfo.obj
+ 0001:00006ab5       ??_Etype_info@@UAEPAXI@Z   10007ab5 f i LIBCMT:typinfo.obj
+ 0001:00006ab5       ??_Gtype_info@@UAEPAXI@Z   10007ab5 f i LIBCMT:typinfo.obj
+ 0001:00006ad6       __purecall                 10007ad6 f   LIBCMT:purevirt.obj
+ 0001:00006b00       ??3@YAXPAX@Z               10007b00 f   LIBCMT:delete.obj
+ 0001:00006b0b       ??1bad_alloc@std@@UAE@XZ   10007b0b f i LIBCMT:new.obj
+ 0001:00006b16       ??_Ebad_alloc@std@@UAEPAXI@Z 10007b16 f i LIBCMT:new.obj
+ 0001:00006b16       ??_Gbad_alloc@std@@UAEPAXI@Z 10007b16 f i LIBCMT:new.obj
+ 0001:00006b3d       ??0bad_alloc@std@@QAE@ABV01@@Z 10007b3d f i LIBCMT:new.obj
+ 0001:00006b5a       ??2@YAPAXI@Z               10007b5a f   LIBCMT:new.obj
+ 0001:00006bda       _atol                      10007bda f   LIBCMT:atox.obj
+ 0001:00006bf0       _atoi                      10007bf0 f   LIBCMT:atox.obj
+ 0001:00006bfb       __CRT_INIT@12              10007bfb f   LIBCMT:dllcrt0.obj
+ 0001:00006e55       __DllMainCRTStartup@12     10007e55 f   LIBCMT:dllcrt0.obj
+ 0001:00006ee6       _sscanf                    10007ee6 f   LIBCMT:sscanf.obj
+ 0001:00006f08       ??0_LocaleUpdate@@QAE@PAUlocaleinfo_struct@@@Z 10007f08 f i LIBCMT:atof.obj
+ 0001:00006f8f       __atof_l                   10007f8f f   LIBCMT:atof.obj
+ 0001:0000703a       _atof                      1000803a f   LIBCMT:atof.obj
+ 0001:0000704d       __vsnprintf_l              1000804d f   LIBCMT:vsnprint.obj
+ 0001:000070f9       __vsnprintf                100080f9 f   LIBCMT:vsnprint.obj
+ 0001:00007120       __chkstk                   10008120 f   LIBCMT:chkstk.obj
+ 0001:00007120       __alloca_probe             10008120     LIBCMT:chkstk.obj
+ 0001:00007160       _strchr                    10008160 f   LIBCMT:strchr.obj
+ 0001:00007166       ___from_strstr_to_strchr   10008166     LIBCMT:strchr.obj
+ 0001:00007220       _memcpy                    10008220 f   LIBCMT:memcpy.obj
+ 0001:00007590       __alloca_probe_16          10008590 f   LIBCMT:alloca16.obj
+ 0001:000075a6       __alloca_probe_8           100085a6     LIBCMT:alloca16.obj
+ 0001:000075c0       _strstr                    100085c0 f   LIBCMT:strstr.obj
+ 0001:00007646       __tolower_l                10008646 f   LIBCMT:tolower.obj
+ 0001:0000775b       _tolower                   1000875b f   LIBCMT:tolower.obj
+ 0001:00007790       __allmul                   10008790 f   LIBCMT:llmul.obj
+ 0001:000077d0       _strncat                   100087d0 f   LIBCMT:strncat.obj
+ 0001:00007910       _memset                    10008910 f   LIBCMT:memset.obj
+ 0001:00007990       _memmove                   10008990 f   LIBCMT:memmove.obj
+ 0001:00007d00       _strncpy                   10008d00 f   LIBCMT:strncpy.obj
+ 0001:00007e30       __allrem                   10008e30 f   LIBCMT:llrem.obj
+ 0001:00007ef0       __alldiv                   10008ef0 f   LIBCMT:lldiv.obj
+ 0001:000081c5       _strtol                    100091c5 f   LIBCMT:strtol.obj
+ 0001:000081f0       _floor                     100091f0 f   LIBCMT:_floor_pentium4_.obj
+ 0001:00008230       __floor_pentium4           10009230 f   LIBCMT:_floor_pentium4_.obj
+ 0001:00008320       _pow                       10009320 f   LIBCMT:_pow_.obj
+ 0001:00008360       __CIpow                    10009360 f   LIBCMT:_pow_.obj
+ 0001:0000839b       __CIpow_default            1000939b f   LIBCMT:_pow_.obj
+ 0001:000083b4       __pow_default              100093b4     LIBCMT:_pow_.obj
+ 0001:000085aa       ___libm_sse2_pow           100095aa f   LIBCMT:_pow_sse2_.obj
+ 0001:00009030       _acos                      1000a030 f   LIBCMT:_acos_.obj
+ 0001:00009070       __CIacos                   1000a070 f   LIBCMT:_acos_.obj
+ 0001:000090ab       __CIacos_default           1000a0ab f   LIBCMT:_acos_.obj
+ 0001:000090bf       __acos_default             1000a0bf     LIBCMT:_acos_.obj
+ 0001:00009176       ___libm_sse2_sin           1000a176 f   LIBCMT:_sin_sse2_.obj
+ 0001:00009330       _asin                      1000a330 f   LIBCMT:_asin_.obj
+ 0001:00009370       __CIasin                   1000a370 f   LIBCMT:_asin_.obj
+ 0001:000093ab       __CIasin_default           1000a3ab f   LIBCMT:_asin_.obj
+ 0001:000093bf       __asin_default             1000a3bf     LIBCMT:_asin_.obj
+ 0001:00009476       __forcdecpt_l              1000a476 f   LIBCMT:cvt.obj
+ 0001:000094ea       __cropzeros_l              1000a4ea f   LIBCMT:cvt.obj
+ 0001:0000956c       __positive                 1000a56c f   LIBCMT:cvt.obj
+ 0001:00009588       __fassign_l                1000a588 f   LIBCMT:cvt.obj
+ 0001:000095ca       __fassign                  1000a5ca f   LIBCMT:cvt.obj
+ 0001:00009603       __forcdecpt                1000a603 f   LIBCMT:cvt.obj
+ 0001:00009616       __cropzeros                1000a616 f   LIBCMT:cvt.obj
+ 0001:0000978a       __cftoe_l                  1000a78a f   LIBCMT:cvt.obj
+ 0001:00009851       __cftoe                    1000a851 f   LIBCMT:cvt.obj
+ 0001:00009871       __cftoa_l                  1000a871 f   LIBCMT:cvt.obj
+ 0001:00009cea       __cftof_l                  1000acea f   LIBCMT:cvt.obj
+ 0001:00009dab       __cftog_l                  1000adab f   LIBCMT:cvt.obj
+ 0001:00009e98       __cfltcvt_l                1000ae98 f   LIBCMT:cvt.obj
+ 0001:00009f20       __cfltcvt                  1000af20 f   LIBCMT:cvt.obj
+ 0001:00009f43       __initp_misc_cfltcvt_tab   1000af43 f   LIBCMT:cmiscdat.obj
+ 0001:00009f66       __setdefaultprecision      1000af66 f   LIBCMT:fp8.obj
+ 0001:00009f90       __cintrindisp2             1000af90 f   LIBCMT:_87cdisp_.obj
+ 0001:00009fce       __cintrindisp1             1000afce f   LIBCMT:_87cdisp_.obj
+ 0001:0000a00b       __ctrandisp2               1000b00b f   LIBCMT:_87cdisp_.obj
+ 0001:0000a19a       __ctrandisp1               1000b19a f   LIBCMT:_87cdisp_.obj
+ 0001:0000a1cd       __fload                    1000b1cd f   LIBCMT:_87cdisp_.obj
+ 0001:0000a210       __trandisp1                1000b210 f   LIBCMT:_87disp_.obj
+ 0001:0000a277       __trandisp2                1000b277 f   LIBCMT:_87disp_.obj
+ 0001:0000a303       __rttospopde               1000b303     LIBCMT:_87disp_.obj
+ 0001:0000a308       __rttospop                 1000b308     LIBCMT:_87disp_.obj
+ 0001:0000a30a       __rtnospop                 1000b30a     LIBCMT:_87disp_.obj
+ 0001:0000a30c       __rttosnpop                1000b30c     LIBCMT:_87disp_.obj
+ 0001:0000a30d       __rtnospopde               1000b30d     LIBCMT:_87disp_.obj
+ 0001:0000a314       __rtzeropop                1000b314     LIBCMT:_87disp_.obj
+ 0001:0000a316       __rtzeronpop               1000b316     LIBCMT:_87disp_.obj
+ 0001:0000a31b       __rtonepop                 1000b31b     LIBCMT:_87disp_.obj
+ 0001:0000a31d       __rtonenpop                1000b31d     LIBCMT:_87disp_.obj
+ 0001:0000a322       __tosnan1                  1000b322     LIBCMT:_87disp_.obj
+ 0001:0000a34d       __nosnan2                  1000b34d     LIBCMT:_87disp_.obj
+ 0001:0000a34f       __tosnan2                  1000b34f     LIBCMT:_87disp_.obj
+ 0001:0000a377       __nan2                     1000b377     LIBCMT:_87disp_.obj
+ 0001:0000a3b6       __rtindfpop                1000b3b6     LIBCMT:_87disp_.obj
+ 0001:0000a3b8       __rtindfnpop               1000b3b8     LIBCMT:_87disp_.obj
+ 0001:0000a3c9       __rttosnpopde              1000b3c9     LIBCMT:_87disp_.obj
+ 0001:0000a3d3       __rtchsifneg               1000b3d3     LIBCMT:_87disp_.obj
+ 0001:0000a3da       ___sse2_available_init     1000b3da f   LIBCMT:cpu_disp.obj
+ 0001:0000a3ea       __malloc_crt               1000b3ea f   LIBCMT:crtheap.obj
+ 0001:0000a42f       __calloc_crt               1000b42f f   LIBCMT:crtheap.obj
+ 0001:0000a47b       __realloc_crt              1000b47b f   LIBCMT:crtheap.obj
+ 0001:0000a4c9       __recalloc_crt             1000b4c9 f   LIBCMT:crtheap.obj
+ 0001:0000a51b       __msize                    1000b51b f   LIBCMT:msize.obj
+ 0001:0000a54e       ___crtCorExitProcess       1000b54e f   LIBCMT:crt0dat.obj
+ 0001:0000a579       ___crtExitProcess          1000b579 f   LIBCMT:crt0dat.obj
+ 0001:0000a591       __lockexit                 1000b591 f   LIBCMT:crt0dat.obj
+ 0001:0000a59a       __unlockexit               1000b59a f   LIBCMT:crt0dat.obj
+ 0001:0000a5a3       __init_pointers            1000b5a3 f   LIBCMT:crt0dat.obj
+ 0001:0000a5d6       __initterm_e               1000b5d6 f   LIBCMT:crt0dat.obj
+ 0001:0000a5fa       __cinit                    1000b5fa f   LIBCMT:crt0dat.obj
+ 0001:0000a7d1       __exit                     1000b7d1 f   LIBCMT:crt0dat.obj
+ 0001:0000a7e7       __cexit                    1000b7e7 f   LIBCMT:crt0dat.obj
+ 0001:0000a7f6       __amsg_exit                1000b7f6 f   LIBCMT:crt0dat.obj
+ 0001:0000a820       __SEH_prolog4              1000b820 f   LIBCMT:sehprolg4.obj
+ 0001:0000a865       __SEH_epilog4              1000b865 f   LIBCMT:sehprolg4.obj
+ 0001:0000a880       __except_handler4          1000b880 f   LIBCMT:chandler4.obj
+ 0001:0000aa0f       ?_Type_info_dtor@type_info@@CAXPAV1@@Z 1000ba0f f   LIBCMT:typname.obj
+ 0001:0000aa80       _strcmp                    1000ba80 f   LIBCMT:strcmp.obj
+ 0001:0000ab08       _abort                     1000bb08 f   LIBCMT:abort.obj
+ 0001:0000ab3b       __set_abort_behavior       1000bb3b f   LIBCMT:abort.obj
+ 0001:0000ab5c       __GET_RTERRMSG             1000bb5c f   LIBCMT:crt0msg.obj
+ 0001:0000ab82       __NMSG_WRITE               1000bb82 f   LIBCMT:crt0msg.obj
+ 0001:0000ad31       __FF_MSGBANNER             1000bd31 f   LIBCMT:crt0msg.obj
+ 0001:0000ad6a       __initp_misc_purevirt      1000bd6a f   LIBCMT:inithelp.obj
+ 0001:0000ad79       _free                      1000bd79 f   LIBCMT:free.obj
+ 0001:0000adb3       ??0exception@std@@QAE@ABQBDH@Z 1000bdb3 f   LIBCMT:stdexcpt.obj
+ 0001:0000add0       ?what@exception@std@@UBEPBDXZ 1000bdd0 f   LIBCMT:stdexcpt.obj
+ 0001:0000addd       ?_Copy_str@exception@std@@AAEXPBD@Z 1000bddd f   LIBCMT:stdexcpt.obj
+ 0001:0000ae1d       ?_Tidy@exception@std@@AAEXXZ 1000be1d f   LIBCMT:stdexcpt.obj
+ 0001:0000ae3b       ??4exception@std@@QAEAAV01@ABV01@@Z 1000be3b f   LIBCMT:stdexcpt.obj
+ 0001:0000ae70       ??1exception@std@@UAE@XZ   1000be70 f   LIBCMT:stdexcpt.obj
+ 0001:0000ae7b       ??_Eexception@std@@UAEPAXI@Z 1000be7b f i LIBCMT:stdexcpt.obj
+ 0001:0000ae7b       ??_Gexception@std@@UAEPAXI@Z 1000be7b f i LIBCMT:stdexcpt.obj
+ 0001:0000aea2       ??0exception@std@@QAE@ABV01@@Z 1000bea2 f   LIBCMT:stdexcpt.obj
+ 0001:0000aec7       _malloc                    1000bec7 f   LIBCMT:malloc.obj
+ 0001:0000af5b       __initp_heap_handler       1000bf5b f   LIBCMT:handler.obj
+ 0001:0000af6a       __callnewh                 1000bf6a f   LIBCMT:handler.obj
+ 0001:0000af92       __CxxThrowException@8      1000bf92 f   LIBCMT:throw.obj
+ 0001:0000afde       __encoded_null             1000bfde f   LIBCMT:tidtable.obj
+ 0001:0000afe7       ___crtTlsAlloc@4           1000bfe7 f   LIBCMT:tidtable.obj
+ 0001:0000aff0       ___set_flsgetvalue         1000bff0 f   LIBCMT:tidtable.obj
+ 0001:0000b024       __mtterm                   1000c024 f   LIBCMT:tidtable.obj
+ 0001:0000b061       __initptd                  1000c061 f   LIBCMT:tidtable.obj
+ 0001:0000b115       __getptd_noexit            1000c115 f   LIBCMT:tidtable.obj
+ 0001:0000b18e       __getptd                   1000c18e f   LIBCMT:tidtable.obj
+ 0001:0000b1a8       __freefls@4                1000c1a8 f   LIBCMT:tidtable.obj
+ 0001:0000b2d7       __freeptd                  1000c2d7 f   LIBCMT:tidtable.obj
+ 0001:0000b345       __mtinit                   1000c345 f   LIBCMT:tidtable.obj
+ 0001:0000b4c0       __ioinit                   1000c4c0 f   LIBCMT:ioinit.obj
+ 0001:0000b705       __ioterm                   1000c705 f   LIBCMT:ioinit.obj
+ 0001:0000b758       __setenvp                  1000c758 f   LIBCMT:stdenvp.obj
+ 0001:0000b9ce       __setargv                  1000c9ce f   LIBCMT:stdargv.obj
+ 0001:0000ba89       ___crtGetEnvironmentStringsA 1000ca89 f   LIBCMT:a_env.obj
+ 0001:0000bb20       __RTC_Initialize           1000cb20 f   LIBCMT:_initsect_.obj
+ 0001:0000bb46       __RTC_Terminate            1000cb46 f   LIBCMT:_initsect_.obj
+ 0001:0000bb6c       __heap_init                1000cb6c f   LIBCMT:heapinit.obj
+ 0001:0000bb8a       __heap_term                1000cb8a f   LIBCMT:heapinit.obj
+ 0001:0000bb9e       __XcptFilter               1000cb9e f   LIBCMT:winxfltr.obj
+ 0001:0000bce8       ___CppXcptFilter           1000cce8 f   LIBCMT:winxfltr.obj
+ 0001:0000bd08       _DllMain@12                1000cd08 f   LIBCMT:dllmain.obj
+ 0001:0000bd0e       ___security_init_cookie    1000cd0e f   LIBCMT:gs_support.obj
+ 0001:0000bdb0       _strlen                    1000cdb0 f   LIBCMT:strlen.obj
+ 0001:0000be3b       __initp_misc_invarg        1000ce3b f   LIBCMT:invarg.obj
+ 0001:0000be4a       __call_reportfault         1000ce4a f   LIBCMT:invarg.obj
+ 0001:0000bf73       __invoke_watson            1000cf73 f   LIBCMT:invarg.obj
+ 0001:0000bf98       __invalid_parameter        1000cf98 f   LIBCMT:invarg.obj
+ 0001:0000bfc5       __invalid_parameter_noinfo 1000cfc5 f   LIBCMT:invarg.obj
+ 0001:0000bfd7       __get_errno_from_oserr     1000cfd7 f   LIBCMT:dosmap.obj
+ 0001:0000c019       __errno                    1000d019 f   LIBCMT:dosmap.obj
+ 0001:0000c02c       ___doserrno                1000d02c f   LIBCMT:dosmap.obj
+ 0001:0000c03f       __dosmaperr                1000d03f f   LIBCMT:dosmap.obj
+ 0001:0000c119       __input_l                  1000d119 f   LIBCMT:input.obj
+ 0001:0000d340       ___updatetmbcinfo          1000e340 f   LIBCMT:mbctype.obj
+ 0001:0000d460       __setmbcp_nolock           1000e460 f   LIBCMT:mbctype.obj
+ 0001:0000d649       __setmbcp                  1000e649 f   LIBCMT:mbctype.obj
+ 0001:0000d7e3       ___initmbctable            1000e7e3 f   LIBCMT:mbctype.obj
+ 0001:0000d801       ___addlocaleref            1000e801 f   LIBCMT:localref.obj
+ 0001:0000d890       ___removelocaleref         1000e890 f   LIBCMT:localref.obj
+ 0001:0000d929       ___freetlocinfo            1000e929 f   LIBCMT:localref.obj
+ 0001:0000da74       __updatetlocinfoEx_nolock  1000ea74 f   LIBCMT:localref.obj
+ 0001:0000dac1       ___updatetlocinfo          1000eac1 f   LIBCMT:localref.obj
+ 0001:0000db3a       __fltin2                   1000eb3a f   LIBCMT:_cfin_.obj
+ 0001:0000dbe1       __isctype_l                1000ebe1 f   LIBCMT:isctype.obj
+ 0001:0000dc99       @__security_check_cookie@4 1000ec99 f   LIBCMT:secchk.obj
+ 0001:0000dca8       ___strgtold12_l            1000eca8 f   LIBCMT:_strgtold_.obj
+ 0001:0000e384       __flsbuf                   1000f384 f   LIBCMT:_flsbuf.obj
+ 0001:0000e57d       __output_l                 1000f57d f   LIBCMT:output.obj
+ 0001:0000f185       __VEC_memcpy               10010185 f   LIBCMT:p4_memcpy.obj
+ 0001:0000f288       __freea                    10010288 f i LIBCMT:a_map.obj
+ 0001:0000f48f       ___crtLCMapStringA         1001048f f   LIBCMT:a_map.obj
+ 0001:0000f4d5       __isleadbyte_l             100104d5 f i LIBCMT:_wctype.obj
+ 0001:0000f50d       _isleadbyte                1001050d f i LIBCMT:_wctype.obj
+ 0001:0000f520       __VEC_memzero              10010520 f   LIBCMT:p4_memset.obj
+ 0001:0000f5da       __mtinitlocks              100105da f   LIBCMT:mlock.obj
+ 0001:0000f624       __mtdeletelocks            10010624 f   LIBCMT:mlock.obj
+ 0001:0000f67b       __unlock                   1001067b f   LIBCMT:mlock.obj
+ 0001:0000f692       __mtinitlocknum            10010692 f   LIBCMT:mlock.obj
+ 0001:0000f754       __lock                     10010754 f   LIBCMT:mlock.obj
+ 0001:0000f790       __aulldvrm                 10010790 f   LIBCMT:ulldvrm.obj
+ 0001:0000f830       ___libm_error_support      10010830 f   LIBCMT:_libm_error_.obj
+ 0001:0000fafc       __sse2_mathfcns_init       10010afc f   LIBCMT:_mathfcns_.obj
+ 0001:0000fb0c       __floor_default            10010b0c f   LIBCMT:_floor_.obj
+ 0001:0000fbf0       __CIpow_pentium4           10010bf0 f   LIBCMT:_pow_pentium4_.obj
+ 0001:0000fc09       __pow_pentium4             10010c09     LIBCMT:_pow_pentium4_.obj
+ 0001:00010761       __fFEXP                    10011761     LIBCMT:_87tran_.obj
+ 0001:000107b8       __rtinfpopse               100117b8     LIBCMT:_87tran_.obj
+ 0001:000107ba       __rtinfnpopse              100117ba     LIBCMT:_87tran_.obj
+ 0001:000107ca       __fFLN                     100117ca     LIBCMT:_87tran_.obj
+ 0001:0001087f       __rtinfpop                 1001187f     LIBCMT:_87tran_.obj
+ 0001:00010881       __rtinfnpop                10011881     LIBCMT:_87tran_.obj
+ 0001:0001089e       __ffexpm1                  1001189e     LIBCMT:_87tran_.obj
+ 0001:00010950       __startTwoArgErrorHandling 10011950 f   LIBCMT:_genexcep_.obj
+ 0001:00010967       __startOneArgErrorHandling 10011967 f   LIBCMT:_genexcep_.obj
+ 0001:000109b0       __twoToTOS                 100119b0 f   LIBCMT:_common_.obj
+ 0001:000109c5       __load_CW                  100119c5 f   LIBCMT:_common_.obj
+ 0001:000109dc       __convertTOStoQNaN         100119dc f   LIBCMT:_common_.obj
+ 0001:000109f5       __fload_withFB             100119f5 f   LIBCMT:_common_.obj
+ 0001:00010a38       __checkTOS_withFB          10011a38 f   LIBCMT:_common_.obj
+ 0001:00010a4e       __fast_exit                10011a4e f   LIBCMT:_common_.obj
+ 0001:00010a5b       __math_exit                10011a5b f   LIBCMT:_common_.obj
+ 0001:00010a85       __check_overflow_exit      10011a85 f   LIBCMT:_common_.obj
+ 0001:00010a99       __check_range_exit         10011a99 f   LIBCMT:_common_.obj
+ 0001:00010b3c       __d_inttype                10011b3c f   LIBCMT:_powhlp_.obj
+ 0001:00010ba6       __powhlp                   10011ba6 f   LIBCMT:_powhlp_.obj
+ 0001:00010ce0       __CIacos_pentium4          10011ce0 f   LIBCMT:_acos_pentium4_.obj
+ 0001:00010cf8       __acos_pentium4            10011cf8     LIBCMT:_acos_pentium4_.obj
+ 0001:00011240       _cos                       10012240 f   LIBCMT:_cos_.obj
+ 0001:00011280       __CIcos                    10012280 f   LIBCMT:_cos_.obj
+ 0001:000112bb       __CIcos_default            100122bb f   LIBCMT:_cos_.obj
+ 0001:000112cf       __cos_default              100122cf     LIBCMT:_cos_.obj
+ 0001:00011370       _sin                       10012370 f   LIBCMT:_sin_.obj
+ 0001:000113b0       __CIsin                    100123b0 f   LIBCMT:_sin_.obj
+ 0001:000113eb       __CIsin_default            100123eb f   LIBCMT:_sin_.obj
+ 0001:000113ff       __sin_default              100123ff     LIBCMT:_sin_.obj
+ 0001:000114a0       _tan                       100124a0 f   LIBCMT:_tan_.obj
+ 0001:000114e0       __CItan                    100124e0 f   LIBCMT:_tan_.obj
+ 0001:0001151b       __CItan_default            1001251b f   LIBCMT:_tan_.obj
+ 0001:0001152f       __tan_default              1001252f     LIBCMT:_tan_.obj
+ 0001:000115d0       __CIasin_pentium4          100125d0 f   LIBCMT:_asin_pentium4_.obj
+ 0001:000115e8       __asin_pentium4            100125e8     LIBCMT:_asin_pentium4_.obj
+ 0001:00011b50       _strrchr                   10012b50 f   LIBCMT:strrchr.obj
+ 0001:00011b7d       __isdigit_l                10012b7d f i LIBCMT:_ctype.obj
+ 0001:00011bce       _isdigit                   10012bce f i LIBCMT:_ctype.obj
+ 0001:00011bfc       __isxdigit_l               10012bfc f i LIBCMT:_ctype.obj
+ 0001:00011c52       _isxdigit                  10012c52 f i LIBCMT:_ctype.obj
+ 0001:00011c82       __isspace_l                10012c82 f i LIBCMT:_ctype.obj
+ 0001:00011cd3       _isspace                   10012cd3 f i LIBCMT:_ctype.obj
+ 0001:00011d01       __atodbl_l                 10012d01 f   LIBCMT:atodbl.obj
+ 0001:00011da9       __atoflt_l                 10012da9 f   LIBCMT:atodbl.obj
+ 0001:00011e51       _strcpy_s                  10012e51 f   LIBCMT:strcpy_s.obj
+ 0001:00011eb0       __fptostr                  10012eb0 f   LIBCMT:_fptostr.obj
+ 0001:00011f63       ___dtold                   10012f63 f   LIBCMT:_cfout_.obj
+ 0001:00012016       __fltout2                  10013016 f   LIBCMT:_cfout_.obj
+ 0001:000120b0       __alldvrm                  100130b0 f   LIBCMT:lldvrm.obj
+ 0001:00012190       __aullshr                  10013190 f   LIBCMT:ullshr.obj
+ 0001:000121af       __fptrap                   100131af f   LIBCMT:crt0fp.obj
+ 0001:000121b8       __controlfp_s              100131b8 f   LIBCMT:_contrlfp_.obj
+ 0001:00012217       __87except                 10013217 f   LIBCMT:_87except_.obj
+ 0001:00012356       __calloc_impl              10013356 f   LIBCMT:calloc_impl.obj
+ 0001:000123d8       _realloc                   100133d8 f   LIBCMT:realloc.obj
+ 0001:00012485       __recalloc                 10013485 f   LIBCMT:recalloc.obj
+ 0001:000124f3       ?terminate@@YAXXZ          100134f3 f   LIBCMT:hooks.obj
+ 0001:0001252c       __initp_eh_hooks           1001352c f   LIBCMT:hooks.obj
+ 0001:0001253d       __initp_misc_winsig        1001353d f   LIBCMT:winsig.obj
+ 0001:00012592       ___get_sigabrt             10013592 f   LIBCMT:winsig.obj
+ 0001:0001259f       _raise                     1001359f f   LIBCMT:winsig.obj
+ 0001:00012742       __initp_misc_rand_s        10013742 f   LIBCMT:rand_s.obj
+ 0001:00012760       __ValidateImageBase        10013760 f   LIBCMT:pesect.obj
+ 0001:000127a0       __FindPESection            100137a0 f   LIBCMT:pesect.obj
+ 0001:000127f0       __IsNonwritableInCurrentImage 100137f0 f   LIBCMT:pesect.obj
+ 0001:000128b0       __local_unwind4            100138b0 f   LIBCMT:exsup4.obj
+ 0001:00012986       __seh_longjmp_unwind4@4    10013986 f   LIBCMT:exsup4.obj
+ 0001:000129a2       @_EH4_CallFilterFunc@8     100139a2 f   LIBCMT:exsup4.obj
+ 0001:000129b9       @_EH4_TransferToHandler@8  100139b9 f   LIBCMT:exsup4.obj
+ 0001:000129d2       @_EH4_GlobalUnwind2@8      100139d2 f   LIBCMT:exsup4.obj
+ 0001:000129eb       @_EH4_LocalUnwind@16       100139eb f   LIBCMT:exsup4.obj
+ 0001:00012a02       ___crtMessageBoxW          10013a02 f   LIBCMT:crtmboxw.obj
+ 0001:00012b6e       _wcscat_s                  10013b6e f   LIBCMT:wcscat_s.obj
+ 0001:00012be3       _wcsncpy_s                 10013be3 f   LIBCMT:wcsncpy_s.obj
+ 0001:00012cb0       _wcslen                    10013cb0 f   LIBCMT:wcslen.obj
+ 0001:00012ccb       _wcscpy_s                  10013ccb f   LIBCMT:wcscpy_s.obj
+ 0001:00012d2e       __set_error_mode           10013d2e f   LIBCMT:errmode.obj
+ 0001:00012dc0       __ismbblead                10013dc0 f   LIBCMT:ismbbyte.obj
+ 0001:00012dd8       __crt_debugger_hook        10013dd8 f   LIBCMT:dbghook.obj
+ 0001:00012de0       __filbuf                   10013de0 f   LIBCMT:_filbuf.obj
+ 0001:00012f02       __ungetc_nolock            10013f02 f   LIBCMT:ungetc.obj
+ 0001:00012fe5       __mbtowc_l                 10013fe5 f   LIBCMT:mbtowc.obj
+ 0001:000130fb       _mbtowc                    100140fb f   LIBCMT:mbtowc.obj
+ 0001:00013115       __fileno                   10014115 f   LIBCMT:fileno.obj
+ 0001:00013222       ___crtGetStringTypeA       10014222 f   LIBCMT:a_str.obj
+ 0001:00013262       ___free_lc_time            10014262 f   LIBCMT:inittime.obj
+ 0001:000135d9       ___free_lconv_num          100145d9 f   LIBCMT:initnum.obj
+ 0001:00013642       ___free_lconv_mon          10014642 f   LIBCMT:initmon.obj
+ 0001:00013740       __ld12tod                  10014740 f   LIBCMT:_intrncvt_.obj
+ 0001:00013c91       __ld12tof                  10014c91 f   LIBCMT:_intrncvt_.obj
+ 0001:000141e2       ___report_gsfailure        100151e2 f   LIBCMT:gs_report.obj
+ 0001:000142e8       ___mtold12                 100152e8 f   LIBCMT:_mantold_.obj
+ 0001:000144cc       __lseeki64_nolock          100154cc f   LIBCMT:lseeki64.obj
+ 0001:00014551       __lseeki64                 10015551 f   LIBCMT:lseeki64.obj
+ 0001:0001463b       __write_nolock             1001563b f   LIBCMT:write.obj
+ 0001:00014d38       __write                    10015d38 f   LIBCMT:write.obj
+ 0001:00014e0c       __getbuf                   10015e0c f   LIBCMT:_getbuf.obj
+ 0001:00014e55       __isatty                   10015e55 f   LIBCMT:isatty.obj
+ 0001:00014eab       ___iob_func                10015eab f   LIBCMT:_file.obj
+ 0001:00014eb1       ___initstdio               10015eb1 f   LIBCMT:_file.obj
+ 0001:00014f62       ___endstdio                10015f62 f   LIBCMT:_file.obj
+ 0001:00014f82       __lock_file                10015f82 f   LIBCMT:_file.obj
+ 0001:00014fc3       __lock_file2               10015fc3 f   LIBCMT:_file.obj
+ 0001:00014ff7       __unlock_file              10015ff7 f   LIBCMT:_file.obj
+ 0001:00015033       __unlock_file2             10016033 f   LIBCMT:_file.obj
+ 0001:00015062       __get_printf_count_output  10016062 f   LIBCMT:printf.obj
+ 0001:00015078       __wctomb_s_l               10016078 f   LIBCMT:wctomb.obj
+ 0001:000151cd       _wctomb_s                  100161cd f   LIBCMT:wctomb.obj
+ 0001:000151f0       _strcspn                   100161f0 f   LIBCMT:strcspn.obj
+ 0001:00015240       _strpbrk                   10016240 f   LIBCMT:strpbrk.obj
+ 0001:00015280       __SEH_prolog4_GS           10016280 f   LIBCMT:sehprolg4gs.obj
+ 0001:000152c8       __SEH_epilog4_GS           100162c8 f   LIBCMT:sehprolg4gs.obj
+ 0001:000152d7       __matherr                  100162d7 f   LIBCMT:_matherr_.obj
+ 0001:000152da       __raise_exc_ex             100162da f   LIBCMT:_fpexcept_.obj
+ 0001:000155b6       __raise_exc                100165b6 f   LIBCMT:_fpexcept_.obj
+ 0001:000155d9       __handle_exc               100165d9 f   LIBCMT:_fpexcept_.obj
+ 0001:000157bd       __set_errno_from_matherr   100167bd f   LIBCMT:_fpexcept_.obj
+ 0001:000157ea       __errcode                  100167ea f   LIBCMT:_fpexcept_.obj
+ 0001:0001581e       __umatherr                 1001681e f   LIBCMT:_fpexcept_.obj
+ 0001:000158be       __handle_qnan1             100168be f   LIBCMT:_fpexcept_.obj
+ 0001:00015913       __except1                  10016913 f   LIBCMT:_fpexcept_.obj
+ 0001:000159dd       __frnd                     100169dd f   LIBCMT:_frnd_.obj
+ 0001:000159f1       __set_exp                  100169f1 f   LIBCMT:_util_.obj
+ 0001:00015a1e       __sptype                   10016a1e f   LIBCMT:_util_.obj
+ 0001:00015a84       __decomp                   10016a84 f   LIBCMT:_util_.obj
+ 0001:00015b47       __statfp                   10016b47 f   LIBCMT:_fpctrl_.obj
+ 0001:00015b57       __clrfp                    10016b57 f   LIBCMT:_fpctrl_.obj
+ 0001:00015b68       __ctrlfp                   10016b68 f   LIBCMT:_fpctrl_.obj
+ 0001:00015b93       __set_statfp               10016b93 f   LIBCMT:_fpctrl_.obj
+ 0001:00015beb       ___set_fpsr_sse2           10016beb f   LIBCMT:_fpctrl_.obj
+ 0001:00015c5d       __fpclass                  10016c5d f   LIBCMT:_ieeemisc_.obj
+ 0001:00015d00       __CIcos_pentium4           10016d00 f   LIBCMT:_cos_pentium4_.obj
+ 0001:00015d18       __cos_pentium4             10016d18     LIBCMT:_cos_pentium4_.obj
+ 0001:00015eb0       __CIsin_pentium4           10016eb0 f   LIBCMT:_sin_pentium4_.obj
+ 0001:00015ec8       __sin_pentium4             10016ec8     LIBCMT:_sin_pentium4_.obj
+ 0001:00016080       __CItan_pentium4           10017080 f   LIBCMT:_tan_pentium4_.obj
+ 0001:00016098       __tan_pentium4             10017098     LIBCMT:_tan_pentium4_.obj
+ 0001:000162e0       _$I10_OUTPUT               100172e0 f   LIBCMT:_x10fout_.obj
+ 0001:00016d06       __control87                10017d06 f i LIBCMT:_ieee87_.obj
+ 0001:00017020       __global_unwind2           10018020 f   LIBCMT:exsup.obj
+ 0001:00017085       __local_unwind2            10018085 f   LIBCMT:exsup.obj
+ 0001:00017109       __abnormal_termination     10018109 f   LIBCMT:exsup.obj
+ 0001:0001712c       __NLG_Notify1              1001812c f   LIBCMT:exsup.obj
+ 0001:00017135       __NLG_Notify               10018135 f   LIBCMT:exsup.obj
+ 0001:0001714c       __NLG_Dispatch2            1001814c     LIBCMT:exsup.obj
+ 0001:0001714c       __NLG_Dispatch             1001814c     LIBCMT:exsup.obj
+ 0001:00017154       __NLG_Call                 10018154 f   LIBCMT:exsup.obj
+ 0001:00017156       __NLG_Return2              10018156     LIBCMT:exsup.obj
+ 0001:00017157       __read_nolock              10018157 f   LIBCMT:read.obj
+ 0001:0001770e       __read                     1001870e f   LIBCMT:read.obj
+ 0001:00017804       __free_osfhnd              10018804 f   LIBCMT:osfinfo.obj
+ 0001:0001788a       __get_osfhandle            1001888a f   LIBCMT:osfinfo.obj
+ 0001:000178f3       ___lock_fhandle            100188f3 f   LIBCMT:osfinfo.obj
+ 0001:00017992       __unlock_fhandle           10018992 f   LIBCMT:osfinfo.obj
+ 0001:000179b9       __putwch_nolock            100189b9 f   LIBCMT:putwch.obj
+ 0001:000179fb       __fcloseall                100189fb f   LIBCMT:closeall.obj
+ 0001:00017a97       __flush                    10018a97 f   LIBCMT:fflush.obj
+ 0001:00017aff       __fflush_nolock            10018aff f   LIBCMT:fflush.obj
+ 0001:00017c21       __flushall                 10018c21 f   LIBCMT:fflush.obj
+ 0001:00017c2a       ___initconout              10018c2a f   LIBCMT:initcon.obj
+ 0001:00017c49       ___termconout              10018c49 f   LIBCMT:initcon.obj
+ 0001:00017c60       __fclose_nolock            10018c60 f   LIBCMT:fclose.obj
+ 0001:00017ccd       _fclose                    10018ccd f   LIBCMT:fclose.obj
+ 0001:00017d41       __commit                   10018d41 f   LIBCMT:commit.obj
+ 0001:00017e20       ___ascii_strnicmp          10018e20 f   LIBCMT:_strnicm.obj
+ 0001:00017e81       __close_nolock             10018e81 f   LIBCMT:close.obj
+ 0001:00017f1d       __close                    10018f1d f   LIBCMT:close.obj
+ 0001:00017fe1       __freebuf                  10018fe1 f   LIBCMT:_freebuf.obj
+ 0001:00018020       ?ConnectTier1Libraries@@YAXPAP6APAXPBDPAH@ZH@Z 10019020 f   tier1:tier1.obj
+ 0001:00018030       ?DisconnectTier1Libraries@@YAXXZ 10019030 f   tier1:tier1.obj
+ 0001:00018036       _RtlUnwind@16              10019036 f   kernel32:KERNEL32.dll
  0002:00000000       __imp__MultiByteToWideChar@24 1001a000     kernel32:KERNEL32.dll
  0002:00000004       __imp__WideCharToMultiByte@32 1001a004     kernel32:KERNEL32.dll
  0002:00000008       __imp__GetProcAddress@8    1001a008     kernel32:KERNEL32.dll
@@ -1060,8 +1061,8 @@
  0002:000016a0       __OP_FMODjmptab            1001b6a0     LIBCMT:_87fmod_.obj
  0002:000016f4       ??_7type_info@@6B@         1001b6f4     LIBCMT:typinfo.obj
  0002:000016fc       ??_7bad_alloc@std@@6B@     1001b6fc     LIBCMT:new.obj
- 0002:00001704       __pRawDllMain              1001b704     LIBCMT:dllcrt0.obj
  0002:00001704       __pDefaultRawDllMain       1001b704     LIBCMT:dllcrt0.obj
+ 0002:00001704       __pRawDllMain              1001b704     LIBCMT:dllcrt0.obj
  0002:0000cba8       ??_C@_05KLBDPFGC@e?$CL000?$AA@ 10026ba8     LIBCMT:cvt.obj
  0002:0000cbe0       __indefinite               10026be0     LIBCMT:_87disp_.obj
  0002:0000cbea       __piby2                    10026bea     LIBCMT:_87disp_.obj
@@ -1731,104 +1732,104 @@
  0003:00016118       ___sse2_available          1004a118     <common>
  0003:0001611c       __acmdln                   1004a11c     <common>
 
- entry point at        0001:00006d85
+ entry point at        0001:00006e55
 
  Static symbols
 
- 0001:00001bf0       ?test_packing@@YAXABVCCommand@@@Z 10002bf0 f   defpass_gbuffer.obj
- 0001:00001cd0       ?test_unpacking@@YAXABVCCommand@@@Z 10002cd0 f   defpass_gbuffer.obj
- 0001:00002a00       ?__CreateCDeferredExtensionIDeferredExtension_interface@@YAPAXXZ 10003a00 f   IDeferredExt.obj
- 0001:0000689b       __onexit_nolock            1000789b f   LIBCMT:onexit.obj
- 0001:00006c8f       ___DllMainCRTStartup       10007c8f f   LIBCMT:dllcrt0.obj
- 0001:00006da8       _vscan_fn                  10007da8 f   LIBCMT:sscanf.obj
- 0001:00007eca       ?strtoxl@@YAKPAUlocaleinfo_struct@@PBDPAPBDHH@Z 10008eca f   LIBCMT:strtol.obj
- 0001:00009514       __shift                    1000a514 f   LIBCMT:cvt.obj
- 0001:00009559       __cftoe2_l                 1000a559 f   LIBCMT:cvt.obj
- 0001:00009b17       __cftof2_l                 1000ab17 f   LIBCMT:cvt.obj
- 0001:0000a5c1       _doexit                    1000b5c1 f   LIBCMT:crt0dat.obj
- 0001:0000b764       _parse_cmdline             1000c764 f   LIBCMT:stdargv.obj
- 0001:0000bf90       ___check_float_string      1000cf90 f   LIBCMT:input.obj
- 0001:0000bfe7       __hextodec                 1000cfe7 f   LIBCMT:input.obj
- 0001:0000c007       __inc                      1000d007 f   LIBCMT:input.obj
- 0001:0000c01d       __whiteout                 1000d01d f   LIBCMT:input.obj
- 0001:0000d04b       ?CPtoLCID@@YAHH@Z          1000e04b f   LIBCMT:mbctype.obj
- 0001:0000d07a       ?setSBCS@@YAXPAUthreadmbcinfostruct@@@Z 1000e07a f   LIBCMT:mbctype.obj
- 0001:0000d0de       ?setSBUpLow@@YAXPAUthreadmbcinfostruct@@@Z 1000e0de f   LIBCMT:mbctype.obj
- 0001:0000d312       ?getSystemCP@@YAHH@Z       1000e312 f   LIBCMT:mbctype.obj
- 0001:0000e416       _write_char                1000f416 f   LIBCMT:output.obj
- 0001:0000e449       _write_string              1000f449 f   LIBCMT:output.obj
- 0001:0000f1d6       ?__crtLCMapStringA_stat@@YAHPAUlocaleinfo_struct@@KKPBDHPADHHH@Z 100101d6 f   LIBCMT:a_map.obj
- 0001:0001248b       _siglookup                 1001348b f   LIBCMT:winsig.obj
- 0001:00012870       __unwind_handler4          10013870 f   LIBCMT:exsup4.obj
- 0001:00012c9d       ?x_ismbbtype_l@@YAHPAUlocaleinfo_struct@@IHH@Z 10013c9d f   LIBCMT:ismbbyte.obj
- 0001:0001306b       ?__crtGetStringTypeA_stat@@YAHPAUlocaleinfo_struct@@KPBDHPAGHHH@Z 1001406b f   LIBCMT:a_str.obj
- 0001:00016b28       __hw_cw                    10017b28 f   LIBCMT:_ieee87_.obj
- 0001:00016bb6       ___hw_cw_sse2              10017bb6 f   LIBCMT:_ieee87_.obj
- 0001:00016f90       __unwind_handler           10017f90 f   LIBCMT:exsup.obj
- 0001:00017a97       _flsall                    10018a97 f   LIBCMT:fflush.obj
- 0001:00017f90       ??__Emat_fullbright@@YAXXZ 10018f90 f   BaseVSShader.obj
- 0001:00017fc0       ??__Es_ShaderParams@GAUSSIAN_BLUR_6@@YAXXZ 10018fc0 f   blur.obj
- 0001:00017fd0       ??__EISVERTICAL@GAUSSIAN_BLUR_6@@YAXXZ 10018fd0 f   blur.obj
- 0001:00017ff0       ??__Es_ShaderInstance@GAUSSIAN_BLUR_6@@YAXXZ 10018ff0 f   blur.obj
- 0001:00018010       ??__Es_ShaderParams@DEBUG_LIGHTING_CTRL@@YAXXZ 10019010 f   debug_lightingctrl.obj
- 0001:00018020       ??__Es_ShaderInstance@DEBUG_LIGHTING_CTRL@@YAXXZ 10019020 f   debug_lightingctrl.obj
- 0001:00018040       ??__Es_ShaderParams@DEBUG_SHADOW@@YAXXZ 10019040 f   debug_shadow.obj
- 0001:00018050       ??__Es_ShaderInstance@DEBUG_SHADOW@@YAXXZ 10019050 f   debug_shadow.obj
- 0001:00018070       ??__Es_ShaderParams@DEFERRED_BRUSH@@YAXXZ 10019070 f   deferred_brush.obj
- 0001:00018080       ??__EBUMPMAP@DEFERRED_BRUSH@@YAXXZ 10019080 f   deferred_brush.obj
- 0001:000180a0       ??__ELITFACE@DEFERRED_BRUSH@@YAXXZ 100190a0 f   deferred_brush.obj
- 0001:000180c0       ??__EPHONG_SCALE@DEFERRED_BRUSH@@YAXXZ 100190c0 f   deferred_brush.obj
- 0001:000180e0       ??__EPHONG_EXP@DEFERRED_BRUSH@@YAXXZ 100190e0 f   deferred_brush.obj
- 0001:00018100       ??__EPHONG_MAP@DEFERRED_BRUSH@@YAXXZ 10019100 f   deferred_brush.obj
- 0001:00018120       ??__EPHONG_BOOST@DEFERRED_BRUSH@@YAXXZ 10019120 f   deferred_brush.obj
- 0001:00018140       ??__EALPHATESTREFERENCE@DEFERRED_BRUSH@@YAXXZ 10019140 f   deferred_brush.obj
- 0001:00018160       ??__Es_ShaderInstance@DEFERRED_BRUSH@@YAXXZ 10019160 f   deferred_brush.obj
- 0001:00018180       ??__Es_ShaderParams@DEFERRED_MODEL@@YAXXZ 10019180 f   deferred_model.obj
- 0001:00018190       ??__EBUMPMAP@DEFERRED_MODEL@@YAXXZ 10019190 f   deferred_model.obj
- 0001:000181b0       ??__ELITFACE@DEFERRED_MODEL@@YAXXZ 100191b0 f   deferred_model.obj
- 0001:000181d0       ??__EPHONG_SCALE@DEFERRED_MODEL@@YAXXZ 100191d0 f   deferred_model.obj
- 0001:000181f0       ??__EPHONG_EXP@DEFERRED_MODEL@@YAXXZ 100191f0 f   deferred_model.obj
- 0001:00018210       ??__EPHONG_MAP@DEFERRED_MODEL@@YAXXZ 10019210 f   deferred_model.obj
- 0001:00018230       ??__EPHONG_BOOST@DEFERRED_MODEL@@YAXXZ 10019230 f   deferred_model.obj
- 0001:00018250       ??__EALPHATESTREFERENCE@DEFERRED_MODEL@@YAXXZ 10019250 f   deferred_model.obj
- 0001:00018270       ??__Es_ShaderInstance@DEFERRED_MODEL@@YAXXZ 10019270 f   deferred_model.obj
- 0001:00018290       ??__Etest_packing_command@@YAXXZ 10019290 f   defpass_gbuffer.obj
- 0001:000182c0       ??__Etest_unpacking_command@@YAXXZ 100192c0 f   defpass_gbuffer.obj
- 0001:000182f0       ??__E__g_defExt@@YAXXZ     100192f0 f   IDeferredExt.obj
- 0001:00018310       ??__E__g_CreateCDeferredExtensionIDeferredExtension_reg@@YAXXZ 10019310 f   IDeferredExt.obj
- 0001:00018330       ??__Es_ShaderParams@LIGHTING_GLOBAL@@YAXXZ 10019330 f   lighting_global.obj
- 0001:00018340       ??__Es_ShaderInstance@LIGHTING_GLOBAL@@YAXXZ 10019340 f   lighting_global.obj
- 0001:00018360       ??__Es_ShaderParams@LIGHTING_WORLD@@YAXXZ 10019360 f   lighting_world.obj
- 0001:00018370       ??__ELIGHTTYPE@LIGHTING_WORLD@@YAXXZ 10019370 f   lighting_world.obj
- 0001:00018390       ??__EWORLDPROJECTION@LIGHTING_WORLD@@YAXXZ 10019390 f   lighting_world.obj
- 0001:000183b0       ??__Es_ShaderInstance@LIGHTING_WORLD@@YAXXZ 100193b0 f   lighting_world.obj
- 0001:000183d0       ??__Es_ShaderParams@LIGHTING_VOLUME@@YAXXZ 100193d0 f   lighting_volume.obj
- 0001:000183e0       ??__ELIGHTTYPE@LIGHTING_VOLUME@@YAXXZ 100193e0 f   lighting_volume.obj
- 0001:00018400       ??__EWORLDPROJECTION@LIGHTING_VOLUME@@YAXXZ 10019400 f   lighting_volume.obj
- 0001:00018420       ??__Es_ShaderInstance@LIGHTING_VOLUME@@YAXXZ 10019420 f   lighting_volume.obj
- 0001:00018440       ??__Es_ShaderParams@VOLUME_BLEND@@YAXXZ 10019440 f   volume_blend.obj
- 0001:00018450       ??__Es_ShaderInstance@VOLUME_BLEND@@YAXXZ 10019450 f   volume_blend.obj
- 0001:00018470       ??__Es_ShaderParams@VOLUME_PREPASS@@YAXXZ 10019470 f   volume_prepass.obj
- 0001:00018480       ??__Es_ShaderInstance@VOLUME_PREPASS@@YAXXZ 10019480 f   volume_prepass.obj
- 0001:000184a0       ??__Es_EmptyConVar@@YAXXZ  100194a0 f   tier1:convar.obj
- 0001:000185d0       ??__Es_StringCharConversion@@YAXXZ 100195d0 f   tier1:utlbuffer.obj
- 0001:00018630       ??__Es_NoEscConversion@@YAXXZ 10019630 f   tier1:utlbuffer.obj
- 0001:00018660       ??__Emat_fullbright@@YAXXZ 10019660 f   shaderlib:BaseShader.obj
- 0001:00018690       ??__E__g_CreateIShaderDLLInternal_reg@@YAXXZ 10019690 f   shaderlib:ShaderDLL.obj
- 0001:000186b0       ??__Fmat_fullbright@@YAXXZ 100196b0 f   BaseVSShader.obj
- 0001:000186c0       ??__Fs_ShaderParams@GAUSSIAN_BLUR_6@@YAXXZ 100196c0 f   blur.obj
- 0001:000186d0       ??__Fs_ShaderParams@DEBUG_LIGHTING_CTRL@@YAXXZ 100196d0 f   debug_lightingctrl.obj
- 0001:000186e0       ??__Fs_ShaderParams@DEBUG_SHADOW@@YAXXZ 100196e0 f   debug_shadow.obj
- 0001:000186f0       ??__Fs_ShaderParams@DEFERRED_BRUSH@@YAXXZ 100196f0 f   deferred_brush.obj
- 0001:00018700       ??__Fs_ShaderParams@DEFERRED_MODEL@@YAXXZ 10019700 f   deferred_model.obj
- 0001:00018710       ??__Ftest_packing_command@@YAXXZ 10019710 f   defpass_gbuffer.obj
- 0001:00018720       ??__Ftest_unpacking_command@@YAXXZ 10019720 f   defpass_gbuffer.obj
- 0001:00018730       ??__F__g_defExt@@YAXXZ     10019730 f   IDeferredExt.obj
- 0001:00018740       ??__Fs_ShaderParams@LIGHTING_GLOBAL@@YAXXZ 10019740 f   lighting_global.obj
- 0001:00018750       ??__Fs_ShaderParams@LIGHTING_WORLD@@YAXXZ 10019750 f   lighting_world.obj
- 0001:00018760       ??__Fs_ShaderParams@LIGHTING_VOLUME@@YAXXZ 10019760 f   lighting_volume.obj
- 0001:00018770       ??__Fs_ShaderParams@VOLUME_BLEND@@YAXXZ 10019770 f   volume_blend.obj
- 0001:00018780       ??__Fs_ShaderParams@VOLUME_PREPASS@@YAXXZ 10019780 f   volume_prepass.obj
- 0001:00018790       ??__Fs_EmptyConVar@@YAXXZ  10019790 f   tier1:convar.obj
- 0001:000187e0       ??__Fmat_fullbright@@YAXXZ 100197e0 f   shaderlib:BaseShader.obj
- 0001:000187ea       ??__Fnomem@?5???2@YAPAXI@Z@YAXXZ 100197ea f   LIBCMT:new.obj
+ 0001:00001be0       ?test_packing@@YAXABVCCommand@@@Z 10002be0 f   defpass_gbuffer.obj
+ 0001:00001cc0       ?test_unpacking@@YAXABVCCommand@@@Z 10002cc0 f   defpass_gbuffer.obj
+ 0001:00002a20       ?__CreateCDeferredExtensionIDeferredExtension_interface@@YAPAXXZ 10003a20 f   IDeferredExt.obj
+ 0001:0000696b       __onexit_nolock            1000796b f   LIBCMT:onexit.obj
+ 0001:00006d5f       ___DllMainCRTStartup       10007d5f f   LIBCMT:dllcrt0.obj
+ 0001:00006e78       _vscan_fn                  10007e78 f   LIBCMT:sscanf.obj
+ 0001:00007f9a       ?strtoxl@@YAKPAUlocaleinfo_struct@@PBDPAPBDHH@Z 10008f9a f   LIBCMT:strtol.obj
+ 0001:000095e4       __shift                    1000a5e4 f   LIBCMT:cvt.obj
+ 0001:00009629       __cftoe2_l                 1000a629 f   LIBCMT:cvt.obj
+ 0001:00009be7       __cftof2_l                 1000abe7 f   LIBCMT:cvt.obj
+ 0001:0000a691       _doexit                    1000b691 f   LIBCMT:crt0dat.obj
+ 0001:0000b834       _parse_cmdline             1000c834 f   LIBCMT:stdargv.obj
+ 0001:0000c062       ___check_float_string      1000d062 f   LIBCMT:input.obj
+ 0001:0000c0b9       __hextodec                 1000d0b9 f   LIBCMT:input.obj
+ 0001:0000c0d9       __inc                      1000d0d9 f   LIBCMT:input.obj
+ 0001:0000c0ef       __whiteout                 1000d0ef f   LIBCMT:input.obj
+ 0001:0000d11d       ?CPtoLCID@@YAHH@Z          1000e11d f   LIBCMT:mbctype.obj
+ 0001:0000d14c       ?setSBCS@@YAXPAUthreadmbcinfostruct@@@Z 1000e14c f   LIBCMT:mbctype.obj
+ 0001:0000d1b0       ?setSBUpLow@@YAXPAUthreadmbcinfostruct@@@Z 1000e1b0 f   LIBCMT:mbctype.obj
+ 0001:0000d3e4       ?getSystemCP@@YAHH@Z       1000e3e4 f   LIBCMT:mbctype.obj
+ 0001:0000e4e8       _write_char                1000f4e8 f   LIBCMT:output.obj
+ 0001:0000e51b       _write_string              1000f51b f   LIBCMT:output.obj
+ 0001:0000f2a8       ?__crtLCMapStringA_stat@@YAHPAUlocaleinfo_struct@@KKPBDHPADHHH@Z 100102a8 f   LIBCMT:a_map.obj
+ 0001:0001255b       _siglookup                 1001355b f   LIBCMT:winsig.obj
+ 0001:00012940       __unwind_handler4          10013940 f   LIBCMT:exsup4.obj
+ 0001:00012d6d       ?x_ismbbtype_l@@YAHPAUlocaleinfo_struct@@IHH@Z 10013d6d f   LIBCMT:ismbbyte.obj
+ 0001:0001313b       ?__crtGetStringTypeA_stat@@YAHPAUlocaleinfo_struct@@KPBDHPAGHHH@Z 1001413b f   LIBCMT:a_str.obj
+ 0001:00016bd8       __hw_cw                    10017bd8 f   LIBCMT:_ieee87_.obj
+ 0001:00016c66       ___hw_cw_sse2              10017c66 f   LIBCMT:_ieee87_.obj
+ 0001:00017040       __unwind_handler           10018040 f   LIBCMT:exsup.obj
+ 0001:00017b47       _flsall                    10018b47 f   LIBCMT:fflush.obj
+ 0001:00018040       ??__Emat_fullbright@@YAXXZ 10019040 f   BaseVSShader.obj
+ 0001:00018070       ??__Es_ShaderParams@GAUSSIAN_BLUR_6@@YAXXZ 10019070 f   blur.obj
+ 0001:00018080       ??__EISVERTICAL@GAUSSIAN_BLUR_6@@YAXXZ 10019080 f   blur.obj
+ 0001:000180a0       ??__Es_ShaderInstance@GAUSSIAN_BLUR_6@@YAXXZ 100190a0 f   blur.obj
+ 0001:000180c0       ??__Es_ShaderParams@DEBUG_LIGHTING_CTRL@@YAXXZ 100190c0 f   debug_lightingctrl.obj
+ 0001:000180d0       ??__Es_ShaderInstance@DEBUG_LIGHTING_CTRL@@YAXXZ 100190d0 f   debug_lightingctrl.obj
+ 0001:000180f0       ??__Es_ShaderParams@DEBUG_SHADOW@@YAXXZ 100190f0 f   debug_shadow.obj
+ 0001:00018100       ??__Es_ShaderInstance@DEBUG_SHADOW@@YAXXZ 10019100 f   debug_shadow.obj
+ 0001:00018120       ??__Es_ShaderParams@DEFERRED_BRUSH@@YAXXZ 10019120 f   deferred_brush.obj
+ 0001:00018130       ??__EBUMPMAP@DEFERRED_BRUSH@@YAXXZ 10019130 f   deferred_brush.obj
+ 0001:00018150       ??__ELITFACE@DEFERRED_BRUSH@@YAXXZ 10019150 f   deferred_brush.obj
+ 0001:00018170       ??__EPHONG_SCALE@DEFERRED_BRUSH@@YAXXZ 10019170 f   deferred_brush.obj
+ 0001:00018190       ??__EPHONG_EXP@DEFERRED_BRUSH@@YAXXZ 10019190 f   deferred_brush.obj
+ 0001:000181b0       ??__EPHONG_MAP@DEFERRED_BRUSH@@YAXXZ 100191b0 f   deferred_brush.obj
+ 0001:000181d0       ??__EPHONG_BOOST@DEFERRED_BRUSH@@YAXXZ 100191d0 f   deferred_brush.obj
+ 0001:000181f0       ??__EALPHATESTREFERENCE@DEFERRED_BRUSH@@YAXXZ 100191f0 f   deferred_brush.obj
+ 0001:00018210       ??__Es_ShaderInstance@DEFERRED_BRUSH@@YAXXZ 10019210 f   deferred_brush.obj
+ 0001:00018230       ??__Es_ShaderParams@DEFERRED_MODEL@@YAXXZ 10019230 f   deferred_model.obj
+ 0001:00018240       ??__EBUMPMAP@DEFERRED_MODEL@@YAXXZ 10019240 f   deferred_model.obj
+ 0001:00018260       ??__ELITFACE@DEFERRED_MODEL@@YAXXZ 10019260 f   deferred_model.obj
+ 0001:00018280       ??__EPHONG_SCALE@DEFERRED_MODEL@@YAXXZ 10019280 f   deferred_model.obj
+ 0001:000182a0       ??__EPHONG_EXP@DEFERRED_MODEL@@YAXXZ 100192a0 f   deferred_model.obj
+ 0001:000182c0       ??__EPHONG_MAP@DEFERRED_MODEL@@YAXXZ 100192c0 f   deferred_model.obj
+ 0001:000182e0       ??__EPHONG_BOOST@DEFERRED_MODEL@@YAXXZ 100192e0 f   deferred_model.obj
+ 0001:00018300       ??__EALPHATESTREFERENCE@DEFERRED_MODEL@@YAXXZ 10019300 f   deferred_model.obj
+ 0001:00018320       ??__Es_ShaderInstance@DEFERRED_MODEL@@YAXXZ 10019320 f   deferred_model.obj
+ 0001:00018340       ??__Etest_packing_command@@YAXXZ 10019340 f   defpass_gbuffer.obj
+ 0001:00018370       ??__Etest_unpacking_command@@YAXXZ 10019370 f   defpass_gbuffer.obj
+ 0001:000183a0       ??__E__g_defExt@@YAXXZ     100193a0 f   IDeferredExt.obj
+ 0001:000183c0       ??__E__g_CreateCDeferredExtensionIDeferredExtension_reg@@YAXXZ 100193c0 f   IDeferredExt.obj
+ 0001:000183e0       ??__Es_ShaderParams@LIGHTING_GLOBAL@@YAXXZ 100193e0 f   lighting_global.obj
+ 0001:000183f0       ??__Es_ShaderInstance@LIGHTING_GLOBAL@@YAXXZ 100193f0 f   lighting_global.obj
+ 0001:00018410       ??__Es_ShaderParams@LIGHTING_WORLD@@YAXXZ 10019410 f   lighting_world.obj
+ 0001:00018420       ??__ELIGHTTYPE@LIGHTING_WORLD@@YAXXZ 10019420 f   lighting_world.obj
+ 0001:00018440       ??__EWORLDPROJECTION@LIGHTING_WORLD@@YAXXZ 10019440 f   lighting_world.obj
+ 0001:00018460       ??__Es_ShaderInstance@LIGHTING_WORLD@@YAXXZ 10019460 f   lighting_world.obj
+ 0001:00018480       ??__Es_ShaderParams@LIGHTING_VOLUME@@YAXXZ 10019480 f   lighting_volume.obj
+ 0001:00018490       ??__ELIGHTTYPE@LIGHTING_VOLUME@@YAXXZ 10019490 f   lighting_volume.obj
+ 0001:000184b0       ??__EWORLDPROJECTION@LIGHTING_VOLUME@@YAXXZ 100194b0 f   lighting_volume.obj
+ 0001:000184d0       ??__Es_ShaderInstance@LIGHTING_VOLUME@@YAXXZ 100194d0 f   lighting_volume.obj
+ 0001:000184f0       ??__Es_ShaderParams@VOLUME_BLEND@@YAXXZ 100194f0 f   volume_blend.obj
+ 0001:00018500       ??__Es_ShaderInstance@VOLUME_BLEND@@YAXXZ 10019500 f   volume_blend.obj
+ 0001:00018520       ??__Es_ShaderParams@VOLUME_PREPASS@@YAXXZ 10019520 f   volume_prepass.obj
+ 0001:00018530       ??__Es_ShaderInstance@VOLUME_PREPASS@@YAXXZ 10019530 f   volume_prepass.obj
+ 0001:00018550       ??__Es_EmptyConVar@@YAXXZ  10019550 f   tier1:convar.obj
+ 0001:00018680       ??__Es_StringCharConversion@@YAXXZ 10019680 f   tier1:utlbuffer.obj
+ 0001:000186e0       ??__Es_NoEscConversion@@YAXXZ 100196e0 f   tier1:utlbuffer.obj
+ 0001:00018710       ??__Emat_fullbright@@YAXXZ 10019710 f   shaderlib:BaseShader.obj
+ 0001:00018740       ??__E__g_CreateIShaderDLLInternal_reg@@YAXXZ 10019740 f   shaderlib:ShaderDLL.obj
+ 0001:00018760       ??__Fmat_fullbright@@YAXXZ 10019760 f   BaseVSShader.obj
+ 0001:00018770       ??__Fs_ShaderParams@GAUSSIAN_BLUR_6@@YAXXZ 10019770 f   blur.obj
+ 0001:00018780       ??__Fs_ShaderParams@DEBUG_LIGHTING_CTRL@@YAXXZ 10019780 f   debug_lightingctrl.obj
+ 0001:00018790       ??__Fs_ShaderParams@DEBUG_SHADOW@@YAXXZ 10019790 f   debug_shadow.obj
+ 0001:000187a0       ??__Fs_ShaderParams@DEFERRED_BRUSH@@YAXXZ 100197a0 f   deferred_brush.obj
+ 0001:000187b0       ??__Fs_ShaderParams@DEFERRED_MODEL@@YAXXZ 100197b0 f   deferred_model.obj
+ 0001:000187c0       ??__Ftest_packing_command@@YAXXZ 100197c0 f   defpass_gbuffer.obj
+ 0001:000187d0       ??__Ftest_unpacking_command@@YAXXZ 100197d0 f   defpass_gbuffer.obj
+ 0001:000187e0       ??__F__g_defExt@@YAXXZ     100197e0 f   IDeferredExt.obj
+ 0001:000187f0       ??__Fs_ShaderParams@LIGHTING_GLOBAL@@YAXXZ 100197f0 f   lighting_global.obj
+ 0001:00018800       ??__Fs_ShaderParams@LIGHTING_WORLD@@YAXXZ 10019800 f   lighting_world.obj
+ 0001:00018810       ??__Fs_ShaderParams@LIGHTING_VOLUME@@YAXXZ 10019810 f   lighting_volume.obj
+ 0001:00018820       ??__Fs_ShaderParams@VOLUME_BLEND@@YAXXZ 10019820 f   volume_blend.obj
+ 0001:00018830       ??__Fs_ShaderParams@VOLUME_PREPASS@@YAXXZ 10019830 f   volume_prepass.obj
+ 0001:00018840       ??__Fs_EmptyConVar@@YAXXZ  10019840 f   tier1:convar.obj
+ 0001:00018890       ??__Fmat_fullbright@@YAXXZ 10019890 f   shaderlib:BaseShader.obj
+ 0001:0001889a       ??__Fnomem@?5???2@YAPAXI@Z@YAXXZ 1001989a f   LIBCMT:new.obj
