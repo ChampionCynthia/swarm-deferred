@@ -212,8 +212,8 @@ void CLightingManager::CullLights()
 		// if the optimized bounds cause popping for you, use the naive ones or
 		// ...improve the optimization code
 
-		//if ( engine->CullBox( l->bounds_min_naive, l->bounds_max_naive ) )
-		if ( engine->CullBox( l->bounds_min, l->bounds_max ) )
+		if ( engine->CullBox( l->bounds_min_naive, l->bounds_max_naive ) )
+		//if ( engine->CullBox( l->bounds_min, l->bounds_max ) )
 			continue;
 
 		if ( l->IsSpot() && l->HasShadow() )

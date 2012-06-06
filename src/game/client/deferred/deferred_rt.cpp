@@ -70,7 +70,7 @@ void InitDeferredRTs( bool bInitial )
 		false;
 #endif
 
-	const ImageFormat fmt_depth = g_pMaterialSystemHardwareConfig->GetShadowDepthTextureFormat();
+	const ImageFormat fmt_depth = GetDeferredManager()->GetShadowDepthFormat();
 	const ImageFormat fmt_depthColor = bShadowUseColor ? IMAGE_FORMAT_R32F
 		: g_pMaterialSystemHardwareConfig->GetNullTextureFormat();
 
