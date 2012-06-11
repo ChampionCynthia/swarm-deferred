@@ -23,12 +23,14 @@
 #include "rendertexture.h"
 #include "c_rope.h"
 #include "model_types.h"
-#ifdef SWARM_DLL
+
+
+#if SEDIT_USING_SWARM
 #include "modelrendersystem.h"
 #endif
 
 
-#if SWARM_DLL
+#if SEDIT_USING_SWARM
 #define Editor_MainViewOrigin MainViewOrigin( 0 )
 #define Editor_MainViewForward MainViewForward( 0 )
 #else
@@ -79,7 +81,7 @@ bool ShaderEditorHandler::Init()
 #endif
 
 	char modulePath[MAX_PATH*4];
-#ifdef SWARM_DLL
+#ifdef SEDIT_USING_SWARM
 	Q_snprintf( modulePath, sizeof( modulePath ), "%s/bin/shadereditor_swarm.dll\0", engine->GetGameDirectory() );
 #elif SOURCE_2006
 	Q_snprintf( modulePath, sizeof( modulePath ), "%s/bin/shadereditor_2006.dll\0", engine->GetGameDirectory() );
@@ -518,7 +520,7 @@ protected:
 		if ( bParticles )
 			g_pParticleSystemMgr->ResetRenderCache();
 
-#ifdef SWARM_DLL
+#ifdef SEDIT_USING_SWARM
 
 		extern ConVar cl_modelfastpath;
 		extern ConVar r_drawothermodels;
@@ -741,7 +743,7 @@ protected:
 			g_pParticleSystemMgr->DrawRenderCache( bShadowDepth );
 	};
 
-#ifdef SWARM_DLL
+#ifdef SEDIT_USING_SWARM
 	void	DrawOpaqueRenderables_ModelRenderables( int nCount, ModelRenderSystemData_t* pModelRenderables, bool bShadowDepth )
 	{
 		g_pModelRenderSystem->DrawModels( pModelRenderables, nCount, bShadowDepth ? MODEL_RENDER_MODE_SHADOW_DEPTH : MODEL_RENDER_MODE_NORMAL );
@@ -864,7 +866,7 @@ protected:
 	};
 #endif
 
-#ifdef SWARM_DLL
+#ifdef SEDIT_USING_SWARM
 	void DrawOpaqueRenderables_DrawBrushModels( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bShadowDepth )
 	{
 		for( int i = 0; i < nCount; ++i )
@@ -878,7 +880,7 @@ protected:
 	};
 #endif
 
-#ifdef SWARM_DLL
+#ifdef SEDIT_USING_SWARM
 	void DrawOpaqueRenderables_DrawStaticProps( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bShadowDepth )
 	{
 		if ( nCount == 0 )
@@ -951,7 +953,7 @@ protected:
 	};
 #endif
 
-#ifdef SWARM_DLL
+#ifdef SEDIT_USING_SWARM
 	void DrawOpaqueRenderables_Range( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bShadowDepth )
 	{
 		for ( int i = 0; i < nCount; ++i )
@@ -1136,7 +1138,7 @@ public:
 
 		for ( int i = 0; i < RENDER_GROUP_COUNT; i++ )
 		{
-#ifndef SWARM_DLL
+#ifndef SEDIT_USING_SWARM
 			const bool bStaticProp = i == 0 || i == 2 || i == 4 || i == 6;
 #endif
 
@@ -1147,7 +1149,7 @@ public:
 				if ( !pEntry || !pEntry->m_pRenderable )
 					continue;
 
-#ifdef SWARM_DLL
+#ifdef SEDIT_USING_SWARM
 				const bool bStaticProp = pEntry->m_nModelType == RENDERABLE_MODEL_STATIC_PROP;
 #endif
 
@@ -1167,7 +1169,7 @@ public:
 						bRemove = !settings.bDrawPlayers;
 					else if ( dynamic_cast< CBaseCombatWeapon* >( pEntity ) != NULL )
 						bRemove = !settings.bDrawWeapons;
-#ifdef SWARM_DLL
+#ifdef SEDIT_USING_SWARM
 					else if ( pEntity->ComputeTranslucencyType() != RENDERABLE_IS_OPAQUE )
 #else
 					else if ( pEntry->m_pRenderable->IsTransparent() )
@@ -1180,7 +1182,7 @@ public:
 				if ( bRemove )
 				{
 					pEntry->m_pRenderable = NULL;
-#ifndef SWARM_DLL
+#ifndef SEDIT_USING_SWARM
 					pEntry->m_RenderHandle = NULL;
 #endif
 				}
@@ -1192,7 +1194,7 @@ public:
 				CClientRenderablesList::CEntry *pEntry = m_pRenderablesList->m_RenderGroups[i] + e;
 
 				if ( !pEntry || !pEntry->m_pRenderable
-#ifndef SWARM_DLL
+#ifndef SEDIT_USING_SWARM
 					|| !pEntry->m_RenderHandle
 #endif
 					)
@@ -1201,12 +1203,12 @@ public:
 					{
 						CClientRenderablesList::CEntry *pEntry2 = m_pRenderablesList->m_RenderGroups[i] + e2;
 						if ( pEntry2 && pEntry2->m_pRenderable
-#ifndef SWARM_DLL
+#ifndef SEDIT_USING_SWARM
 							&& pEntry2->m_RenderHandle
 #endif
 							)
 						{
-#ifdef SWARM_DLL
+#ifdef SEDIT_USING_SWARM
 							CClientRenderablesList::CEntry tmp = *pEntry;
 							*pEntry = *pEntry2;
 							*pEntry2 = tmp;
@@ -1219,7 +1221,7 @@ public:
 				}
 
 				if ( pEntry && pEntry->m_pRenderable
-#ifndef SWARM_DLL
+#ifndef SEDIT_USING_SWARM
 					&& pEntry->m_RenderHandle
 #endif
 					)
@@ -1260,7 +1262,7 @@ private:
 
 };
 
-#ifdef SWARM_DLL
+#ifdef SEDIT_USING_SWARM
 bool UpdateRefractIfNeededByList( CViewModelRenderablesList::RenderGroups_t &list )
 {
 	int nCount = list.Count();
@@ -1459,7 +1461,7 @@ pFnVrCallback_Declare( VrCallback_ViewModel )
 	viewModelSetup.zNear = view.zNearViewmodel;
 	viewModelSetup.zFar = view.zFarViewmodel;
 	viewModelSetup.fov = view.fovViewmodel;
-#ifdef SWARM_DLL
+#ifdef SEDIT_USING_SWARM
 	viewModelSetup.m_flAspectRatio = engine->GetScreenAspectRatio( view.width, view.height );
 #else
 	viewModelSetup.m_flAspectRatio = engine->GetScreenAspectRatio();
@@ -1486,7 +1488,7 @@ pFnVrCallback_Declare( VrCallback_ViewModel )
 	if( bUseDepthHack )
 		pRenderContext->DepthRange( 0.0f, 0.1f );
 	
-#ifdef SWARM_DLL
+#ifdef SEDIT_USING_SWARM
 	CViewModelRenderablesList list;
 	ClientLeafSystem()->CollateViewModelRenderables( &list );
 	CViewModelRenderablesList::RenderGroups_t &opaqueViewModelList = list.m_RenderGroups[ CViewModelRenderablesList::VM_GROUP_OPAQUE ];

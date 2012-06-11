@@ -1828,11 +1828,11 @@ void C_BasePlayer::ThirdPersonSwitch( bool bThirdperson )
 //-----------------------------------------------------------------------------
 bool C_BasePlayer::ShouldDrawLocalPlayer()
 {
-	int nSlot = GetSplitScreenPlayerSlot();
+	//int nSlot = GetSplitScreenPlayerSlot();
 
 
 
-	ACTIVE_SPLITSCREEN_PLAYER_GUARD( nSlot );
+	//ACTIVE_SPLITSCREEN_PLAYER_GUARD( nSlot );
 	return input->CAM_IsThirdPerson() || ( ToolsEnabled() && ToolFramework_IsThirdPersonCamera() );
 }
 

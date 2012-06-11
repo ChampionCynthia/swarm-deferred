@@ -496,7 +496,7 @@ void GameSettings::OnCommand(const char *command)
 		pSettings->SetString( "update/game/campaign", stripped );
 
 		// set the current mission to the first real mission in the campaign
-		IASW_Mission_Chooser_Source *pSource = NULL; //missionchooser ? missionchooser->LocalMissionSource() : NULL;
+		IASW_Mission_Chooser_Source *pSource = missionchooser ? missionchooser->LocalMissionSource() : NULL;
 		if ( pSource )
 		{
 			KeyValues *pCampaignDetails = pSource->GetCampaignDetails( szCampaignSelected );
@@ -960,7 +960,7 @@ void GameSettings::UpdateMissionImage()
 
 	DropDownMenu *menu = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpSelectMission", true ) );
 
-	IASW_Mission_Chooser_Source *pSource = NULL; //missionchooser ? missionchooser->LocalMissionSource() : NULL;
+	IASW_Mission_Chooser_Source *pSource = missionchooser ? missionchooser->LocalMissionSource() : NULL;
 	if ( !pSource || !m_pSettings || !menu )
 		return;
 
@@ -1105,23 +1105,23 @@ void GameSettings::ShowMissionSelect()
 		const char *szGameType = m_pSettings->GetString( "game/mode", "campaign" );
 		if ( !Q_stricmp( szGameType, "campaign" ) )
 		{
-			//CNB_Select_Campaign_Panel *pPanel = new CNB_Select_Campaign_Panel( this, "Select_Campaign_Panel" );
+			CNB_Select_Campaign_Panel *pPanel = new CNB_Select_Campaign_Panel( this, "Select_Campaign_Panel" );
 			//pPanel->InitList();
-			//pPanel->MoveToFront();
+			pPanel->MoveToFront();
 
-			//UpdateMissionImage();
+			UpdateMissionImage();
 
-			//m_hSubScreen = pPanel;
+			m_hSubScreen = pPanel;
 		}
 		else if ( !Q_stricmp( szGameType, "single_mission" ) )
 		{
-			//CNB_Select_Mission_Panel *pPanel = new CNB_Select_Mission_Panel( this, "Select_Mission_Panel" );
-			//pPanel->InitList();
-			//pPanel->MoveToFront();
+			CNB_Select_Mission_Panel *pPanel = new CNB_Select_Mission_Panel( this, "Select_Mission_Panel" );
+			pPanel->InitList();
+			pPanel->MoveToFront();
 
-			//UpdateMissionImage();
+			UpdateMissionImage();
 
-			//m_hSubScreen = pPanel;
+			m_hSubScreen = pPanel;
 		}
 	}	
 }
@@ -1135,18 +1135,18 @@ void GameSettings::ShowStartingMissionSelect()
 
 	if ( m_pSettings )
 	{
-		//const char *szGameType = m_pSettings->GetString( "game/mode", "campaign" );
-		//if ( !Q_stricmp( szGameType, "campaign" ) )
-		//{
-		//	CNB_Select_Mission_Panel *pPanel = new CNB_Select_Mission_Panel( this, "Select_Mission_Panel" );
-		//	pPanel->SelectMissionsFromCampaign( m_pSettings->GetString( "game/campaign", "jacob" ) );
-		//	pPanel->InitList();
-		//	pPanel->MoveToFront();
+		const char *szGameType = m_pSettings->GetString( "game/mode", "campaign" );
+		if ( !Q_stricmp( szGameType, "campaign" ) )
+		{
+			CNB_Select_Mission_Panel *pPanel = new CNB_Select_Mission_Panel( this, "Select_Mission_Panel" );
+			pPanel->SelectMissionsFromCampaign( m_pSettings->GetString( "game/campaign", "jacob" ) );
+			pPanel->InitList();
+			pPanel->MoveToFront();
 
-		//	UpdateMissionImage();
+			UpdateMissionImage();
 
-		//	m_hSubScreen = pPanel;
-		//}
+			m_hSubScreen = pPanel;
+		}
 	}	
 }
 

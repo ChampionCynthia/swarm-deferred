@@ -29,14 +29,20 @@ public:
 	void			ViewDrawSceneDeferred( const CViewSetup &view, int nClearFlags, view_id_t viewID,
 		bool bDrawViewModel );
 
-	void			ViewDrawGBuffer( const CViewSetup &view, bool &bDrew3dSkybox, SkyboxVisibility_t &nSkyboxVisible );
+	void			ViewDrawGBuffer( const CViewSetup &view, bool &bDrew3dSkybox, SkyboxVisibility_t &nSkyboxVisible,
+		bool bDrawViewModel );
 	void			ViewDrawComposite( const CViewSetup &view, bool &bDrew3dSkybox, SkyboxVisibility_t &nSkyboxVisible,
-		int nClearFlags, view_id_t viewID );
+		int nClearFlags, view_id_t viewID, bool bDrawViewModel );
 
 	void			DrawSkyboxComposite( const CViewSetup &view, const bool &bDrew3dSkybox );
 	void			DrawWorldComposite( const CViewSetup &view, int nClearFlags, bool bDrawSkybox );
 
 	void			DrawLightShadowView( const CViewSetup &view, int iDesiredShadowmap, def_light_t *l );
+
+protected:
+
+	void			DrawViewModels( const CViewSetup &view, bool drawViewmodel, bool bGBuffer );
+
 
 private:
 

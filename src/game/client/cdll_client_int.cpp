@@ -110,6 +110,8 @@
 
 #if defined( SWARM_DLL )
 #include "swarm/gameui/swarm/basemodpanel.h"
+#elif defined( SDK_CLIENT_DLL )
+#include "sdk/gameui/sdk/basemodpanel.h"
 #else
 #error "GAMEUI_EMBEDDED"
 #endif
@@ -1773,7 +1775,7 @@ void ConfigureCurrentSystemLevel()
 #elif defined ( HL2_EPISODIC )
 	char szModName[32] = "ep2";
 #elif defined ( SDK_CLIENT_DLL )
-	char szModName[32] = "sdk";
+	char szModName[32] = "swarm";//"sdk"; // TODO, FIXME. Need other ekv files?
 #endif
 
 	UpdateSystemLevel( nCPULevel, nGPULevel, nMemLevel, nGPUMemLevel, VGui_IsSplitScreen(), szModName );

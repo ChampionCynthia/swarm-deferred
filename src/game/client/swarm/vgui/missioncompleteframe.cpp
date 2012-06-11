@@ -40,9 +40,9 @@ MissionCompleteFrame::MissionCompleteFrame(bool bSuccess, Panel *parent, const c
 	m_fWrongState = 0;
 
 	// clear the currently visible part of the chat
-	//CHudChat *pChat = GET_HUDELEMENT( CHudChat );
-	//if (pChat)
-	//	pChat->InsertBlankPage();
+	CHudChat *pChat = GET_HUDELEMENT( CHudChat );
+	if (pChat)
+		pChat->InsertBlankPage();
 
 	if (GetClientModeASW() && GetClientModeASW()->m_bSpectator)
 	{

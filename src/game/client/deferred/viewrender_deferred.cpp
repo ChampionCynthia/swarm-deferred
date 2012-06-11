@@ -348,8 +348,8 @@ public:
 	virtual void	PushView( float waterHeight );
 	virtual void	PopView();
 
-	void PushGBuffer( bool bInitial, float zScale = 1.0f );
-	void PopGBuffer();
+	static void PushGBuffer( bool bInitial, float zScale = 1.0f );
+	static void PopGBuffer();
 
 private: 
 	VisibleFogVolumeInfo_t m_fogInfo;
@@ -648,11 +648,11 @@ void CDeferredViewRender::ViewDrawSceneDeferred( const CViewSetup &view, int nCl
 	bool bDrew3dSkybox = false;
 	SkyboxVisibility_t nSkyboxVisible = SKYBOX_NOT_VISIBLE;
 
-	ViewDrawGBuffer( view, bDrew3dSkybox, nSkyboxVisible );
+	ViewDrawGBuffer( view, bDrew3dSkybox, nSkyboxVisible, bDrawViewModel );
 
 	PerformLighting( view );
 
-	ViewDrawComposite( view, bDrew3dSkybox, nSkyboxVisible, nClearFlags, viewID );
+	ViewDrawComposite( view, bDrew3dSkybox, nSkyboxVisible, nClearFlags, viewID, bDrawViewModel );
 
 	g_ShaderEditorSystem->UpdateSkymask( bDrew3dSkybox );
 
@@ -701,7 +701,8 @@ void CDeferredViewRender::ViewDrawSceneDeferred( const CViewSetup &view, int nCl
 	}
 }
 
-void CDeferredViewRender::ViewDrawGBuffer( const CViewSetup &view, bool &bDrew3dSkybox, SkyboxVisibility_t &nSkyboxVisible )
+void CDeferredViewRender::ViewDrawGBuffer( const CViewSetup &view, bool &bDrew3dSkybox, SkyboxVisibility_t &nSkyboxVisible,
+	bool bDrawViewModel )
 {
 	MDLCACHE_CRITICAL_SECTION();
 
@@ -722,11 +723,13 @@ void CDeferredViewRender::ViewDrawGBuffer( const CViewSetup &view, bool &bDrew3d
 	pGBufferView->Setup( view, bDrew3dSkybox );
 	AddViewToScene( pGBufferView );
 
+	DrawViewModels( view, bDrawViewModel, true );
+
 	g_CurrentViewID = oldViewID;
 }
 
 void CDeferredViewRender::ViewDrawComposite( const CViewSetup &view, bool &bDrew3dSkybox, SkyboxVisibility_t &nSkyboxVisible,
-		int nClearFlags, view_id_t viewID )
+		int nClearFlags, view_id_t viewID, bool bDrawViewModel )
 {
 	DrawSkyboxComposite( view, bDrew3dSkybox );
 
@@ -765,6 +768,9 @@ void CDeferredViewRender::ViewDrawComposite( const CViewSetup &view, bool &bDrew
 	ParticleMgr()->IncrementFrameCode();
 
 	DrawWorldComposite( view, nClearFlags, drawSkybox );
+
+	DrawViewModels( view, bDrawViewModel, false );
+
 }
 
 void CDeferredViewRender::DrawSkyboxComposite( const CViewSetup &view, const bool &bDrew3dSkybox )
@@ -967,6 +973,122 @@ void CDeferredViewRender::DrawLightShadowView( const CViewSetup &view, int iDesi
 		}
 		break;
 	}
+}
+
+void CDeferredViewRender::DrawViewModels( const CViewSetup &view, bool drawViewmodel, bool bGBuffer )
+{
+	VPROF( "CViewRender::DrawViewModel" );
+
+	bool bShouldDrawPlayerViewModel = ShouldDrawViewModel( drawViewmodel );
+	bool bShouldDrawToolViewModels = ToolsEnabled();
+
+	if ( !bShouldDrawPlayerViewModel && !bShouldDrawToolViewModels )
+		return;
+
+	CMatRenderContextPtr pRenderContext( materials );
+	MDLCACHE_CRITICAL_SECTION();
+
+
+	PIXEVENT( pRenderContext, "DrawViewModels()" );
+
+	// Restore the matrices
+	pRenderContext->MatrixMode( MATERIAL_PROJECTION );
+	pRenderContext->PushMatrix();
+
+	CViewSetup viewModelSetup( view );
+	viewModelSetup.zNear = view.zNearViewmodel;
+	viewModelSetup.zFar = view.zFarViewmodel;
+	viewModelSetup.fov = view.fovViewmodel;
+	viewModelSetup.m_flAspectRatio = engine->GetScreenAspectRatio( view.width, view.height );
+
+	render->Push3DView( viewModelSetup, 0, NULL, GetFrustum() );
+
+	if ( bGBuffer )
+	{
+		const float flViewmodelScale = view.zFarViewmodel / view.zFar;
+		CGBufferView::PushGBuffer( false, flViewmodelScale );
+	}
+	else
+	{
+		pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE,
+			DEFERRED_RENDER_STAGE_COMPOSITION );
+	}
+
+
+	const bool bUseDepthHack = true;
+
+	// FIXME: Add code to read the current depth range
+	float depthmin = 0.0f;
+	float depthmax = 1.0f;
+
+	// HACK HACK:  Munge the depth range to prevent view model from poking into walls, etc.
+	// Force clipped down range
+	if( bUseDepthHack )
+		pRenderContext->DepthRange( 0.0f, 0.1f );
+	
+	CViewModelRenderablesList list;
+	ClientLeafSystem()->CollateViewModelRenderables( &list );
+	CViewModelRenderablesList::RenderGroups_t &opaqueList = list.m_RenderGroups[ CViewModelRenderablesList::VM_GROUP_OPAQUE ];
+	CViewModelRenderablesList::RenderGroups_t &translucentList = list.m_RenderGroups[ CViewModelRenderablesList::VM_GROUP_TRANSLUCENT ];
+
+	if ( ToolsEnabled() && ( !bShouldDrawPlayerViewModel || !bShouldDrawToolViewModels ) )
+	{
+		int nOpaque = opaqueList.Count();
+		for ( int i = nOpaque-1; i >= 0; --i )
+		{
+			IClientRenderable *pRenderable = opaqueList[ i ].m_pRenderable;
+			bool bEntity = pRenderable->GetIClientUnknown()->GetBaseEntity() ? true : false;
+			if ( ( bEntity && !bShouldDrawPlayerViewModel ) || ( !bEntity && !bShouldDrawToolViewModels ) )
+			{
+				opaqueList.FastRemove( i );
+			}
+		}
+
+		int nTranslucent = translucentList.Count();
+		for ( int i = nTranslucent-1; i >= 0; --i )
+		{
+			IClientRenderable *pRenderable = translucentList[ i ].m_pRenderable;
+			bool bEntity = pRenderable->GetIClientUnknown()->GetBaseEntity() ? true : false;
+			if ( ( bEntity && !bShouldDrawPlayerViewModel ) || ( !bEntity && !bShouldDrawToolViewModels ) )
+			{
+				translucentList.FastRemove( i );
+			}
+		}
+	}
+
+	// Update refract for opaque models & draw
+	bool bUpdatedRefractForOpaque = UpdateRefractIfNeededByList( opaqueList );
+	DrawRenderablesInList( opaqueList );
+
+	if ( !bGBuffer )
+	{
+		// Update refract for translucent models (if we didn't already update it above) & draw
+		if ( !bUpdatedRefractForOpaque ) // Only do this once for better perf
+		{
+			UpdateRefractIfNeededByList( translucentList );
+		}
+		DrawRenderablesInList( translucentList, STUDIO_TRANSPARENCY );
+	}
+	else
+	{
+		pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE,
+			DEFERRED_RENDER_STAGE_INVALID );
+	}
+
+	// Reset the depth range to the original values
+	if( bUseDepthHack )
+		pRenderContext->DepthRange( depthmin, depthmax );
+
+	if ( bGBuffer )
+	{
+		CGBufferView::PopGBuffer();
+	}
+
+	render->PopView( GetFrustum() );
+
+	// Restore the matrices
+	pRenderContext->MatrixMode( MATERIAL_PROJECTION );
+	pRenderContext->PopMatrix();
 }
 
 //-----------------------------------------------------------------------------

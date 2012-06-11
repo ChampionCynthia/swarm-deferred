@@ -132,7 +132,7 @@ bool SEditModelRender::LoadModel( const char *localPath )
 
 	C_BaseFlex *pEnt = new C_BaseFlex();
 	pEnt->InitializeAsClientEntity( NULL,
-#if SWARM_DLL
+#if SEDIT_USING_SWARM
 		false
 #else
 		RENDER_GROUP_OPAQUE_ENTITY
@@ -272,12 +272,12 @@ void SEditModelRender::ExecRender()
 	for ( int i = 0; i < m_iNumPoseParams; i++ )
 		pModelInstance->SetPoseParameter( i, 0 );
 
-#if SWARM_DLL
+#if SEDIT_USING_SWARM
 	RenderableInstance_t instance;
 	instance.m_nAlpha = 255;
 #endif
 	pModelInstance->DrawModel( STUDIO_RENDER
-#if SWARM_DLL
+#if SEDIT_USING_SWARM
 		, instance
 #endif
 		);
@@ -301,7 +301,7 @@ int SEditModelRender::MaterialPicker( char ***szMat )
 	Vector ray;
 	const CViewSetup *pViewSetup = view->GetPlayerViewSetup();
 	float ratio =engine->GetScreenAspectRatio(
-#if SWARM_DLL
+#if SEDIT_USING_SWARM
 		pViewSetup->width, pViewSetup->height
 #endif
 		);

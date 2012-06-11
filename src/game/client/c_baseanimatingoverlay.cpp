@@ -177,9 +177,9 @@ void ResizeAnimationLayerCallback( void *pStruct, int offsetToUtlVector, int len
 	CUtlVector < CAnimationLayer > *pVec = &pEnt->m_AnimOverlay;
 	CUtlVector< CInterpolatedVar< CAnimationLayer > > *pVecIV = &pEnt->m_iv_AnimOverlay;
 	
-	//Assert( (char*)pVec - (char*)pEnt == offsetToUtlVector );
-	//Assert( pVec->Count() == pVecIV->Count() );
-	//Assert( pVec->Count() <= C_BaseAnimatingOverlay::MAX_OVERLAYS );
+	Assert( (char*)pVec - (char*)pEnt == offsetToUtlVector );
+	Assert( pVec->Count() == pVecIV->Count() );
+	Assert( pVec->Count() <= C_BaseAnimatingOverlay::MAX_OVERLAYS );
 	
 	int diff = len - pVec->Count();
 	if ( diff != 0 )

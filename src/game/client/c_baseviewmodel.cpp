@@ -201,7 +201,7 @@ bool C_BaseViewModel::Interpolate( float currentTime )
 
 inline bool C_BaseViewModel::ShouldFlipViewModel()
 {
-	return false;
+	return true;
 }
 
 
@@ -261,7 +261,7 @@ bool C_BaseViewModel::ShouldDraw()
 #endif
 	else
 	{
-		Assert( !IsEffectActive( EF_NODRAW ) );
+		//Assert( !IsEffectActive( EF_NODRAW ) );
 		Assert(	GetRenderMode() != kRenderNone );
 
 		if ( vm_draw_always.GetBool() )

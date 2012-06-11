@@ -232,8 +232,8 @@ void CBaseViewport::CreateDefaultPanels( void )
 
 void CBaseViewport::UpdateAllPanels( void )
 {
-	int nSlot = vgui::ipanel()->GetMessageContextId( GetVPanel() );
-	ACTIVE_SPLITSCREEN_PLAYER_GUARD_VGUI( nSlot );
+	//int nSlot = vgui::ipanel()->GetMessageContextId( GetVPanel() );
+	//ACTIVE_SPLITSCREEN_PLAYER_GUARD_VGUI( nSlot );
 
 	for ( int i = 0; i < m_UnorderedPanels.Count(); ++i )
 	{
@@ -686,8 +686,8 @@ void CBaseViewport::OnThink()
 	// check the auto-reload cvar
 	m_pAnimController->SetAutoReloadScript(hud_autoreloadscript.GetBool());
 
-	int nSlot = vgui::ipanel()->GetMessageContextId( GetVPanel() );
-	ACTIVE_SPLITSCREEN_PLAYER_GUARD_VGUI( nSlot );
+	//int nSlot = vgui::ipanel()->GetMessageContextId( GetVPanel() );
+	//ACTIVE_SPLITSCREEN_PLAYER_GUARD_VGUI( nSlot );
 
 	for ( int i = 0; i < m_UnorderedPanels.Count(); ++i )
 	{

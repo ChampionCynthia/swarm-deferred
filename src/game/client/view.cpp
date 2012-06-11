@@ -48,6 +48,8 @@
 
 #if defined( SWARM_DLL )
 #include "swarm/gameui/swarm/basemodpanel.h"
+#elif defined( SDK_CLIENT_DLL )
+#include "sdk/gameui/sdk/basemodpanel.h"
 #else
 #error "GAMEUI_EMBEDDED"
 #endif

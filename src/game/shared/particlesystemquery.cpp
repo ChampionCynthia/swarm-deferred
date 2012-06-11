@@ -748,8 +748,8 @@ Vector CParticleSystemQuery::GetLocalPlayerPos( void )
 {
 #ifdef CLIENT_DLL
 //	HACK_GETLOCALPLAYER_GUARD( "CParticleSystemQuery::GetLocalPlayerPos" );
-	int slot = GET_ACTIVE_SPLITSCREEN_SLOT();
-	ACTIVE_SPLITSCREEN_PLAYER_GUARD( slot );
+	//int slot = GET_ACTIVE_SPLITSCREEN_SLOT();
+	//ACTIVE_SPLITSCREEN_PLAYER_GUARD( slot );
 	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 	if ( !pPlayer )
 		return vec3_origin;
@@ -766,8 +766,8 @@ void CParticleSystemQuery::GetLocalPlayerEyeVectors( Vector *pForward, Vector *p
 {
 #ifdef CLIENT_DLL
 //	HACK_GETLOCALPLAYER_GUARD( "CParticleSystemQuery::GetLocalPlayerPos" );
-	int slot = GET_ACTIVE_SPLITSCREEN_SLOT();
-	ACTIVE_SPLITSCREEN_PLAYER_GUARD( slot );
+	//int slot = GET_ACTIVE_SPLITSCREEN_SLOT();
+	//ACTIVE_SPLITSCREEN_PLAYER_GUARD( slot );
 	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 	if ( !pPlayer )
 	{
@@ -793,8 +793,8 @@ void CParticleSystemQuery::GetLocalPlayerEyeVectors( Vector *pForward, Vector *p
 Vector CParticleSystemQuery::GetCurrentViewOrigin()
 {
 #ifdef CLIENT_DLL
-	int slot = GET_ACTIVE_SPLITSCREEN_SLOT();
-	ACTIVE_SPLITSCREEN_PLAYER_GUARD( slot );
+	//int slot = GET_ACTIVE_SPLITSCREEN_SLOT();
+	//ACTIVE_SPLITSCREEN_PLAYER_GUARD( slot );
 	return CurrentViewOrigin();
 #else
 	return vec3_origin;
@@ -806,8 +806,8 @@ Vector CParticleSystemQuery::GetCurrentViewOrigin()
 float CParticleSystemQuery::GetPixelVisibility( int *pQueryHandle, const Vector &vecOrigin, float flScale )
 {
 #ifdef CLIENT_DLL
-	int slot = GET_ACTIVE_SPLITSCREEN_SLOT();
-	ACTIVE_SPLITSCREEN_PLAYER_GUARD( slot );
+	//int slot = GET_ACTIVE_SPLITSCREEN_SLOT();
+	//ACTIVE_SPLITSCREEN_PLAYER_GUARD( slot );
 	pixelvis_queryparams_t params;
 	params.Init( vecOrigin, flScale, 1.0 );
 	float flVisibility = PixelVisibility_FractionVisible( params, pQueryHandle );

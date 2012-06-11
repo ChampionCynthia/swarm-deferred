@@ -79,8 +79,8 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;.\;..\..\game\shared;..\..\utils\common;..\..\game\server\NextBot;$(IntDir);.\hl2;..\..\game\shared\hl2;.\swarm;..\..\game\shared\swarm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=server;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=server;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;SWARM_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;.\;..\..\game\shared;..\..\utils\common;..\..\game\server\NextBot;$(IntDir);.\hl2;..\..\game\shared\hl2;.\sdk;..\..\game\shared\sdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=server;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=server;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;SDK_SERVER_DLL;SDK_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>
@@ -154,8 +154,8 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;.\;..\..\game\shared;..\..\utils\common;..\..\game\server\NextBot;$(IntDir);.\hl2;..\..\game\shared\hl2;.\swarm;..\..\game\shared\swarm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=server;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=server;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;SWARM_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;.\;..\..\game\shared;..\..\utils\common;..\..\game\server\NextBot;$(IntDir);.\hl2;..\..\game\shared\hl2;.\sdk;..\..\game\shared\sdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=server;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=server;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;SDK_SERVER_DLL;SDK_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -228,6 +228,18 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\..\vpc_scripts\loadaddress.vpc" />
+    <None Include="server_base.vpc" />
+    <None Include="server_swarm.vpc" />
+    <None Include="..\..\vpc_scripts\source_dll_base.vpc" />
+    <None Include="..\..\vpc_scripts\source_dll_win32_base.vpc" />
+    <None Include="..\..\vpc_scripts\source_dll_win32_debug.vpc" />
+    <None Include="..\..\vpc_scripts\source_dll_win32_release.vpc" />
+    <None Include="..\..\vpc_scripts\version.vpc" />
+    <None Include="spawn_helper.nut" />
+    <None Include="vscript_server.nut" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\shared\achievement_saverestore.cpp" />
     <ClCompile Include="..\shared\achievementmgr.cpp" />
     <ClCompile Include="..\shared\activitylist.cpp" />
@@ -236,25 +248,17 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
     <ClCompile Include="..\shared\deferred\CDefLightGlobal.cpp" />
     <ClCompile Include="..\shared\deferred\deferred_shared_common.cpp" />
     <ClCompile Include="..\shared\predicted_viewmodel.cpp" />
-    <ClCompile Include="..\shared\sdk\rainbow_weapon_parse.cpp" />
-    <ClCompile Include="..\shared\sdk\weapon_rainbowbase.cpp" />
-    <ClCompile Include="..\shared\sdk\weapon_rainbowbase_combatweapon.cpp" />
-    <ClCompile Include="..\shared\skeleton\multiplayer\basenetworkedplayer_gamemove.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\shared\skeleton\multiplayer\basenetworkedplayer_shared.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\shared\skeleton\multiplayer\multiplayer_animstate.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\shared\skeleton\skeleton_gamemovement.cpp" />
-    <ClCompile Include="..\shared\skeleton\skeleton_gamerules.cpp" />
-    <ClCompile Include="..\shared\skeleton\skeleton_parsers.cpp" />
-    <ClCompile Include="..\shared\skeleton\skeleton_usermessages.cpp" />
+    <ClCompile Include="..\shared\sdk\sdk_fx_shared.cpp" />
+    <ClCompile Include="..\shared\sdk\sdk_gamemovement.cpp" />
+    <ClCompile Include="..\shared\sdk\sdk_gamerules.cpp" />
+    <ClCompile Include="..\shared\sdk\sdk_playeranimstate.cpp" />
+    <ClCompile Include="..\shared\sdk\sdk_player_shared.cpp" />
+    <ClCompile Include="..\shared\sdk\sdk_shareddefs.cpp" />
+    <ClCompile Include="..\shared\sdk\sdk_usermessages.cpp" />
+    <ClCompile Include="..\shared\sdk\sdk_weapon_parse.cpp" />
+    <ClCompile Include="..\shared\sdk\weapon_mp5.cpp" />
+    <ClCompile Include="..\shared\sdk\weapon_pistol.cpp" />
+    <ClCompile Include="..\shared\sdk\weapon_sdkbase.cpp" />
     <ClCompile Include="ai_activity.cpp" />
     <ClCompile Include="ai_addon.cpp" />
     <ClCompile Include="ai_agent.cpp" />
@@ -327,7 +331,6 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
     <ClCompile Include="..\shared\ammodef.cpp" />
     <ClCompile Include="..\shared\animation.cpp" />
     <ClCompile Include="..\shared\base_playeranimstate.cpp" />
-    <ClCompile Include="base_gameinterface.cpp" />
     <ClCompile Include="base_transmit_proxy.cpp" />
     <ClCompile Include="..\shared\baseachievement.cpp" />
     <ClCompile Include="baseanimating.cpp" />
@@ -464,7 +467,6 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="filters.cpp" />
-    <ClCompile Include="fire.cpp" />
     <ClCompile Include="fire_smoke.cpp" />
     <ClCompile Include="fish.cpp" />
     <ClCompile Include="flex_expresser.cpp" />
@@ -693,6 +695,13 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
     </ClCompile>
     <ClCompile Include="scripted.cpp" />
     <ClCompile Include="scriptedtarget.cpp" />
+    <ClCompile Include="sdk\npc_infected.cpp" />
+    <ClCompile Include="sdk\sdk_bot_temp.cpp" />
+    <ClCompile Include="sdk\sdk_client.cpp" />
+    <ClCompile Include="sdk\sdk_fire.cpp" />
+    <ClCompile Include="sdk\sdk_gameinterface.cpp" />
+    <ClCompile Include="sdk\sdk_player.cpp" />
+    <ClCompile Include="sdk\sdk_playermove.cpp" />
     <ClCompile Include="sendproxy.cpp" />
     <ClCompile Include="..\shared\sequence_Transitioner.cpp" />
     <ClCompile Include="..\..\public\server_class.cpp">
@@ -718,18 +727,6 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
     </ClCompile>
     <ClCompile Include="..\shared\simtimer.cpp" />
     <ClCompile Include="..\shared\singleplay_gamerules.cpp" />
-    <ClCompile Include="skeleton\multiplayer\basenetworkedplayer.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="skeleton\multiplayer\basenetworkedragdoll.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="skeleton\skeleton_client.cpp" />
-    <ClCompile Include="skeleton\skeleton_eventlog.cpp" />
-    <ClCompile Include="skeleton\skeleton_player.cpp" />
-    <ClCompile Include="skeleton\skeleton_playermove.cpp" />
     <ClCompile Include="skyboxswapper.cpp" />
     <ClCompile Include="SkyCamera.cpp" />
     <ClCompile Include="slideshow_display.cpp" />
@@ -871,6 +868,21 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
     <ClCompile Include="nav_mesh_factory.cpp" />
     <ClCompile Include="nav_node.cpp" />
     <ClCompile Include="nav_simplify.cpp" />
+    <ClCompile Include="hl2\ai_behavior_actbusy.cpp" />
+    <ClCompile Include="hl2\ai_spotlight.cpp" />
+    <ClCompile Include="hl2\antlion_dust.cpp" />
+    <ClCompile Include="hl2\ar2_explosion.cpp" />
+    <ClCompile Include="hl2\cbasehelicopter.cpp" />
+    <ClCompile Include="hl2\cbasespriteprojectile.cpp" />
+    <ClCompile Include="hl2\env_speaker.cpp" />
+    <ClCompile Include="hl2\hl2_eventlog.cpp" />
+    <ClCompile Include="hl2\look_door.cpp" />
+    <ClCompile Include="hl2\monster_dummy.cpp" />
+    <ClCompile Include="hl2\npc_attackchopper.cpp" />
+    <ClCompile Include="hl2\npc_bullseye.cpp" />
+    <ClCompile Include="hl2\npc_combinegunship.cpp" />
+    <ClCompile Include="hl2\npc_enemyfinder.cpp" />
+    <ClCompile Include="hl2\rotorwash.cpp" />
     <ClCompile Include="entity_tools_server.cpp" />
     <ClCompile Include="toolframework_server.cpp" />
   </ItemGroup>
@@ -884,21 +896,14 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
     <ClInclude Include="..\shared\deferred\CDefLightGlobal.h" />
     <ClInclude Include="..\shared\deferred\deferred_shared_common.h" />
     <ClInclude Include="..\shared\predicted_viewmodel.h" />
-    <ClInclude Include="..\shared\sdk\rainbow_weapon_parse.h" />
-    <ClInclude Include="..\shared\sdk\weapon_rainbowbase.h" />
-    <ClInclude Include="..\shared\sdk\weapon_rainbowbase_combatweapon.h" />
-    <ClInclude Include="..\shared\skeleton\multiplayer\basenetworkedplayer_gamemove.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\shared\skeleton\multiplayer\basenetworkedplayer_shared.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\shared\skeleton\multiplayer\multiplayer_animstate.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="..\shared\sdk\sdk_fx_shared.h" />
+    <ClInclude Include="..\shared\sdk\sdk_gamerules.h" />
+    <ClInclude Include="..\shared\sdk\sdk_movedata.h" />
+    <ClInclude Include="..\shared\sdk\sdk_playeranimstate.h" />
+    <ClInclude Include="..\shared\sdk\sdk_player_shared.h" />
+    <ClInclude Include="..\shared\sdk\sdk_shareddefs.h" />
+    <ClInclude Include="..\shared\sdk\sdk_weapon_parse.h" />
+    <ClInclude Include="..\shared\sdk\weapon_sdkbase.h" />
     <ClInclude Include="ai_addon.h" />
     <ClInclude Include="ai_agent.h" />
     <ClInclude Include="ai_baseactor.h" />
@@ -1043,7 +1048,6 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
     <ClInclude Include="eventqueue.h" />
     <ClInclude Include="explode.h" />
     <ClInclude Include="filters.h" />
-    <ClInclude Include="fire.h" />
     <ClInclude Include="fire_smoke.h" />
     <ClInclude Include="fish.h" />
     <ClInclude Include="fogvolume.h" />
@@ -1152,6 +1156,9 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
     <ClInclude Include="scriptedtarget.h" />
     <ClInclude Include="..\shared\scriptevent.h" />
     <ClInclude Include="..\..\public\server_class.h" />
+    <ClInclude Include="sdk\sdk_bot_temp.h" />
+    <ClInclude Include="sdk\sdk_fire.h" />
+    <ClInclude Include="sdk\sdk_player.h" />
     <ClInclude Include="serverbenchmark_base.h" />
     <ClInclude Include="ServerNetworkProperty.h" />
     <ClInclude Include="..\shared\sharedvar.h" />
@@ -1161,15 +1168,6 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
     <ClInclude Include="..\shared\simtimer.h" />
     <ClInclude Include="..\shared\singleplay_gamerules.h" />
     <ClInclude Include="..\shared\solidsetdefaults.h" />
-    <ClInclude Include="skeleton\multiplayer\basenetworkedplayer.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="skeleton\multiplayer\basenetworkedragdoll.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="skeleton\skeleton_player.h" />
     <ClInclude Include="soundent.h" />
     <ClInclude Include="soundscape.h" />
     <ClInclude Include="spark.h" />
@@ -1216,6 +1214,18 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
     <ClInclude Include="nav_mesh.h" />
     <ClInclude Include="nav_node.h" />
     <ClInclude Include="nav_pathfind.h" />
+    <ClInclude Include="hl2\ai_behavior_actbusy.h" />
+    <ClInclude Include="hl2\ai_interactions.h" />
+    <ClInclude Include="hl2\ai_spotlight.h" />
+    <ClInclude Include="hl2\antlion_dust.h" />
+    <ClInclude Include="hl2\ar2_explosion.h" />
+    <ClInclude Include="hl2\cbasehelicopter.h" />
+    <ClInclude Include="hl2\cbasespriteprojectile.h" />
+    <ClInclude Include="hl2\energy_wave.h" />
+    <ClInclude Include="hl2\env_speaker.h" />
+    <ClInclude Include="hl2\npc_attackchopper.h" />
+    <ClInclude Include="hl2\npc_bullseye.h" />
+    <ClInclude Include="hl2\rotorwash.h" />
     <ClInclude Include="..\..\public\mathlib\amd3dx.h" />
     <ClInclude Include="..\shared\ammodef.h" />
     <ClInclude Include="..\shared\base_playeranimstate.h" />
@@ -1439,10 +1449,6 @@ if exist "$(TargetDir)"$(ProjectName).pdb copy "$(TargetDir)"$(ProjectName).pdb 
     <ClInclude Include="..\..\public\worldsize.h" />
     <ClInclude Include="..\..\public\zip_uncompressed.h" />
     <ClInclude Include="toolframework_server.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="spawn_helper.nut" />
-    <None Include="vscript_server.nut" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\lib\public\bonesetup.lib" />

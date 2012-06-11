@@ -491,6 +491,8 @@ void C_BaseCombatWeapon::EnsureCorrectRenderingModel()
 		return;
 	}
 
+	MDLCACHE_CRITICAL_SECTION();
+
 	// BRJ 10/14/02
 	// FIXME: Remove when Yahn's client-side prediction is done
 	// It's a hacky workaround for the model indices fighting

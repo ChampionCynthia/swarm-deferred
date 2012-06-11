@@ -112,6 +112,10 @@
 #include "asw_gamerules.h"
 #endif
 
+#ifdef SDK_DLL
+#include "matchmaking/swarm/imatchext_swarm.h"
+#endif // SDK_DLL
+
 // @Deferred - Biohazard
 // for cookie string table
 #include "deferred/deferred_shared_common.h"
@@ -189,6 +193,8 @@ IBlackBox *blackboxrecorder = NULL;
 
 #ifdef INFESTED_DLL
 IASW_Mission_Chooser *missionchooser = NULL;
+IMatchExtSwarm *g_pMatchExtSwarm = NULL;
+#else
 IMatchExtSwarm *g_pMatchExtSwarm = NULL;
 #endif
 
@@ -720,6 +726,9 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 #ifdef INFESTED_DLL
 	if ( (missionchooser = (IASW_Mission_Chooser *)appSystemFactory(ASW_MISSION_CHOOSER_VERSION, NULL)) == NULL )
 		return false;
+	if ( (g_pMatchExtSwarm = (IMatchExtSwarm *)appSystemFactory(IMATCHEXT_SWARM_INTERFACE, NULL)) == NULL )
+		return false;
+#else
 	if ( (g_pMatchExtSwarm = (IMatchExtSwarm *)appSystemFactory(IMATCHEXT_SWARM_INTERFACE, NULL)) == NULL )
 		return false;
 #endif

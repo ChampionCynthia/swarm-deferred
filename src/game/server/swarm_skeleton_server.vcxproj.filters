@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="VPC Scripts">
+      <UniqueIdentifier>{a2369d5d-d207-4a52-864e-8f0a5e3a2a4a}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{d29c8459-c580-43da-9709-fc65bb9c54be}</UniqueIdentifier>
     </Filter>
@@ -13,6 +16,9 @@
     <Filter Include="Source Files\Nav Mesh">
       <UniqueIdentifier>{8742242a-aa11-4b63-9b83-4996de2fa404}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\From HL2">
+      <UniqueIdentifier>{c4d42023-7d85-418b-89f5-3c4cb98b17f1}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Link Libraries">
       <UniqueIdentifier>{f71ca88d-34ab-49be-a4c9-e9d0c512313d}</UniqueIdentifier>
     </Filter>
@@ -20,32 +26,52 @@
       <UniqueIdentifier>{ca4464d1-f9e2-43aa-a60b-bdbb378bfcc1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Tools Framework">
-      <UniqueIdentifier>{636d29da-d078-468c-a636-086177fb878e}</UniqueIdentifier>
+      <UniqueIdentifier>{77843216-956d-42f2-9b6e-33925fbfdd5e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Skeleton">
-      <UniqueIdentifier>{44c474a5-70ed-44d9-a20d-8bfa8e547899}</UniqueIdentifier>
+    <Filter Include="Source Files\sdk">
+      <UniqueIdentifier>{16195d93-51f1-4e6e-b796-f99b9330fe01}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Skeleton\Re-includes">
-      <UniqueIdentifier>{1ce97870-aa79-4d7c-9ff1-3750d7cfa8f4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Skeleton\Shared">
-      <UniqueIdentifier>{10d1e542-f95e-4d51-9019-0fa6c3428310}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Skeleton\Multiplayer">
-      <UniqueIdentifier>{0a949a3a-77e7-4c5d-b252-267e8ad8903a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Skeleton\Multiplayer\Shared">
-      <UniqueIdentifier>{093e03e1-9c1f-42ec-8f93-0e6a119d4c36}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\SDK">
-      <UniqueIdentifier>{6c20e217-ae4d-4e4e-ae6c-9d81722f079d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\deferred">
-      <UniqueIdentifier>{15202bde-9fd3-45af-ad4a-29cd6c36fca6}</UniqueIdentifier>
+    <Filter Include="Source Files\sdk\Shared">
+      <UniqueIdentifier>{d8f68d65-a5e3-4632-9809-604043b22c0a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\deferred\shared">
       <UniqueIdentifier>{0be2cf97-8149-4d8c-a9bf-a5c56234c6a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\deferred">
+      <UniqueIdentifier>{15202bde-9fd3-45af-ad4a-29cd6c36fca6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\vpc_scripts\loadaddress.vpc">
+      <Filter>VPC Scripts</Filter>
+    </None>
+    <None Include="server_base.vpc">
+      <Filter>VPC Scripts</Filter>
+    </None>
+    <None Include="server_swarm.vpc">
+      <Filter>VPC Scripts</Filter>
+    </None>
+    <None Include="..\..\vpc_scripts\source_dll_base.vpc">
+      <Filter>VPC Scripts</Filter>
+    </None>
+    <None Include="..\..\vpc_scripts\source_dll_win32_base.vpc">
+      <Filter>VPC Scripts</Filter>
+    </None>
+    <None Include="..\..\vpc_scripts\source_dll_win32_debug.vpc">
+      <Filter>VPC Scripts</Filter>
+    </None>
+    <None Include="..\..\vpc_scripts\source_dll_win32_release.vpc">
+      <Filter>VPC Scripts</Filter>
+    </None>
+    <None Include="..\..\vpc_scripts\version.vpc">
+      <Filter>VPC Scripts</Filter>
+    </None>
+    <None Include="spawn_helper.nut">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="vscript_server.nut">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\shared\achievement_saverestore.cpp">
@@ -1416,69 +1442,115 @@
     <ClCompile Include="nav_simplify.cpp">
       <Filter>Source Files\Nav Mesh</Filter>
     </ClCompile>
+<ClCompile Include="hl2\ai_behavior_actbusy.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\ai_spotlight.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\antlion_dust.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\ar2_explosion.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\cbasehelicopter.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\cbasespriteprojectile.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\env_speaker.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\hl2_eventlog.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\look_door.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\monster_dummy.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\npc_attackchopper.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\npc_bullseye.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\npc_combinegunship.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\npc_enemyfinder.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2\rotorwash.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
     <ClCompile Include="entity_tools_server.cpp">
       <Filter>Tools Framework</Filter>
     </ClCompile>
     <ClCompile Include="toolframework_server.cpp">
       <Filter>Tools Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\skeleton\skeleton_usermessages.cpp">
-      <Filter>Source Files\Skeleton\Shared</Filter>
+    <ClCompile Include="sdk\sdk_client.cpp">
+      <Filter>Source Files\sdk</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\skeleton\skeleton_gamemovement.cpp">
-      <Filter>Source Files\Skeleton\Shared</Filter>
+    <ClCompile Include="sdk\sdk_player.cpp">
+      <Filter>Source Files\sdk</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\skeleton\skeleton_gamerules.cpp">
-      <Filter>Source Files\Skeleton\Shared</Filter>
+    <ClCompile Include="..\shared\sdk\sdk_usermessages.cpp">
+      <Filter>Source Files\sdk</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\skeleton\skeleton_parsers.cpp">
-      <Filter>Source Files\Skeleton\Shared</Filter>
+    <ClCompile Include="sdk\sdk_gameinterface.cpp">
+      <Filter>Source Files\sdk</Filter>
     </ClCompile>
-    <ClCompile Include="skeleton\skeleton_eventlog.cpp">
-      <Filter>Source Files\Skeleton</Filter>
+    <ClCompile Include="sdk\sdk_playermove.cpp">
+      <Filter>Source Files\sdk</Filter>
     </ClCompile>
-    <ClCompile Include="skeleton\skeleton_playermove.cpp">
-      <Filter>Source Files\Skeleton</Filter>
+    <ClCompile Include="sdk\sdk_fire.cpp">
+      <Filter>Source Files\sdk</Filter>
     </ClCompile>
-    <ClCompile Include="skeleton\skeleton_client.cpp">
-      <Filter>Source Files\Skeleton</Filter>
+    <ClCompile Include="..\shared\sdk\sdk_player_shared.cpp">
+      <Filter>Source Files\sdk\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="fire.cpp">
-      <Filter>Source Files\Skeleton\Re-includes</Filter>
+    <ClCompile Include="..\shared\sdk\sdk_gamerules.cpp">
+      <Filter>Source Files\sdk\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="base_gameinterface.cpp">
-      <Filter>Source Files\Skeleton\Re-includes</Filter>
+    <ClCompile Include="..\shared\sdk\sdk_gamemovement.cpp">
+      <Filter>Source Files\sdk\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="skeleton\skeleton_player.cpp">
-      <Filter>Source Files\Skeleton</Filter>
+    <ClCompile Include="..\shared\sdk\weapon_sdkbase.cpp">
+      <Filter>Source Files\sdk\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="skeleton\multiplayer\basenetworkedplayer.cpp">
-      <Filter>Source Files\Skeleton\Multiplayer</Filter>
+    <ClCompile Include="..\shared\sdk\weapon_mp5.cpp">
+      <Filter>Source Files\sdk\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="skeleton\multiplayer\basenetworkedragdoll.cpp">
-      <Filter>Source Files\Skeleton\Multiplayer</Filter>
+    <ClCompile Include="..\shared\sdk\sdk_weapon_parse.cpp">
+      <Filter>Source Files\sdk\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\sdk\sdk_shareddefs.cpp">
+      <Filter>Source Files\sdk\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\sdk\sdk_playeranimstate.cpp">
+      <Filter>Source Files\sdk\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\sdk\sdk_fx_shared.cpp">
+      <Filter>Source Files\sdk\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\sdk\weapon_pistol.cpp">
+      <Filter>Source Files\sdk\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="sdk\npc_infected.cpp">
+      <Filter>Source Files\sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="sdk\sdk_bot_temp.cpp">
+      <Filter>Source Files\sdk</Filter>
     </ClCompile>
     <ClCompile Include="..\shared\predicted_viewmodel.cpp">
-      <Filter>Source Files\Skeleton\Re-includes</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\skeleton\multiplayer\basenetworkedplayer_gamemove.cpp">
-      <Filter>Source Files\Skeleton\Multiplayer\Shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\skeleton\multiplayer\basenetworkedplayer_shared.cpp">
-      <Filter>Source Files\Skeleton\Multiplayer\Shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\skeleton\multiplayer\multiplayer_animstate.cpp">
-      <Filter>Source Files\Skeleton\Multiplayer\Shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\sdk\rainbow_weapon_parse.cpp">
-      <Filter>Source Files\SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\sdk\weapon_rainbowbase.cpp">
-      <Filter>Source Files\SDK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\sdk\weapon_rainbowbase_combatweapon.cpp">
-      <Filter>Source Files\SDK</Filter>
-    </ClCompile>
+
     <ClCompile Include="..\shared\deferred\CDefLight.cpp">
       <Filter>Source Files\deferred\shared</Filter>
     </ClCompile>
@@ -2423,6 +2495,42 @@
     <ClInclude Include="nav_pathfind.h">
       <Filter>Source Files\Nav Mesh</Filter>
     </ClInclude>
+    <ClInclude Include="hl2\ai_behavior_actbusy.h">
+      <Filter>Source Files\From HL2</Filter>
+    </ClInclude>
+    <ClInclude Include="hl2\ai_interactions.h">
+      <Filter>Source Files\From HL2</Filter>
+    </ClInclude>
+    <ClInclude Include="hl2\ai_spotlight.h">
+      <Filter>Source Files\From HL2</Filter>
+    </ClInclude>
+    <ClInclude Include="hl2\antlion_dust.h">
+      <Filter>Source Files\From HL2</Filter>
+    </ClInclude>
+    <ClInclude Include="hl2\ar2_explosion.h">
+      <Filter>Source Files\From HL2</Filter>
+    </ClInclude>
+    <ClInclude Include="hl2\cbasehelicopter.h">
+      <Filter>Source Files\From HL2</Filter>
+    </ClInclude>
+    <ClInclude Include="hl2\cbasespriteprojectile.h">
+      <Filter>Source Files\From HL2</Filter>
+    </ClInclude>
+    <ClInclude Include="hl2\energy_wave.h">
+      <Filter>Source Files\From HL2</Filter>
+    </ClInclude>
+    <ClInclude Include="hl2\env_speaker.h">
+      <Filter>Source Files\From HL2</Filter>
+    </ClInclude>
+    <ClInclude Include="hl2\npc_attackchopper.h">
+      <Filter>Source Files\From HL2</Filter>
+    </ClInclude>
+    <ClInclude Include="hl2\npc_bullseye.h">
+      <Filter>Source Files\From HL2</Filter>
+    </ClInclude>
+    <ClInclude Include="hl2\rotorwash.h">
+      <Filter>Source Files\From HL2</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\public\mathlib\amd3dx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -3092,39 +3200,43 @@
     <ClInclude Include="toolframework_server.h">
       <Filter>Tools Framework</Filter>
     </ClInclude>
-    <ClInclude Include="fire.h">
-      <Filter>Source Files\Skeleton\Re-includes</Filter>
+<ClInclude Include="sdk\sdk_player.h">
+      <Filter>Source Files\sdk</Filter>
     </ClInclude>
-    <ClInclude Include="skeleton\skeleton_player.h">
-      <Filter>Source Files\Skeleton</Filter>
+    <ClInclude Include="sdk\sdk_fire.h">
+      <Filter>Source Files\sdk</Filter>
     </ClInclude>
-    <ClInclude Include="skeleton\multiplayer\basenetworkedplayer.h">
-      <Filter>Source Files\Skeleton\Multiplayer</Filter>
+    <ClInclude Include="..\shared\sdk\sdk_player_shared.h">
+      <Filter>Source Files\sdk\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="skeleton\multiplayer\basenetworkedragdoll.h">
-      <Filter>Source Files\Skeleton\Multiplayer</Filter>
+    <ClInclude Include="..\shared\sdk\sdk_gamerules.h">
+      <Filter>Source Files\sdk\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\sdk\weapon_sdkbase.h">
+      <Filter>Source Files\sdk\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\sdk\sdk_weapon_parse.h">
+      <Filter>Source Files\sdk\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\sdk\sdk_shareddefs.h">
+      <Filter>Source Files\sdk\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\sdk\sdk_playeranimstate.h">
+      <Filter>Source Files\sdk\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\sdk\sdk_movedata.h">
+      <Filter>Source Files\sdk\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\sdk\sdk_fx_shared.h">
+      <Filter>Source Files\sdk\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\sdk_bot_temp.h">
+      <Filter>Source Files\sdk</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\predicted_viewmodel.h">
-      <Filter>Source Files\Skeleton\Re-includes</Filter>
+      <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\skeleton\multiplayer\basenetworkedplayer_gamemove.h">
-      <Filter>Source Files\Skeleton\Multiplayer\Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\skeleton\multiplayer\multiplayer_animstate.h">
-      <Filter>Source Files\Skeleton\Multiplayer\Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\skeleton\multiplayer\basenetworkedplayer_shared.h">
-      <Filter>Source Files\Skeleton\Multiplayer\Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\sdk\rainbow_weapon_parse.h">
-      <Filter>Source Files\SDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\sdk\weapon_rainbowbase.h">
-      <Filter>Source Files\SDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\sdk\weapon_rainbowbase_combatweapon.h">
-      <Filter>Source Files\SDK</Filter>
-    </ClInclude>
+
     <ClInclude Include="deferred\deferred_server_common.h">
       <Filter>Source Files\deferred</Filter>
     </ClInclude>
@@ -3144,14 +3256,7 @@
       <Filter>Source Files\deferred\shared</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="spawn_helper.nut">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="vscript_server.nut">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
+
   <ItemGroup>
     <Library Include="..\..\lib\public\bonesetup.lib">
       <Filter>Link Libraries</Filter>
