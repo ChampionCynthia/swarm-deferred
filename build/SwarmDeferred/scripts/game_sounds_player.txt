@@ -31,7 +31,7 @@
 	"channel"	"CHAN_WEAPON"
 	"volume"	"0.8"
 	"soundlevel"  "SNDLVL_75dB"
-	"pitch"	"PITCH_NORM"
+	"pitch"	"90"
 
 	"wave" "items/flashlight1.wav"
 }
