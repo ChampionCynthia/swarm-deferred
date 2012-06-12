@@ -212,3 +212,28 @@ void CSDK_Player::CreateViewModel( int index /*=0*/ )
 		m_hViewModel.Set( index, vm );
 	}
 }
+
+void CSDK_Player::SetFlashlightEnabled( bool bState )
+{
+	if ( bState )
+		AddEffects( EF_DIMLIGHT );
+	else
+		RemoveEffects( EF_DIMLIGHT );
+}
+
+int CSDK_Player::FlashlightIsOn( void )
+{
+	return IsEffectActive( EF_DIMLIGHT );
+}
+
+bool CSDK_Player::FlashlightTurnOn( bool playSound )
+{
+	SetFlashlightEnabled( true );
+
+	return true;
+}
+
+void CSDK_Player::FlashlightTurnOff( bool playSound )
+{
+	SetFlashlightEnabled( false );
+}

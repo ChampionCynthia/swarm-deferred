@@ -47,6 +47,12 @@ public:
 
 	virtual void					UpdateOnRemove( void );
 
+#ifdef CLIENT_DLL
+	virtual const Vector	&GetRenderOrigin();
+
+	Vector m_vecRender;
+#endif
+
 	// Weapon client handling
 	virtual void			SendViewModelMatchingSequence( int sequence );
 	virtual void			SetWeaponModel( const char *pszModelname, CBaseCombatWeapon *weapon );

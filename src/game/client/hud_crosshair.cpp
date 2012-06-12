@@ -186,7 +186,7 @@ void CHudCrosshair::Paint( void )
 	int width = MAX( 1, y * 0.03f );
 	int height = MAX( 1, y * 0.005f );
 
-	surface()->DrawSetColor( 64, 96, 220, 255 );
+	surface()->DrawSetColor( 128, 196, 220, 255 );
 
 	surface()->DrawFilledRect( x - width - height,
 		y - height / 2,

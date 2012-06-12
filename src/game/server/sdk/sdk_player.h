@@ -45,6 +45,11 @@ public:
 	CWeaponSDKBase *GetActiveSDKWeapon() const;
 	virtual void	CreateViewModel( int viewmodelindex = 0 );
 
+	virtual void			SetFlashlightEnabled( bool bState );
+	virtual int				FlashlightIsOn( void );
+	virtual bool			FlashlightTurnOn( bool playSound = false );
+	virtual void			FlashlightTurnOff( bool playSound = false );
+
 // In shared code.
 public:
 	void FireBullet( 

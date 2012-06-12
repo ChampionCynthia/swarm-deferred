@@ -4175,7 +4175,6 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 			DevWarning( "Unhandled eject brass animevent\n" );
 		}
 		break;
-
 	case AE_MUZZLEFLASH:
 		{
 			// Send out the effect for a player
@@ -4233,16 +4232,16 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 	case CL_EVENT_DISPATCHEFFECT7:
 	case CL_EVENT_DISPATCHEFFECT8:
 	case CL_EVENT_DISPATCHEFFECT9:
-	case CL_EVENT_MUZZLEFLASH0:
-	case CL_EVENT_MUZZLEFLASH1:
-	case CL_EVENT_MUZZLEFLASH2:
-	case CL_EVENT_MUZZLEFLASH3:
 	case CL_EVENT_NPC_MUZZLEFLASH0:
 	case CL_EVENT_NPC_MUZZLEFLASH1:
 	case CL_EVENT_NPC_MUZZLEFLASH2:
 	case CL_EVENT_NPC_MUZZLEFLASH3:
 	case CL_EVENT_SPARK0:
 	case CL_EVENT_SOUND:
+	case CL_EVENT_MUZZLEFLASH0:
+	case CL_EVENT_MUZZLEFLASH1:
+	case CL_EVENT_MUZZLEFLASH2:
+	case CL_EVENT_MUZZLEFLASH3:
 		FireObsoleteEvent( origin, angles, event, options );
 		break;
 

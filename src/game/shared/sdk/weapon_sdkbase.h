@@ -34,7 +34,9 @@ public:
 		DECLARE_DATADESC();
 	#endif
 	#ifdef CLIENT_DLL
-       virtual bool ShouldPredict();
+		virtual bool ShouldPredict();
+		virtual void			AddViewmodelBob( CBaseViewModel *viewmodel, Vector &origin, QAngle &angles );
+		virtual float			CalcViewmodelBob( void );
 	#endif
 	// All predicted weapons need to implement and return true
 	virtual bool	IsPredicted() const { return true; }

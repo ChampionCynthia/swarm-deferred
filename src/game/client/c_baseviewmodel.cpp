@@ -273,6 +273,27 @@ bool C_BaseViewModel::ShouldDraw()
 	}
 }
 
+const Vector &C_BaseViewModel::GetRenderOrigin()
+{
+	m_vecRender = BaseClass::GetRenderOrigin();
+
+	if ( ShouldFlipViewModel() )
+	{
+		int nSlot = GET_ACTIVE_SPLITSCREEN_SLOT();
+
+		Assert( nSlot != -1 );
+		const CViewSetup *pViewSetup = view->GetPlayerViewSetup( nSlot );
+
+		Vector right, delta = m_vecRender - pViewSetup->origin;
+		AngleVectors( pViewSetup->angles, NULL, &right, NULL );
+		float flRight = DotProduct( right, delta );
+
+		m_vecRender += right * flRight * -2.0f;
+	}
+
+	return m_vecRender;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Render the weapon. Draw the Viewmodel if the weapon's being carried
 //			by this player, otherwise draw the worldmodel.
