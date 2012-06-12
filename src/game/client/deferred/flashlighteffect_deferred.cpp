@@ -4,7 +4,7 @@
 
 
 
-CFlashlightEffectDeferred::CFlashlightEffectDeferred(int nEntIndex, const char *pszTextureName, float flFov, float flFarZ, float flLinearAtten )
+CFlashlightEffectDeferred::CFlashlightEffectDeferred( int nEntIndex, const char *pszTextureName, float flFov, float flFarZ, float flLinearAtten )
 	: CFlashlightEffect( nEntIndex, pszTextureName, flFov, flFarZ, flLinearAtten )
 {
 	m_pDefLight = NULL;
@@ -49,6 +49,14 @@ void CFlashlightEffectDeferred::UpdateLightProjection( FlashlightState_t &state 
 			m_pDefLight->iFlags |= DEFLIGHT_SHADOW_ENABLED;
 		else
 			m_pDefLight->iFlags &= ~DEFLIGHT_SHADOW_ENABLED;
+	}
+
+	if ( m_pDefLight->HasVolumetrics() != state.m_bVolumetric )
+	{
+		if ( state.m_bVolumetric )
+			m_pDefLight->iFlags |= DEFLIGHT_VOLUMETRICS_ENABLED;
+		else
+			m_pDefLight->iFlags &= ~DEFLIGHT_VOLUMETRICS_ENABLED;
 	}
 
 	m_pDefLight->MakeDirtyXForms();

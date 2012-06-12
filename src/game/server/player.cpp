@@ -6155,6 +6155,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 			#ifdef HL2_EPISODIC
 				GiveAmmo( 5,	"Hopwire" );
 			#endif
+			GiveAmmo( 255,	"mp5");
 
 			GiveNamedItem( "weapon_smg1" );
 			GiveNamedItem( "weapon_frag" );

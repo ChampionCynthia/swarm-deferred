@@ -1222,13 +1222,24 @@ void C_BasePlayer::UpdateFlashlight()
 
 		if ( IsLocalPlayer() )
 		{
-			C_BaseViewModel *pVM = GetViewModel();
-			int iAttachment = pVM ? pVM->LookupAttachment( "muzzle" ) : -1;
+			C_BaseAnimating *pParentEntity = NULL;
 
+			const char *pszAttachmentName = "muzzle";
+			if ( input->CAM_IsThirdPerson() )
+			{
+				pParentEntity = this;
+				pszAttachmentName = "anim_attachment_RH";
+			}
+			else
+			{
+				pParentEntity = GetViewModel();
+			}
+
+			int iAttachment = pParentEntity ? pParentEntity->LookupAttachment( pszAttachmentName ) : -1;
 			if ( iAttachment != -1 )
 			{
 				QAngle angles;
-				pVM->GetAttachment( iAttachment, vecPos, angles );
+				pParentEntity->GetAttachment( iAttachment, vecPos, angles );
 				AngleVectors( angles, &vecForward, &vecRight, &vecUp );
 			}
 		}

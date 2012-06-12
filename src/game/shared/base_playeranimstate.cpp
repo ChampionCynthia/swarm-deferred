@@ -808,7 +808,6 @@ int CBasePlayerAnimState::ConvergeAngles( float goal,float maxrate, float maxgap
 		anglediff = goal - current;
 		anglediff = AngleNormalize( anglediff );
 		anglediffabs = fabs( anglediff );
-		Msg( "jumped = %f\n", flTooFar );
 	}
 
 	if ( anglediffabs < maxmove )

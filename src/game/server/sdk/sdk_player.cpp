@@ -137,8 +137,10 @@ CSDK_Player *CSDK_Player::CreatePlayer( const char *className, edict_t *ed )
 
 void CSDK_Player::Precache()
 {
-
 	PrecacheModel( SDK_PLAYER_MODEL );
+
+	PrecacheScriptSound( "HL2Player.FlashLightOn" );
+	PrecacheScriptSound( "HL2Player.FlashLightOff" );
 
 	BaseClass::Precache();
 }
@@ -188,7 +190,7 @@ void CSDK_Player::PostThink()
 void CSDK_Player::GiveDefaultItems()
 {
 	CBasePlayer::GiveAmmo( 30,	"pistol");
-	CBasePlayer::GiveAmmo( 30,	"mp5");
+	CBasePlayer::GiveAmmo( 60,	"mp5");
 
 	GiveNamedItem( "weapon_pistol" );
 	GiveNamedItem( "weapon_mp5" );
@@ -230,10 +232,14 @@ bool CSDK_Player::FlashlightTurnOn( bool playSound )
 {
 	SetFlashlightEnabled( true );
 
+	EmitSound( "HL2Player.FlashLightOn" );
+
 	return true;
 }
 
 void CSDK_Player::FlashlightTurnOff( bool playSound )
 {
 	SetFlashlightEnabled( false );
+
+	EmitSound( "HL2Player.FlashLightOff" );
 }
