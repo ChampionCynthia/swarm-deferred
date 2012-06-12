@@ -1,6 +1,6 @@
 
 // STATIC:		"ALPHATEST"			"0..1"
-// STATIC:		"BUMPMAP"			"0..1"
+// STATIC:		"BUMPMAP"			"0..2"
 // STATIC:		"NOCULL"			"0..1"
 
 // STATIC:		"PHONGMAP"			"0..1"
@@ -70,7 +70,12 @@ PS_OUTPUT main( const PS_INPUT In )
 
 #if BUMPMAP
 	float3 bumpNormal = tex2D( sBumpmap, In.vTexCoord ).rgb;
-	float3 tangentNormal = bumpNormal * 2.0f - 1.0f;
+	float3 tangentNormal;
+#if BUMPMAP == 1
+	tangentNormal = bumpNormal * 2.0f - 1.0f;
+#else
+	tangentNormal = normalize( bumpBasis[0]*bumpNormal.x + bumpBasis[1]*bumpNormal.y + bumpBasis[2]*bumpNormal.z);
+#endif
 	float3 worldNormal = Vec3TangentToWorld( tangentNormal, In.worldNormal, In.worldTangentS, In.worldTangentT );
 #else
 	float3 worldNormal = In.worldNormal;

@@ -15,6 +15,7 @@ struct defParms_gBuffer
 	// textures
 	int iAlbedo;
 	int iBumpmap;
+	int iSSBump;
 	int iPhongmap;
 
 	// control

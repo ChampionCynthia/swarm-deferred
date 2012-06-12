@@ -43,6 +43,7 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 
 	const bool bAlbedo = PARM_TEX( info.iAlbedo );
 	const bool bBumpmap = PARM_TEX( info.iBumpmap );
+	const bool bSSBump = bBumpmap && PARM_SET( info.iSSBump );
 	const bool bPhongmap = PARM_TEX( info.iPhongmap );
 
 	const bool bAlphatest = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST ) && bAlbedo;
@@ -107,7 +108,7 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 
 		DECLARE_STATIC_PIXEL_SHADER_OLD( gbuffer_ps30 );
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( ALPHATEST, bAlphatest );
-		SET_STATIC_PIXEL_SHADER_COMBO_OLD( BUMPMAP, bBumpmap );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( BUMPMAP, bBumpmap ? bSSBump ? 2 : 1 : 0 );
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( NOCULL, bNoCull );
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( PHONGMAP, bPhongmap );
 		SET_STATIC_PIXEL_SHADER_OLD( gbuffer_ps30 );
