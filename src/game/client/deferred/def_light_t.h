@@ -127,6 +127,7 @@ struct def_light_t
 	ITexture *GetCookieForDraw( const int iTargetIndex = 0 );
 	void ClearCookie();
 	IDefCookie *CreateCookieInstance( const char *pszCookieName );
+	void SetCookie( IDefCookie *pCookie );
 
 	FORCEINLINE float GetFOV()
 	{

@@ -304,6 +304,12 @@ ITexture *def_light_t::GetCookieForDraw( const int iTargetIndex )
 	return pCookie->GetCookieTarget( iTargetIndex );
 }
 
+void def_light_t::SetCookie( IDefCookie *pCookie )
+{
+	ClearCookie();
+	this->pCookie = pCookie;
+}
+
 void def_light_t::ClearCookie()
 {
 	delete pCookie;

@@ -15,6 +15,9 @@
 #include "tier1/KeyValues.h"
 #include "toolframework_client.h"
 
+// @Deferred - Biohazard
+#include "deferred/deferred_shared_common.h"
+
 #ifdef HL2_CLIENT_DLL
 #include "c_basehlplayer.h"
 #endif // HL2_CLIENT_DLL
@@ -90,7 +93,8 @@ CFlashlightEffect::CFlashlightEffect(int nEntIndex, const char *pszTextureName, 
 	m_bIsOn = false;
 
 	UpdateFlashlightTexture( pszTextureName );
-	m_MuzzleFlashTexture.Init( "effects/muzzleflash_light", TEXTURE_GROUP_OTHER, true );
+	//m_MuzzleFlashTexture.Init( "effects/muzzleflash_light", TEXTURE_GROUP_OTHER, true );
+	m_MuzzleFlashTexture.Init( "white", TEXTURE_GROUP_OTHER, true );
 }
 
 
@@ -240,19 +244,8 @@ void CFlashlightEffect::UpdateLightTopDown(const Vector &vecPos, const Vector &v
 	state.m_flShadowSlopeScaleDepthBias = g_pMaterialSystemHardwareConfig->GetShadowSlopeScaleDepthBias();
 	state.m_flShadowDepthBias = g_pMaterialSystemHardwareConfig->GetShadowDepthBias();
 
-	if( m_FlashlightHandle == CLIENTSHADOW_INVALID_HANDLE )
-	{
-		m_FlashlightHandle = g_pClientShadowMgr->CreateFlashlight( state );
-	}
-	else
-	{
-		if( !r_flashlightlockposition.GetBool() )
-		{
-			g_pClientShadowMgr->UpdateFlashlightState( m_FlashlightHandle, state );
-		}
-	}
-
-	g_pClientShadowMgr->UpdateProjectedTexture( m_FlashlightHandle, true );
+	// @Deferred - Biohazard
+	UpdateLightProjection( state );
 
 	// Kill the old flashlight method if we have one.
 	// FIXME: This doesn't compile
@@ -309,20 +302,9 @@ void CFlashlightEffect::UpdateLight(	int nEntIdx, const Vector &vecPos, const Ve
 		return;
 	}
 
-	if( m_FlashlightHandle == CLIENTSHADOW_INVALID_HANDLE )
-	{
-		m_FlashlightHandle = g_pClientShadowMgr->CreateFlashlight( state );
-	}
-	else
-	{
-		if( !r_flashlightlockposition.GetBool() )
-		{
-			g_pClientShadowMgr->UpdateFlashlightState( m_FlashlightHandle, state );
-		}
-	}
-	
-	g_pClientShadowMgr->UpdateProjectedTexture( m_FlashlightHandle, true );
-	
+	// @Deferred - Biohazard
+	UpdateLightProjection( state );
+
 #ifndef NO_TOOLFRAMEWORK
 	if ( clienttools->IsInRecordingMode() )
 	{
@@ -371,19 +353,8 @@ void CFlashlightEffect::UpdateLight(	int nEntIdx, const Vector &vecPos, const Ve
 		state.m_pProjectedMaterial = NULL;
 	}
 
-	if( m_FlashlightHandle == CLIENTSHADOW_INVALID_HANDLE )
-	{
-		m_FlashlightHandle = g_pClientShadowMgr->CreateFlashlight( state );
-	}
-	else
-	{
-		if( !r_flashlightlockposition.GetBool() )
-		{
-			g_pClientShadowMgr->UpdateFlashlightState( m_FlashlightHandle, state );
-		}
-	}
-
-	g_pClientShadowMgr->UpdateProjectedTexture( m_FlashlightHandle, true );
+	// @Deferred - Biohazard
+	UpdateLightProjection( state );
 
 #ifndef NO_TOOLFRAMEWORK
 	if ( clienttools->IsInRecordingMode() )
@@ -397,6 +368,24 @@ void CFlashlightEffect::UpdateLight(	int nEntIdx, const Vector &vecPos, const Ve
 		msg->deleteThis();
 	}
 #endif
+}
+
+// @Deferred - Biohazard
+void CFlashlightEffect::UpdateLightProjection( FlashlightState_t &state )
+{
+	if( m_FlashlightHandle == CLIENTSHADOW_INVALID_HANDLE )
+	{
+		m_FlashlightHandle = g_pClientShadowMgr->CreateFlashlight( state );
+	}
+	else
+	{
+		if( !r_flashlightlockposition.GetBool() )
+		{
+			g_pClientShadowMgr->UpdateFlashlightState( m_FlashlightHandle, state );
+		}
+	}
+
+	g_pClientShadowMgr->UpdateProjectedTexture( m_FlashlightHandle, true );
 }
 
 bool CFlashlightEffect::UpdateDefaultFlashlightState( FlashlightState_t& state, const Vector &vecPos, const Vector &vecForward,
@@ -797,3 +786,34 @@ void CHeadlightEffect::UpdateLight( const Vector &vecPos, const Vector &vecDir, 
 	g_pClientShadowMgr->UpdateProjectedTexture( GetFlashlightHandle(), true );
 }
 
+// @Deferred - Biohazard
+void CFlashlightEffectManager::TurnOnFlashlight( int nEntIndex, const char *pszTextureName, float flFov, float flFarZ, float flLinearAtten )
+{
+	m_pFlashlightTextureName = pszTextureName;
+	m_nFlashlightEntIndex = nEntIndex;
+	m_flFov = flFov;
+	m_flFarZ = flFarZ;
+	m_flLinearAtten = flLinearAtten;
+	m_bFlashlightOn = true;
+
+	if ( m_bFlashlightOverride )
+	{
+		// somebody is overriding the flashlight. We're keeping around the params to restore it later.
+		return;
+	}
+
+	if ( !m_pFlashlightEffect )
+	{
+		if ( GetDeferredManager()->IsDeferredRenderingEnabled() )
+			m_pFlashlightEffect = new CFlashlightEffectDeferred( m_nFlashlightEntIndex, pszTextureName, flFov, flFarZ, flLinearAtten );
+		else
+			m_pFlashlightEffect = new CFlashlightEffect( m_nFlashlightEntIndex, pszTextureName, flFov, flFarZ, flLinearAtten );
+
+		if( !m_pFlashlightEffect )
+		{
+			return;
+		}
+	}
+
+	m_pFlashlightEffect->TurnOn();
+}

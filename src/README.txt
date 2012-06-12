@@ -20,6 +20,8 @@ src/game/client/cdll_client_int.cpp
 src/game/client/clientleafsystem.cpp
 src/game/client/viewrender.h
 src/game/client/viewrender.cpp		(not all changes have a comment since there are too many, use diff)
+src/game/client/flashlighteffect.h
+src/game/client/flashlighteffect.cpp
 src/game/server/gameinterface.cpp
 src/public/renderparm.h
 

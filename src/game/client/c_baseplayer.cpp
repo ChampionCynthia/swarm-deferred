@@ -1220,6 +1220,19 @@ void C_BasePlayer::UpdateFlashlight()
 			vecPos = GetRenderOrigin() + m_vecViewOffset;
 		}
 
+		if ( IsLocalPlayer() )
+		{
+			C_BaseViewModel *pVM = GetViewModel();
+			int iAttachment = pVM ? pVM->LookupAttachment( "muzzle" ) : -1;
+
+			if ( iAttachment != -1 )
+			{
+				QAngle angles;
+				pVM->GetAttachment( iAttachment, vecPos, angles );
+				AngleVectors( angles, &vecForward, &vecRight, &vecUp );
+			}
+		}
+
 		// Update the light with the new position and direction.		
 		FlashlightEffectManager().UpdateFlashlight( vecPos, vecForward, vecRight, vecUp, pFlashlightPlayer->GetFlashlightFOV(), 
 			pFlashlightPlayer->CastsFlashlightShadows(), pFlashlightPlayer->GetFlashlightFarZ(), pFlashlightPlayer->GetFlashlightLinearAtten(),

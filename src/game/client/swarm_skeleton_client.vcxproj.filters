@@ -40,8 +40,7 @@
     <Filter Include="game_controls Header Files">
       <UniqueIdentifier>{e4e2865e-6f20-4a28-b430-978c101ca2d3}</UniqueIdentifier>
     </Filter>
-
-<Filter Include="Source Files\sdk">
+    <Filter Include="Source Files\sdk">
       <UniqueIdentifier>{4af80b45-705e-489c-ac39-a1732fe090a2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\sdk\vgui">
@@ -62,7 +61,6 @@
     <Filter Include="Source Files\sdk\GameUI - Embedded\SDK GameUI\headers">
       <UniqueIdentifier>{1d683480-93d1-43aa-a426-ee112e26e9a8}</UniqueIdentifier>
     </Filter>
-
     <Filter Include="Source Files\deferred">
       <UniqueIdentifier>{a4019c5d-4fa5-41e2-bc7e-2450afa2154e}</UniqueIdentifier>
     </Filter>
@@ -1435,7 +1433,7 @@
     <ClCompile Include="toolframework_client.cpp">
       <Filter>Tool Framework</Filter>
     </ClCompile>
-<ClCompile Include="sdk\clientmode_sdk.cpp">
+    <ClCompile Include="sdk\clientmode_sdk.cpp">
       <Filter>Source Files\sdk</Filter>
     </ClCompile>
     <ClCompile Include="sdk\vgui\sdk_loading_panel.cpp">
@@ -1852,7 +1850,6 @@
     <ClCompile Include="sdk\vgui\nb_select_level_panel.cpp">
       <Filter>Source Files\sdk\vgui</Filter>
     </ClCompile>
-
     <ClCompile Include="deferred\viewrender_deferred.cpp">
       <Filter>Source Files\deferred</Filter>
     </ClCompile>
@@ -1910,7 +1907,6 @@
     <ClCompile Include="deferred\DefCookieProjectable.cpp">
       <Filter>Source Files\deferred</Filter>
     </ClCompile>
-   
     <ClCompile Include="deferred\clight_editor.cpp">
       <Filter>Source Files\deferred</Filter>
     </ClCompile>
@@ -1927,6 +1923,9 @@
       <Filter>Source Files\deferred\vgui</Filter>
     </ClCompile>
     <ClCompile Include="deferred\materialsystem_passthru.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred\flashlighteffect_deferred.cpp">
       <Filter>Source Files\deferred</Filter>
     </ClCompile>
   </ItemGroup>
@@ -3728,7 +3727,7 @@
     <ClInclude Include="game_controls\vguitextwindow.h">
       <Filter>game_controls Header Files</Filter>
     </ClInclude>
-  <ClInclude Include="sdk\clientmode_sdk.h">
+    <ClInclude Include="sdk\clientmode_sdk.h">
       <Filter>Source Files\sdk</Filter>
     </ClInclude>
     <ClInclude Include="sdk\vgui\sdk_loading_panel.h">
@@ -4172,7 +4171,6 @@
     <ClInclude Include="deferred\IDefCookie.h">
       <Filter>Source Files\deferred\interface</Filter>
     </ClInclude>
-   
     <ClInclude Include="deferred\clight_editor.h">
       <Filter>Source Files\deferred</Filter>
     </ClInclude>
@@ -4186,6 +4184,9 @@
       <Filter>Source Files\deferred\vgui</Filter>
     </ClInclude>
     <ClInclude Include="deferred\materialsystem_passthru.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred\flashlighteffect_deferred.h">
       <Filter>Source Files\deferred</Filter>
     </ClInclude>
   </ItemGroup>

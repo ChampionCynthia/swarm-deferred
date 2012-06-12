@@ -146,7 +146,7 @@ IMaterial *CDeferredMaterialSystem::FindMaterial( char const* pMaterialName, con
 		{
 			for ( int i = 0; i < iNumShaderReplaceDict; i++ )
 			{
-				if ( !Q_stricmp( pszShaderReplaceDict[i][0], pszShaderName ) )
+				if ( Q_stristr( pszShaderName, pszShaderReplaceDict[i][0] ) == pszShaderName )
 				{
 					ShaderReplace( pszShaderReplaceDict[i][1], pMat );
 					break;
