@@ -13,8 +13,8 @@ void InitParmsComposite( const defParms_composite &info, CBaseVSShader *pShader,
 	if ( !PARM_DEFINED( info.iAlphatestRef ) || PARM_FLOAT( info.iAlphatestRef ) == 0.0f )
 		params[ info.iAlphatestRef ]->SetFloatValue( DEFAULT_ALPHATESTREF );
 
-	if ( !PARM_DEFINED( info.iPhongPostBoost ) || PARM_FLOAT( info.iPhongPostBoost ) == 0.0f )
-		params[ info.iPhongPostBoost ]->SetFloatValue( DEFAULT_PHONG_BOOST );
+	if ( !PARM_DEFINED( info.iPhongScale ) )
+		params[ info.iPhongScale ]->SetFloatValue( DEFAULT_PHONG_SCALE );
 }
 
 void InitPassComposite( const defParms_composite &info, CBaseVSShader *pShader, IMaterialVar **params )
@@ -121,14 +121,14 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 
 			int w, t;
 			pShaderAPI->GetBackBufferDimensions( w, t );
-			float fl4[4] = { 0.5f / w, 0.5f / t, 0, 0 };
+			float fl1[4] = { 0.5f / w, 0.5f / t, 0, 0 };
 
-			tmpBuf.SetPixelShaderConstant( 1, fl4 );
+			tmpBuf.SetPixelShaderConstant( 1, fl1 );
 
 			tmpBuf.SetPixelShaderFogParams( 2 );
 
-			float fl4_4[4] = { PARM_FLOAT( info.iPhongPostBoost ), 0, 0, 0 };
-			tmpBuf.SetPixelShaderConstant( 4, fl4_4 );
+			float fl4 = { PARM_FLOAT( info.iPhongScale ) };
+			tmpBuf.SetPixelShaderConstant1( 4, fl4 );
 
 			tmpBuf.End();
 

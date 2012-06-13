@@ -30,12 +30,12 @@ PS_OUTPUT main( const PS_INPUT In )
 
 		float phong_scale, phong_exp, half_lambert, litface;
 
-		UnpackLightingControls( flCompressedLightingctrl, phong_scale, phong_exp, half_lambert, litface );
+		UnpackLightingControls( flCompressedLightingctrl, phong_exp, half_lambert, litface );
 
-		Out.vColor_0.x = phong_scale;
-		Out.vColor_0.y = phong_exp;
-		Out.vColor_0.z = half_lambert;
-		Out.vColor_0.w = litface;
+		Out.vColor_0.x = phong_exp;
+		Out.vColor_0.y = half_lambert;
+		Out.vColor_0.z = litface;
+		Out.vColor_0.w = 1;
 	}
 
 	return Out;

@@ -17,7 +17,7 @@ struct defParms_composite
 
 	// control
 	int iAlphatestRef;
-	int iPhongPostBoost;
+	int iPhongScale;
 
 	// config
 	bool bModel;

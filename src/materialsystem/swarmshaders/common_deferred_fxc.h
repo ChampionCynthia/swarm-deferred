@@ -42,38 +42,35 @@ float4 ReadLighting( float4 compressedLight )
 #endif
 }
 
-// 8 possible values for phong scale/exp
-// phong scale 3 - phong exp 3 - half lambert 1 - litface 1
-// 128 + 64 + 32 - 16 + 8 + 4  - 2              - 1
 
-float PackLightingControls( int phong_scale, int phong_exp, int half_lambert, int litface )
+// phong exp 6						-half lambert 1	- litface 1
+// 128 + 64 + 32 + 16 + 8 + 4		- 2				- 1
+// 6 bits, 63						- 1				- 1
+
+float PackLightingControls( int phong_exp, int half_lambert, int litface )
 {
 	return ( litface +
 		half_lambert * 2 +
-		phong_exp * 4 +
-		phong_scale * 32 ) * 0.0039215686f;
+		phong_exp * 4 ) * 0.0039215686f;
 }
 
 void UnpackLightingControls( float mixed,
-	out float phong_scale, out float phong_exp, out float half_lambert, out float litface )
+	out float phong_exp, out float half_lambert, out float litface )
 {
 	mixed *= 255.0f;
 
 	litface = fmod( mixed, 2.0f );
 	half_lambert = fmod( mixed -= litface, 4.0f );
-	phong_exp = fmod( mixed -= half_lambert, 32.0f );
-	phong_scale = fmod( mixed -= phong_exp, 256.0f );
+	phong_exp = fmod( mixed -= half_lambert, 256.0f );
 
 #if 0
 	// normalized values
 	half_lambert /= 2.0f;
-	phong_exp /= 28.0f;
-	phong_scale /= 224.0f;
+	phong_exp /= 252.0f;
 #else
 	// pre-scaled values for lighting
 	half_lambert *= 0.5f;
-	phong_exp = pow( SPECULAREXP_BASE, 1 + phong_exp * 0.15f );
-	phong_scale *= SPECULARSCALE_DIV; //128.0f;
+	phong_exp = pow( SPECULAREXP_BASE, 1 + phong_exp * 0.02f );
 #endif
 }
 

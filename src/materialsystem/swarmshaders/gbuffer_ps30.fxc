@@ -24,7 +24,7 @@ sampler sBumpmap						: register( s1 );
 #if PHONGMAP
 sampler sPhongmap						: register( s2 );
 #else
-const float2 g_flPhong_scale_exp		: register( c2 );
+const float g_flPhong_exp				: register( c2 );
 #endif
 
 const float2 g_flHalflambert_Litface	: register( c1 );
@@ -89,18 +89,18 @@ PS_OUTPUT main( const PS_INPUT In )
 
 #if ( TRANSLUCENT == 0 )
 #	if PHONGMAP
-	float2 phong_controls = tex2D( sPhongmap, In.vTexCoord ).xy * 7.0f;
+	float phong_exp = tex2D( sPhongmap, In.vTexCoord ).x * 63.0f;
 #	else
-	float2 phong_controls = g_flPhong_scale_exp;
+	float phong_exp = g_flPhong_exp;
 #	endif
 #endif
 
 #if DEFCFG_LIGHTCTRL_PACKING
-	Out.vColor_0 = float4( worldNormal, PackLightingControls( phong_controls.x, phong_controls.y,
+	Out.vColor_0 = float4( worldNormal, PackLightingControls( phong_exp,
 		g_flHalflambert_Litface.x, g_flHalflambert_Litface.y ) );
 #else
 	Out.vColor_0 = float4( worldNormal, 1 );
-	Out.vColor_2 = float4( phong_controls.xy / 7.0f, g_flHalflambert_Litface.xy );
+	Out.vColor_2 = float4( phong_exp / 63.0f, g_flHalflambert_Litface.xy, 0 );
 #endif
 
 	Out.vColor_1 = float4( In.depth, 0, 0, 1 );

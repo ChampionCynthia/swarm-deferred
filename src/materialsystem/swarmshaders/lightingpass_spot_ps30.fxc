@@ -70,7 +70,7 @@ float4 DoSpotLightBasic( const int index, float3 normal,
 	float3 vecWorldToLight, float lightToWorldDist,
 	float3 vecWorldRayInv,
 	float litface, float half_lambert,
-	float phong_scale, float phong_exp, const bool bDoSpotAttn )
+	float phong_exp, const bool bDoSpotAttn )
 {
 #if DEFCFG_CHEAP_LIGHTS
 	float3 normalizedLightVec = vecWorldToLight / lightToWorldDist;
@@ -92,10 +92,10 @@ float4 DoSpotLightBasic( const int index, float3 normal,
 
 #if DEFCFG_BLINN_PHONG
 	float flSpecular = max( 0, dot( normalize( vecWorldRayInv + normalizedLightVec ), flLitNormal ) );
-	flSpecular = pow( flSpecular, phong_exp ) * phong_scale * dot( vecWorldRayInv, flLitNormal );
+	flSpecular = pow( flSpecular, phong_exp ) * dot( vecWorldRayInv, flLitNormal );
 #else
 	float flSpecular = dot( reflect( -normalizedLightVec, flLitNormal ), vecWorldRayInv );
-	flSpecular = pow( flSpecular, phong_exp ) * phong_scale;
+	flSpecular = pow( flSpecular, phong_exp );
 #endif
 
 	float viewFwdDot = dot( normalizedLightVec, flLitNormal );
@@ -148,11 +148,11 @@ PS_OUTPUT main( const PS_INPUT In )
 	float4 flNormalCtrl = tex2D( sNormals, vecTexcoords );
 	float3 flNormal = normalize( flNormalCtrl.xyz * 2.0f - 1.0f );
 
-	float phong_scale, phong_exp, half_lambert, litface;
+	float phong_exp, half_lambert, litface;
 #if DEFCFG_CHEAP_LIGHTS
-	phong_scale = phong_exp = half_lambert = litface = 0;
+	phong_exp = half_lambert = litface = 0;
 #else
-	UnpackLightingControls( flNormalCtrl.a, phong_scale, phong_exp, half_lambert, litface );
+	UnpackLightingControls( flNormalCtrl.a, phong_exp, half_lambert, litface );
 #endif
 
 	float3 worldRayInv = -vecWorldRay;
@@ -183,7 +183,7 @@ PS_OUTPUT main( const PS_INPUT In )
 
 		float4 localLight = DoSpotLightBasic( iDataIndex, flNormal,
 									-vecDelta, dist, worldRayInv,
-									litface, half_lambert, phong_scale, phong_exp, false );
+									litface, half_lambert, phong_exp, false );
 
 		localLight.y *= PerformProjectedShadow( sMixedSampler[ iSamplerIndex ],
 			depthPos, g_vecShadowMappingTweaks_0, g_vecShadowMappingTweaks_1,
@@ -219,7 +219,7 @@ PS_OUTPUT main( const PS_INPUT In )
 
 		float4 localLight = DoSpotLightBasic( iDataIndex, flNormal,
 									-vecDelta, dist, worldRayInv,
-									litface, half_lambert, phong_scale, phong_exp, true );
+									litface, half_lambert, phong_exp, true );
 
 		localLight.y *= PerformProjectedShadow( sMixedSampler[ iSamplerIndex ],
 			depthPos, g_vecShadowMappingTweaks_0, g_vecShadowMappingTweaks_1,
@@ -250,7 +250,7 @@ PS_OUTPUT main( const PS_INPUT In )
 
 		float4 localLight = DoSpotLightBasic( iDataIndex, flNormal,
 									-vecDelta, dist, worldRayInv,
-									litface, half_lambert, phong_scale, phong_exp, false );
+									litface, half_lambert, phong_exp, false );
 
 		localLight.w *= 1.0f - any( floor( depthPos.xyz ) );
 
@@ -272,7 +272,7 @@ PS_OUTPUT main( const PS_INPUT In )
 
 		float4 localLight = DoSpotLightBasic( iDataIndex, flNormal,
 									-vecDelta, dist, worldRayInv,
-									litface, half_lambert, phong_scale, phong_exp, true );
+									litface, half_lambert, phong_exp, true );
 
 		localLight = DoLightFinal( g_flMixedData[ iDataIndex + 1 ].xyz,
 			g_flMixedData[ iDataIndex + 2 ].xyz,

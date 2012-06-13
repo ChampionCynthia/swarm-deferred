@@ -13,9 +13,6 @@ void InitParmsGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMa
 	if ( !PARM_DEFINED( info.iAlphatestRef ) || PARM_FLOAT( info.iAlphatestRef ) == 0.0f )
 		params[ info.iAlphatestRef ]->SetFloatValue( DEFAULT_ALPHATESTREF );
 
-	if ( !PARM_DEFINED( info.iPhongScale ) )
-		params[ info.iPhongScale ]->SetFloatValue( DEFAULT_PHONG_SCALE );
-
 	if ( !PARM_DEFINED( info.iPhongExp ) )
 		params[ info.iPhongExp ]->SetFloatValue( DEFAULT_PHONG_EXP );
 }
@@ -137,9 +134,8 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 				tmpBuf.BindTexture( pShader, SHADER_SAMPLER2, info.iPhongmap );
 			else
 			{
-				float flPhongScale = clamp( PARM_FLOAT( info.iPhongScale ), 0, 1 ) * 7;
-				float flPhongExp = clamp( PARM_FLOAT( info.iPhongExp ), 0, 1 ) * 7;
-				tmpBuf.SetPixelShaderConstant2( 2, flPhongScale, flPhongExp );
+				float flPhongExp = clamp( PARM_FLOAT( info.iPhongExp ), 0, 1 ) * 63.0f;
+				tmpBuf.SetPixelShaderConstant1( 2, flPhongExp );
 			}
 
 			tmpBuf.SetPixelShaderConstant2( 1,
@@ -187,40 +183,36 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 
 
 // testing my crappy math
-float PackLightingControls( int phong_scale, int phong_exp, int half_lambert, int litface )
+float PackLightingControls( int phong_exp, int half_lambert, int litface )
 {
 	return ( litface +
 		half_lambert * 2 +
-		phong_exp * 4 +
-		phong_scale * 32 ) / 255.0f;
+		phong_exp * 4 ) / 255.0f;
 }
 
 void UnpackLightingControls( float mixed,
-	float &phong_scale, float &phong_exp, float &half_lambert, float &litface )
+	float &phong_exp, float &half_lambert, float &litface )
 {
 	mixed *= 255.0f;
 
 	litface = fmod( mixed, 2.0f );
 	half_lambert = fmod( mixed -= litface, 4.0f );
-	phong_exp = fmod( mixed -= half_lambert, 32.0f );
-	phong_scale = fmod( mixed -= phong_exp, 256.0f );
+	phong_exp = fmod( mixed -= half_lambert, 256.0f );
 
 	half_lambert /= 2.0f;
-	phong_exp /= 28.0f;
-	phong_scale /= 224.0f;
+	phong_exp /= 252.0f;
 }
 
 static uint8 packed;
 
 CON_COMMAND( test_packing, "" )
 {
-	if ( args.ArgC() < 5 )
+	if ( args.ArgC() < 4 )
 		return;
 
 	float res = PackLightingControls( atoi( args[1] ),
 		atoi( args[2] ),
-		atoi( args[3] ),
-		atoi( args[4] ) );
+		atoi( args[3] ) );
 
 	res *= 255.0f;
 
@@ -231,9 +223,9 @@ CON_COMMAND( test_packing, "" )
 
 CON_COMMAND( test_unpacking, "" )
 {
-	float o0,o1,o2,o3;
+	float o0,o1,o2;
 
-	UnpackLightingControls( packed / 255.0f, o0, o1, o2, o3 );
+	UnpackLightingControls( packed / 255.0f, o0, o1, o2 );
 
-	Msg( "unpacked to: scale %f, exp %f, halfl %f, litface %f\n", o0, o1, o2, o3 );
+	Msg( "unpacked to: exp %f, halfl %f, litface %f\n", o0, o1, o2 );
 }

@@ -21,7 +21,6 @@ struct defParms_gBuffer
 	// control
 	int iAlphatestRef;
 	int iLitface;
-	int iPhongScale;
 	int iPhongExp;
 
 	// config

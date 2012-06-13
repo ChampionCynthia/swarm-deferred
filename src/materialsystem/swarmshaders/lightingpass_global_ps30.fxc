@@ -48,13 +48,13 @@ PS_OUTPUT main( const PS_INPUT In )
 	float4 flNormalCtrl = tex2D( sNormals, In.vTexCoord );
 	float3 flNormal = normalize( flNormalCtrl.xyz * 2.0f - 1.0f );
 
-	float phong_scale, phong_exp, half_lambert, litface;
-	UnpackLightingControls( flNormalCtrl.a, phong_scale, phong_exp, half_lambert, litface );
+	float phong_exp, half_lambert, litface;
+	UnpackLightingControls( flNormalCtrl.a, phong_exp, half_lambert, litface );
 
 	float3 flLitNormal = lerp( 1, dot( flNormal, g_vecLightVec_Forward ), litface ) * flNormal;
 
 	float flSpecular = max( 0, dot( normalize( -In.vecWorldRay + g_vecLightVec_Forward ), flLitNormal ) );
-	flSpecular = pow( flSpecular, phong_exp ) * phong_scale * dot( -In.vecWorldRay, flLitNormal );
+	flSpecular = pow( flSpecular, phong_exp ) * dot( -In.vecWorldRay, flLitNormal );
 
 	float viewFwdDot = dot( g_vecLightVec_Forward.xyz, flLitNormal );
 	float litDot = lerp( viewFwdDot, viewFwdDot * 0.5f + 0.5f, half_lambert );
