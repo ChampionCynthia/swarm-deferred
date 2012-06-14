@@ -108,6 +108,73 @@ float ShadowColor_Raw( sampler depthMap, float3 uvw )
 	return saturate( ceil( shadowmapDepth - uvw.z ) );
 }
 
+float ShadowColor_4x4SoftwareBilinear_Box( sampler depthMap, float3 uvw, float4 offsets_0, float4 offsets_1 )
+{
+	uvw.xy *= offsets_1.xy;
+	float2 texel_min = floor( uvw.xy ) / offsets_1.xy + (offsets_0.xy * 0.5f);
+	float2 frac_uv = frac( uvw.xy );
+
+#define TWEAK_SUBTRACT_SELF 16666.6f
+#define TWEAK_SUBTRACT_SELF_FAR 8333.3f
+#define TWEAK_SUBTRACT_SELF_FAR_MAX 4166.6f
+
+	float4x4 pcf_samples = saturate(
+							float4x4(	float4(		uvw.z - tex2D( depthMap, texel_min + float2( -offsets_0.x, -offsets_0.y ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( offsets_0.z, -offsets_0.y ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( -offsets_0.x, offsets_0.w ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( offsets_0.z, offsets_0.w ) ).r )
+										* TWEAK_SUBTRACT_SELF_FAR_MAX,
+
+										float4(		uvw.z - tex2D( depthMap, texel_min + float2( 0, -offsets_0.y ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( offsets_0.x, -offsets_0.y ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( -offsets_0.x, 0 ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( offsets_0.z, 0 ) ).r )
+										* TWEAK_SUBTRACT_SELF_FAR,
+
+										float4(		uvw.z - tex2D( depthMap, texel_min + float2( -offsets_0.x, offsets_0.y ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( offsets_0.z, offsets_0.y ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( 0, offsets_0.w ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( offsets_0.x, offsets_0.w ) ).r )
+										* TWEAK_SUBTRACT_SELF_FAR,
+
+										float4(		uvw.z - tex2D( depthMap, texel_min ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( offsets_0.x, 0 ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( 0, offsets_0.y ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( offsets_0.x, offsets_0.y ) ).r )
+										* TWEAK_SUBTRACT_SELF
+										)
+									);
+
+	float2 frac_uv_inv = 1.0f - frac_uv;
+
+	float4 weights =
+		float4( frac_uv.x * frac_uv.y,
+				frac_uv_inv.x * frac_uv.y,
+				frac_uv.x * frac_uv_inv.y,
+				frac_uv_inv.x * frac_uv_inv.y );
+
+	float flLight = dot( weights, float4(
+			pcf_samples[2][2], pcf_samples[0][2], pcf_samples[1][0], pcf_samples[0][0] ) )
+		+			dot( weights, float4(
+			pcf_samples[2][3], pcf_samples[2][2], pcf_samples[1][1], pcf_samples[1][0] ) )
+		+			dot( weights, float4(
+			pcf_samples[0][3], pcf_samples[2][3], pcf_samples[0][1], pcf_samples[1][1] ) )
+
+		+			dot( weights, pcf_samples[3][0] )
+		+			dot( weights, pcf_samples[3][1] )
+		+			dot( weights, float4(
+			pcf_samples[1][3], pcf_samples[1][2], pcf_samples[1][3], pcf_samples[1][2] ) )
+
+		+			dot( weights, pcf_samples[3][2] )
+		+			dot( weights, pcf_samples[3][3] )
+		+			dot( weights, float4(
+			pcf_samples[2][1], pcf_samples[2][0], pcf_samples[2][1], pcf_samples[2][0] ) );
+
+	flLight *= 1.0f / 9.0f;
+
+	return 1.0f - flLight;
+}
+
 float ShadowColor_SoftwareBilinear_SingleRow_4Tap( sampler depthMap, float objDepth, float2 uv_start, float texelsize, float frac_x )
 {
 	float flLast = ceil( tex2D( depthMap, uv_start ).r - objDepth );
@@ -140,7 +207,7 @@ float ShadowColor_SoftwareBilinear_SingleRow_5Tap( sampler depthMap, float objDe
 	return flLight;
 }
 
-float ShadowColor_4x4SoftwareBilinearBox( sampler depthMap, float3 uvw, float4 offsets_0, float4 offsets_1 )
+float ShadowColor_4x4SoftwareBilinear_Gauss( sampler depthMap, float3 uvw, float4 offsets_0, float4 offsets_1 )
 {
 	float2 frac_uv = frac( uvw.xy * offsets_1.xy );
 	float2 texel_min = uvw.xy - frac_uv.xy / offsets_1.xy - offsets_0.xy * 0.5f;
@@ -161,7 +228,7 @@ float ShadowColor_4x4SoftwareBilinearBox( sampler depthMap, float3 uvw, float4 o
 	return flLight;
 }
 
-float ShadowColor_5x5SoftwareBilinearBox( sampler depthMap, float3 uvw, float4 offsets_0, float4 offsets_1 )
+float ShadowColor_5x5SoftwareBilinear_Gauss( sampler depthMap, float3 uvw, float4 offsets_0, float4 offsets_1 )
 {
 	float2 frac_uv = frac( uvw.xy * offsets_1.xy );
 	float2 texel_min = uvw.xy - frac_uv.xy / offsets_1.xy - offsets_0.xy * 0.5f;
@@ -182,16 +249,29 @@ float ShadowColor_5x5SoftwareBilinearBox( sampler depthMap, float3 uvw, float4 o
 	return flLight;
 }
 
+/*
+pFl0[0] = 1.0f / resx;
+pFl0[1] = 1.0f / resy;
+pFl0[2] = 2.0f / resx;
+pFl0[3] = 2.0f / resy;
+
+pFl1[0] = resx;
+pFl1[1] = resy;
+*/
+
 float PerformShadowMapping( sampler depthMap, float3 uvw, float4 offsets_0, float4 offsets_1 )
 {
 #if SHADOWMAPPING_METHOD == SHADOWMAPPING_DEPTH_COLOR__RAW
 	return ShadowColor_Raw( depthMap, uvw );
 
+#elif SHADOWMAPPING_METHOD == SHADOWMAPPING_DEPTH_COLOR__4X4_SOFTWARE_BILINEAR_BOX
+	return ShadowColor_4x4SoftwareBilinear_Box( depthMap, uvw, offsets_0, offsets_1 );
+
 #elif SHADOWMAPPING_METHOD == SHADOWMAPPING_DEPTH_COLOR__4X4_SOFTWARE_BILINEAR_GAUSSIAN
-	return ShadowColor_4x4SoftwareBilinearBox( depthMap, uvw, offsets_0, offsets_1 );
+	return ShadowColor_4x4SoftwareBilinear_Gauss( depthMap, uvw, offsets_0, offsets_1 );
 
 #elif SHADOWMAPPING_METHOD == SHADOWMAPPING_DEPTH_COLOR__5X5_SOFTWARE_BILINEAR_GAUSSIAN
-	return ShadowColor_5x5SoftwareBilinearBox( depthMap, uvw, offsets_0, offsets_1 );
+	return ShadowColor_5x5SoftwareBilinear_Gauss( depthMap, uvw, offsets_0, offsets_1 );
 
 #elif SHADOWMAPPING_METHOD == SHADOWMAPPING_DEPTH_STENCIL__RAW
 	return ShadowDepth_Raw_Nvidia( depthMap, uvw );
