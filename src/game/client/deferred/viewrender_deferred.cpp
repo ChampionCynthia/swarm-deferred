@@ -310,6 +310,8 @@ protected:
 	// BUGBUG this causes all sorts of problems
 	virtual bool	ShouldCacheLists(){ return false; };
 
+	void			DrawOpaqueRenderablesDeferred( bool bShadowDepth, bool bNoDecals );
+
 protected:
 
 	void PushComposite();
@@ -896,6 +898,11 @@ void CDeferredViewRender::PerformLighting( const CViewSetup &view )
 	else
 		bResetLightAccum = true;
 
+	CViewSetup lightingView = view;
+
+	if ( building_cubemaps.GetBool() )
+		engine->GetScreenSize( lightingView.width, lightingView.height );
+
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->PushRenderTargetAndViewport( GetDefRT_Lightaccum() );
 
@@ -905,13 +912,14 @@ void CDeferredViewRender::PerformLighting( const CViewSetup &view )
 		pRenderContext->ClearBuffers( true, false );
 	}
 	else
-		DrawLightPassFullscreen( GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_GLOBAL ), view.width, view.height );
+		DrawLightPassFullscreen( GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_GLOBAL ), lightingView.width, lightingView.height );
 
 	pRenderContext.SafeRelease();
 
-	GetLightingManager()->RenderLights( view, this );
+	GetLightingManager()->RenderLights( lightingView, this );
 
 	pRenderContext.GetFrom( materials );
+
 	pRenderContext->PopRenderTargetAndViewport();
 }
 
@@ -1108,7 +1116,7 @@ void CDeferredViewRender::RenderView( const CViewSetup &view, const CViewSetup &
 
 	CLightingEditor *pLightEditor = GetLightingEditor();
 
-	if ( pLightEditor->IsEditorActive() )
+	if ( pLightEditor->IsEditorActive() && !building_cubemaps.GetBool() )
 		pLightEditor->GetEditorView( &worldView.origin, &worldView.angles );
 	else
 		pLightEditor->SetEditorView( &worldView.origin, &worldView.angles );
@@ -1847,7 +1855,7 @@ static inline void DrawRenderable( IClientRenderable *pEnt, int flags, const Ren
 //-----------------------------------------------------------------------------
 // Draws all opaque renderables in leaves that were rendered
 //-----------------------------------------------------------------------------
-static inline void DrawOpaqueRenderable( IClientRenderable *pEnt, bool bTwoPass, bool bShadowDepth )
+static inline void DrawOpaqueRenderable( IClientRenderable *pEnt, bool bTwoPass, bool bShadowDepth, bool bNoDecals )
 {
 	ASSERT_LOCAL_PLAYER_RESOLVABLE();
 	float color[3];
@@ -1868,6 +1876,11 @@ static inline void DrawOpaqueRenderable( IClientRenderable *pEnt, bool bTwoPass,
 		flags |= STUDIO_SHADOWDEPTHTEXTURE;
 	}
 
+	if ( bNoDecals )
+	{
+		flags |= STUDIO_SKIP_DECALS;
+	}
+
 	RenderableInstance_t instance;
 	instance.m_nAlpha = 255;
 	DrawRenderable( pEnt, flags, instance );
@@ -1882,12 +1895,12 @@ static void SetupBonesOnBaseAnimating( C_BaseAnimating *&pBaseAnimating )
 }
 
 
-static void DrawOpaqueRenderables_DrawBrushModels( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bShadowDepth )
+static void DrawOpaqueRenderables_DrawBrushModels( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bShadowDepth, bool bNoDecals )
 {
 	for( int i = 0; i < nCount; ++i )
 	{
 		Assert( !ppEntities[i]->m_TwoPass );
-		DrawOpaqueRenderable( ppEntities[i]->m_pRenderable, false, bShadowDepth );
+		DrawOpaqueRenderable( ppEntities[i]->m_pRenderable, false, bShadowDepth, bNoDecals );
 	}
 }
 
@@ -1928,14 +1941,14 @@ static void DrawOpaqueRenderables_DrawStaticProps( int nCount, CClientRenderable
 		staticpropmgr->DrawStaticProps( pStatics, pInstances, numScheduled, bShadowDepth, vcollide_wireframe.GetBool() );
 }
 
-static void DrawOpaqueRenderables_Range( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bShadowDepth )
+static void DrawOpaqueRenderables_Range( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bShadowDepth, bool bNoDecals )
 {
 	for ( int i = 0; i < nCount; ++i )
 	{
 		CClientRenderablesList::CEntry *itEntity = ppEntities[i]; 
 		if ( itEntity->m_pRenderable )
 		{
-			DrawOpaqueRenderable( itEntity->m_pRenderable, ( itEntity->m_TwoPass != 0 ), bShadowDepth );
+			DrawOpaqueRenderable( itEntity->m_pRenderable, ( itEntity->m_TwoPass != 0 ), bShadowDepth, bNoDecals );
 		}
 	}
 }
@@ -1948,9 +1961,9 @@ static void	DrawOpaqueRenderables_ModelRenderables( int nCount, ModelRenderSyste
 	g_pModelRenderSystem->DrawModels( pModelRenderables, nCount, bShadowDepth ? MODEL_RENDER_MODE_SHADOW_DEPTH : MODEL_RENDER_MODE_NORMAL );
 }
 
-static void	DrawOpaqueRenderables_NPCs( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bShadowDepth )
+static void	DrawOpaqueRenderables_NPCs( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bShadowDepth, bool bNoDecals )
 {
-	DrawOpaqueRenderables_Range( nCount, ppEntities, bShadowDepth );
+	DrawOpaqueRenderables_Range( nCount, ppEntities, bShadowDepth, bNoDecals );
 }
 
 //-----------------------------------------------------------------------------
@@ -1985,6 +1998,146 @@ static inline void DrawTranslucentRenderable( IClientRenderable *pEnt, const Ren
 	DrawRenderable( pEnt, flags, instance );
 }
 
+void CBaseWorldViewDeferred::DrawOpaqueRenderablesDeferred( bool bShadowDepth, bool bNoDecals )
+{
+	VPROF("CViewRender::DrawOpaqueRenderables" );
+
+	if( !r_drawopaquerenderables.GetBool() )
+		return;
+
+	if( !m_pMainView->ShouldDrawEntities() )
+		return;
+
+	render->SetBlend( 1 );
+
+	//
+	// Prepare to iterate over all leaves that were visible, and draw opaque things in them.	
+	//
+	RopeManager()->ResetRenderCache();
+	g_pParticleSystemMgr->ResetRenderCache();
+
+	// Categorize models by type
+	int nOpaqueRenderableCount = m_pRenderablesList->m_RenderGroupCounts[RENDER_GROUP_OPAQUE];
+	CUtlVector< CClientRenderablesList::CEntry* > brushModels( (CClientRenderablesList::CEntry **)stackalloc( nOpaqueRenderableCount * sizeof( CClientRenderablesList::CEntry* ) ), nOpaqueRenderableCount );
+	CUtlVector< CClientRenderablesList::CEntry* > staticProps( (CClientRenderablesList::CEntry **)stackalloc( nOpaqueRenderableCount * sizeof( CClientRenderablesList::CEntry* ) ), nOpaqueRenderableCount );
+	CUtlVector< CClientRenderablesList::CEntry* > otherRenderables( (CClientRenderablesList::CEntry **)stackalloc( nOpaqueRenderableCount * sizeof( CClientRenderablesList::CEntry* ) ), nOpaqueRenderableCount );
+	CClientRenderablesList::CEntry *pOpaqueList = m_pRenderablesList->m_RenderGroups[RENDER_GROUP_OPAQUE];
+	for ( int i = 0; i < nOpaqueRenderableCount; ++i )
+	{
+		switch( pOpaqueList[i].m_nModelType )
+		{
+		case RENDERABLE_MODEL_BRUSH:		brushModels.AddToTail( &pOpaqueList[i] ); break; 
+		case RENDERABLE_MODEL_STATIC_PROP:	staticProps.AddToTail( &pOpaqueList[i] ); break; 
+		default:							otherRenderables.AddToTail( &pOpaqueList[i] ); break; 
+		}
+	}
+
+	//
+	// First do the brush models
+	//
+	DrawOpaqueRenderables_DrawBrushModels( brushModels.Count(), brushModels.Base(), bShadowDepth, bNoDecals );
+
+	// Move all static props to modelrendersystem
+	bool bUseFastPath = ( cl_modelfastpath.GetInt() != 0 );
+
+	//
+	// Sort everything that's not a static prop
+	//
+	int nStaticPropCount = staticProps.Count();
+	int numOpaqueEnts = otherRenderables.Count();
+	CUtlVector< CClientRenderablesList::CEntry* > arrRenderEntsNpcsFirst( (CClientRenderablesList::CEntry **)stackalloc( numOpaqueEnts * sizeof( CClientRenderablesList::CEntry ) ), numOpaqueEnts );
+	CUtlVector< ModelRenderSystemData_t > arrModelRenderables( (ModelRenderSystemData_t *)stackalloc( ( numOpaqueEnts + nStaticPropCount ) * sizeof( ModelRenderSystemData_t ) ), numOpaqueEnts + nStaticPropCount );
+
+	// Queue up RENDER_GROUP_OPAQUE_ENTITY entities to be rendered later.
+	CClientRenderablesList::CEntry *itEntity;
+	if( r_drawothermodels.GetBool() )
+	{
+		for ( int i = 0; i < numOpaqueEnts; ++i )
+		{
+			itEntity = otherRenderables[i];
+			if ( !itEntity->m_pRenderable )
+				continue;
+
+			IClientUnknown *pUnknown = itEntity->m_pRenderable->GetIClientUnknown();
+			IClientModelRenderable *pModelRenderable = pUnknown->GetClientModelRenderable();
+			C_BaseEntity *pEntity = pUnknown->GetBaseEntity();
+
+			// FIXME: Strangely, some static props are in the non-static prop bucket
+			// which is what the last case in this if statement is for
+			if ( bUseFastPath && pModelRenderable )
+			{
+				ModelRenderSystemData_t data;
+				data.m_pRenderable = itEntity->m_pRenderable;
+				data.m_pModelRenderable = pModelRenderable;
+				data.m_InstanceData = itEntity->m_InstanceData;
+				arrModelRenderables.AddToTail( data );
+				otherRenderables.FastRemove( i );
+				--i; --numOpaqueEnts;
+				continue;
+			}
+
+			if ( !pEntity )
+				continue;
+
+			if ( pEntity->IsNPC() )
+			{
+				arrRenderEntsNpcsFirst.AddToTail( itEntity );
+				otherRenderables.FastRemove( i );
+				--i; --numOpaqueEnts;
+				continue;
+			}
+		}
+	}
+
+	// Queue up the static props to be rendered later.
+	for ( int i = 0; i < nStaticPropCount; ++i )
+	{
+		itEntity = staticProps[i];
+		if ( !itEntity->m_pRenderable )
+			continue;
+
+		IClientUnknown *pUnknown = itEntity->m_pRenderable->GetIClientUnknown();
+		IClientModelRenderable *pModelRenderable = pUnknown->GetClientModelRenderable();
+		if ( !bUseFastPath || !pModelRenderable )
+			continue;
+
+		ModelRenderSystemData_t data;
+		data.m_pRenderable = itEntity->m_pRenderable;
+		data.m_pModelRenderable = pModelRenderable;
+		data.m_InstanceData = itEntity->m_InstanceData;
+		arrModelRenderables.AddToTail( data );
+
+		staticProps.FastRemove( i );
+		--i; --nStaticPropCount;
+	}
+
+	//
+	// Draw model renderables now (ie. models that use the fast path)
+	//					 
+	DrawOpaqueRenderables_ModelRenderables( arrModelRenderables.Count(), arrModelRenderables.Base(), bShadowDepth );
+
+	// Turn off z pass here. Don't want non-fastpath models with potentially large dynamic VB requirements overwrite
+	// stuff in the dynamic VB ringbuffer. We're calling End360ZPass again in DrawExecute, but that's not a problem.
+	// Begin360ZPass/End360ZPass don't have to be matched exactly.
+	End360ZPass();
+
+	//
+	// Draw static props + opaque entities that aren't using the fast path.
+	//
+	DrawOpaqueRenderables_Range( otherRenderables.Count(), otherRenderables.Base(), bShadowDepth, bNoDecals );
+	DrawOpaqueRenderables_DrawStaticProps( staticProps.Count(), staticProps.Base(), bShadowDepth );
+
+	//
+	// Draw NPCs now
+	//
+	DrawOpaqueRenderables_NPCs( arrRenderEntsNpcsFirst.Count(), arrRenderEntsNpcsFirst.Base(), bShadowDepth, bNoDecals );
+
+	//
+	// Ropes and particles
+	//
+	RopeManager()->DrawRenderCache( bShadowDepth );
+	g_pParticleSystemMgr->DrawRenderCache( bShadowDepth );
+}
 
 
 
@@ -2591,7 +2744,7 @@ void CBaseWorldViewDeferred::DrawExecute( float waterHeight, view_id_t viewID, f
 	m_DrawFlags &= ~DF_SKIP_WORLD_DECALS_AND_OVERLAYS;
 	if ( m_DrawFlags & DF_DRAW_ENTITITES )
 	{
-		DrawOpaqueRenderables( false );
+		DrawOpaqueRenderablesDeferred( false, m_bDrawWorldNormal );
 	}
 	End360ZPass();		// DrawOpaqueRenderables currently already calls End360ZPass. No harm in calling it again to make sure we're always ending it
 

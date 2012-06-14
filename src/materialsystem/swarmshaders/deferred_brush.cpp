@@ -18,6 +18,12 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 
 		SHADER_PARAM( ALPHATESTREFERENCE, SHADER_PARAM_TYPE_FLOAT, "", "" )
 
+		SHADER_PARAM( ENVMAP, SHADER_PARAM_TYPE_TEXTURE, "shadertest/shadertest_env", "envmap" )
+		SHADER_PARAM( ENVMAPTINT, SHADER_PARAM_TYPE_COLOR, "[1 1 1]", "envmap tint" )
+		SHADER_PARAM( ENVMAPCONTRAST, SHADER_PARAM_TYPE_FLOAT, "0.0", "contrast 0 == normal 1 == color*color" )
+		SHADER_PARAM( ENVMAPSATURATION, SHADER_PARAM_TYPE_FLOAT, "1.0", "saturation 0 == greyscale 1 == normal" )
+		SHADER_PARAM( ENVMAPMASK, SHADER_PARAM_TYPE_TEXTURE, "shadertest/shadertest_envmask", "envmap mask" )
+
 	END_SHADER_PARAMS
 
 	void SetupParmsGBuffer( defParms_gBuffer &p )
@@ -45,6 +51,13 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 	{
 		p.bModel = false;
 		p.iAlbedo = BASETEXTURE;
+
+		p.iEnvmap = ENVMAP;
+		p.iEnvmapMask = ENVMAPMASK;
+		p.iEnvmapTint = ENVMAPTINT;
+		p.iEnvmapContrast = ENVMAPCONTRAST;
+		p.iEnvmapSaturation = ENVMAPSATURATION;
+
 		p.iAlphatestRef = ALPHATESTREFERENCE;
 		p.iPhongScale = PHONG_SCALE;
 	}

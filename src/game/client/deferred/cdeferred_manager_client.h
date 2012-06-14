@@ -56,7 +56,6 @@ private:
 
 	IMaterial *m_pMat_Def[ DEF_MAT_COUNT ];
 	KeyValues *m_pKV_Def[ DEF_MAT_COUNT ];
-
 };
 
 bool CDeferredManagerClient::IsDeferredRenderingEnabled()

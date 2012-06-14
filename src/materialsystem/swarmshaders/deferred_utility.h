@@ -7,9 +7,13 @@
 #define DEFAULT_PHONG_EXP 0.15f
 #define DEFAULT_PHONG_BOOST 1.0f
 
+#define PARM_VALID( x ) ( x != -1 )
 
 #define PARM_DEFINED( x ) ( x != -1 &&\
 	params[ x ]->IsDefined() == true )
+
+#define PARM_NO_DEFAULT( x ) ( PARM_VALID( x ) &&\
+	!PARM_DEFINED( x ) )
 
 #define PARM_SET( x ) ( PARM_DEFINED( x ) &&\
 	params[ x ]->GetIntValue() != 0 )

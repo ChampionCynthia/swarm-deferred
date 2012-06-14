@@ -2,13 +2,8 @@
 #include "cbase.h"
 #include "deferred/deferred_shared_common.h"
 
-void ConVarCallbackShadowRes( IConVar *var, const char *pOldValue, float flOldValue )
-{
-	InitDeferredRTs( false );
-}
-
-ConVar deferred_rt_shadowspot_res( "deferred_rt_shadowspot_res", "1024", 0, "", ConVarCallbackShadowRes );
-ConVar deferred_rt_shadowpoint_res( "deferred_rt_shadowpoint_res", "1024", 0, "", ConVarCallbackShadowRes );
+ConVar deferred_rt_shadowspot_res( "deferred_rt_shadowspot_res", "1024", FCVAR_HIDDEN );
+ConVar deferred_rt_shadowpoint_res( "deferred_rt_shadowpoint_res", "1024", FCVAR_HIDDEN );
 
 ConVar deferred_lightmanager_debug( "deferred_lightmanager_debug", "0" );
 

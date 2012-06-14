@@ -8,19 +8,37 @@
 
 static CCommandBufferBuilder< CFixedCommandStorageBuffer< 512 > > tmpBuf;
 
+ConVar building_cubemaps( "building_cubemaps", "0" );
+
 void InitParmsComposite( const defParms_composite &info, CBaseVSShader *pShader, IMaterialVar **params )
 {
-	if ( !PARM_DEFINED( info.iAlphatestRef ) || PARM_FLOAT( info.iAlphatestRef ) == 0.0f )
+	if ( PARM_NO_DEFAULT( info.iAlphatestRef ) ||
+		PARM_VALID( info.iAlphatestRef ) && PARM_FLOAT( info.iAlphatestRef ) == 0.0f )
 		params[ info.iAlphatestRef ]->SetFloatValue( DEFAULT_ALPHATESTREF );
 
-	if ( !PARM_DEFINED( info.iPhongScale ) )
+	if ( PARM_NO_DEFAULT( info.iPhongScale ) )
 		params[ info.iPhongScale ]->SetFloatValue( DEFAULT_PHONG_SCALE );
+
+	if ( PARM_NO_DEFAULT( info.iEnvmapContrast ) )
+		params[ info.iEnvmapContrast ]->SetFloatValue( 0.0f );
+
+	if ( PARM_NO_DEFAULT( info.iEnvmapSaturation ) )
+		params[ info.iEnvmapSaturation ]->SetFloatValue( 1.0f );
+
+	if ( PARM_NO_DEFAULT( info.iEnvmapTint ) )
+		params[ info.iEnvmapTint ]->SetVecValue( 1.0f, 1.0f, 1.0f );
 }
 
 void InitPassComposite( const defParms_composite &info, CBaseVSShader *pShader, IMaterialVar **params )
 {
 	if ( PARM_DEFINED( info.iAlbedo ) )
 		pShader->LoadTexture( info.iAlbedo );
+
+	if ( PARM_DEFINED( info.iEnvmap ) )
+		pShader->LoadCubeMap( info.iEnvmap );
+
+	if ( PARM_DEFINED( info.iEnvmapMask ) )
+		pShader->LoadTexture( info.iEnvmapMask );
 }
 
 void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, IMaterialVar **params,
@@ -36,9 +54,16 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 	const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT ) && bAlbedo && !bAlphatest;
 
 	const bool bNoCull = IS_FLAG_SET( MATERIAL_VAR_NOCULL );
-	const bool bGBufferNormal = false;
 
 	const bool bUseSRGB = DEFCFG_USE_SRGB_CONVERSION != 0;
+
+	const bool bEnvmap = PARM_TEX( info.iEnvmap );
+	const bool bEnvmapMask = bEnvmap && PARM_TEX( info.iEnvmapMask );
+
+	const bool bGBufferNormal = bEnvmap;
+
+	AssertMsgOnce( IS_FLAG_SET( MATERIAL_VAR_NORMALMAPALPHAENVMAPMASK ) == false,
+		"Normal map sampling should stay out of composition pass." );
 
 	SHADOW_STATE
 	{
@@ -80,6 +105,19 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		pShaderShadow->EnableTexture( SHADER_SAMPLER2, true );
 		pShaderShadow->EnableSRGBRead( SHADER_SAMPLER2, false );
 
+		if ( bEnvmap )
+		{
+			pShaderShadow->EnableTexture( SHADER_SAMPLER3, true );
+
+			if( g_pHardwareConfig->GetHDRType() == HDR_TYPE_NONE )
+				pShaderShadow->EnableSRGBRead( SHADER_SAMPLER3, true );
+
+			if ( bEnvmapMask )
+			{
+				pShaderShadow->EnableTexture( SHADER_SAMPLER4, true );
+			}
+		}
+
 		pShaderShadow->EnableAlphaWrites( false );
 		pShaderShadow->EnableDepthWrites( !bTranslucent );
 
@@ -91,6 +129,7 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		SET_STATIC_VERTEX_SHADER_COMBO_OLD( MODEL, bModel );
 		SET_STATIC_VERTEX_SHADER_COMBO_OLD( MORPHING_VTEX, bModel && bFastVTex );
 		SET_STATIC_VERTEX_SHADER_COMBO_OLD( DECAL, bModel && bIsDecal );
+		SET_STATIC_VERTEX_SHADER_COMBO_OLD( ENVMAP, bEnvmap );
 		SET_STATIC_VERTEX_SHADER_OLD( composite_vs30 );
 
 		DECLARE_STATIC_PIXEL_SHADER_OLD( composite_ps30 );
@@ -98,13 +137,16 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( TRANSLUCENT, bTranslucent );
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( READNORMAL, bGBufferNormal );
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( NOCULL, bNoCull );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( ENVMAP, bEnvmap );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( ENVMAPMASK, bEnvmapMask );
 		SET_STATIC_PIXEL_SHADER_OLD( composite_ps30 );
 	}
 	DYNAMIC_STATE
 	{
 		Assert( pDeferredContext != NULL );
 
-		if ( pDeferredContext->m_bMaterialVarsChanged || !pDeferredContext->HasCommands( CDeferredPerMaterialContextData::DEFSTAGE_COMPOSITE ) )
+		if ( pDeferredContext->m_bMaterialVarsChanged || !pDeferredContext->HasCommands( CDeferredPerMaterialContextData::DEFSTAGE_COMPOSITE )
+			|| building_cubemaps.GetBool() )
 		{
 			tmpBuf.Reset();
 
@@ -118,6 +160,31 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 				tmpBuf.BindTexture( pShader, SHADER_SAMPLER0, info.iAlbedo );
 			else
 				tmpBuf.BindStandardTexture( SHADER_SAMPLER0, TEXTURE_GREY );
+
+			if ( bEnvmap )
+			{
+				if ( building_cubemaps.GetBool() )
+					tmpBuf.BindStandardTexture( SHADER_SAMPLER3, TEXTURE_BLACK );
+				else
+				{
+					if ( PARM_TEX( info.iEnvmap ) && !bModel )
+						tmpBuf.BindTexture( pShader, SHADER_SAMPLER3, info.iEnvmap );
+					else
+						tmpBuf.BindStandardTexture( SHADER_SAMPLER3, TEXTURE_LOCAL_ENV_CUBEMAP );
+				}
+
+				if ( bEnvmapMask )
+					tmpBuf.BindTexture( pShader, SHADER_SAMPLER4, info.iEnvmapMask );
+
+				float fl5[4] = { 0 };
+				params[ info.iEnvmapTint ]->GetVecValue( fl5, 3 );
+				tmpBuf.SetPixelShaderConstant( 5, fl5 );
+
+				float fl6[4] = { 0 };
+				fl6[0] = PARM_FLOAT( info.iEnvmapSaturation );
+				fl6[1] = PARM_FLOAT( info.iEnvmapContrast );
+				tmpBuf.SetPixelShaderConstant( 6, fl6 );
+			}
 
 			int w, t;
 			pShaderAPI->GetBackBufferDimensions( w, t );
@@ -164,6 +231,13 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		pShader->BindTexture( SHADER_SAMPLER2, GetDeferredExt()->GetTexture_LightAccum() );
 
 		CommitBaseDeferredConstants_Origin( pShaderAPI, 3 );
+
+		if ( bEnvmap )
+		{
+			float vEyepos[4] = {0,0,0,0};
+			pShaderAPI->GetWorldSpaceCameraPosition( vEyepos );
+			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_0, vEyepos );
+		}
 	}
 
 	pShader->Draw();

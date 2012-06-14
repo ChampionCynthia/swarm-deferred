@@ -284,11 +284,6 @@ void InitDeferredRTs( bool bInitial )
 	GetDeferredExt()->CommitTexture_VolumePrePass( g_tex_VolumePrepass );
 
 	GetDeferredExt()->CommitShadowData_General( generalShadowData );
-
-	if ( !bInitial )
-	{
-		materials->ReloadMaterials();
-	}
 }
 
 int GetShadowResolution_Spot()

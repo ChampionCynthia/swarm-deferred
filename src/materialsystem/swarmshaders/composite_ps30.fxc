@@ -4,9 +4,14 @@
 // STATIC:		"READNORMAL"		"0..1"
 // STATIC:		"NOCULL"			"0..1"
 
+// STATIC:		"ENVMAP"			"0..1"
+// STATIC:		"ENVMAPMASK"		"0..1"
+
 // DYNAMIC:		"PIXELFOGTYPE"		"0..1"
 
 // SKIP:		$ALPHATEST && $TRANSLUCENT
+// SKIP:		!$ENVMAP && $ENVMAPMASK
+// SKIP:		$ENVMAP && !$READNORMAL
 
 #include "common_ps_fxc.h"
 #include "common_deferred_fxc.h"
@@ -31,12 +36,26 @@ const float3 g_vecOrigin				: register( c3 );
 
 const float g_flPhongScale				: register( c4 );
 
+#if ENVMAP
+sampler sEnvmap								: register( s3 );
+const float3 g_flEnvmapTint					: register( c5 );
+const float2 g_flEnvmapSaturationContrast	: register( c6 );
+
+#	if ENVMAPMASK
+sampler sEnvmapMask							: register( s4 );
+#	endif
+#endif
+
 struct PS_INPUT
 {
 	float2 vTexCoord				: TEXCOORD0;
 
-	float3 vProjPosXYW				: TEXCOORD4;
-	float3 vWorldPos				: TEXCOORD5;
+	float3 vProjPosXYW				: TEXCOORD1;
+	float3 vWorldPos				: TEXCOORD2;
+
+#if ENVMAP
+	float3 worldToEye				: TEXCOORD3;
+#endif
 
 #if NOCULL
 	float vDir						: VFACE;
@@ -70,7 +89,7 @@ PS_OUTPUT main( const PS_INPUT In )
 	float4 flLighting = ReadLighting( tex2D( sLightAccum, screenPos ) );
 
 #if READNORMAL
-	float3 worldNormal = tex2D( sNormals, screenPos );
+	float3 worldNormal = tex2D( sNormals, screenPos ).xyz * 2.0f - 1.0f;
 #endif
 
 	float flLightScale =
@@ -80,7 +99,33 @@ PS_OUTPUT main( const PS_INPUT In )
 		GAMMA_LIGHT_SCALE;
 #endif
 
+
+#if ENVMAP
+	float flSpecularFactor =
+#if ENVMAPMASK
+		tex2D( sEnvmapMask, In.vTexCoord );
+#else
+		flAlbedoSample.a;
+#endif
+
+	float3 reflectVect = CalcReflectionVectorUnnormalized( worldNormal, In.worldToEye );
+
+	float3 specularLighting = ENV_MAP_SCALE * texCUBE( sEnvmap, reflectVect ).rgb;
+	specularLighting *= flSpecularFactor;
+	specularLighting *= g_flEnvmapTint;
+
+	float3 specularLightingSquared = specularLighting * specularLighting;
+	specularLighting = lerp( specularLighting, specularLightingSquared, g_flEnvmapSaturationContrast.y );
+	float3 greyScale = dot( specularLighting, float3( 0.299f, 0.587f, 0.114f ) );
+	specularLighting = lerp( greyScale, specularLighting, g_flEnvmapSaturationContrast.x );
+#endif
+
+
 	Out.vColor_0.xyz = ( flAlbedoSample + flLighting.w * g_flPhongScale ) * flLighting.xyz * flLightScale;
+
+#if ENVMAP
+	Out.vColor_0.xyz += specularLighting;
+#endif
 
 #if PIXELFOGTYPE == 0
 	float fogAmt = CalcRangeFog( g_vecOrigin, In.vWorldPos, g_vecFogParams.x, g_vecFogParams.z, g_vecFogParams.w );

@@ -14,6 +14,13 @@ struct defParms_composite
 
 	// textures
 	int iAlbedo;
+	int iEnvmap;
+	int iEnvmapMask;
+
+	// envmapping
+	int iEnvmapTint;
+	int iEnvmapSaturation;
+	int iEnvmapContrast;
 
 	// control
 	int iAlphatestRef;

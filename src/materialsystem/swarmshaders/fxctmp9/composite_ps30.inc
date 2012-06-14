@@ -85,6 +85,48 @@ public:
 		m_bNOCULL = true;
 #endif
 	}
+private:
+	int m_nENVMAP;
+#ifdef _DEBUG
+	bool m_bENVMAP;
+#endif
+public:
+	void SetENVMAP( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nENVMAP = i;
+#ifdef _DEBUG
+		m_bENVMAP = true;
+#endif
+	}
+	void SetENVMAP( bool i )
+	{
+		m_nENVMAP = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bENVMAP = true;
+#endif
+	}
+private:
+	int m_nENVMAPMASK;
+#ifdef _DEBUG
+	bool m_bENVMAPMASK;
+#endif
+public:
+	void SetENVMAPMASK( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nENVMAPMASK = i;
+#ifdef _DEBUG
+		m_bENVMAPMASK = true;
+#endif
+	}
+	void SetENVMAPMASK( bool i )
+	{
+		m_nENVMAPMASK = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bENVMAPMASK = true;
+#endif
+	}
 public:
 	composite_ps30_Static_Index( )
 	{
@@ -104,19 +146,27 @@ public:
 		m_bNOCULL = false;
 #endif // _DEBUG
 		m_nNOCULL = 0;
+#ifdef _DEBUG
+		m_bENVMAP = false;
+#endif // _DEBUG
+		m_nENVMAP = 0;
+#ifdef _DEBUG
+		m_bENVMAPMASK = false;
+#endif // _DEBUG
+		m_nENVMAPMASK = 0;
 	}
 	int GetIndex()
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bALPHATEST && m_bTRANSLUCENT && m_bREADNORMAL && m_bNOCULL;
+		bool bAllStaticVarsDefined = m_bALPHATEST && m_bTRANSLUCENT && m_bREADNORMAL && m_bNOCULL && m_bENVMAP && m_bENVMAPMASK;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 2 * m_nALPHATEST ) + ( 4 * m_nTRANSLUCENT ) + ( 8 * m_nREADNORMAL ) + ( 16 * m_nNOCULL ) + 0;
+		return ( 2 * m_nALPHATEST ) + ( 4 * m_nTRANSLUCENT ) + ( 8 * m_nREADNORMAL ) + ( 16 * m_nNOCULL ) + ( 32 * m_nENVMAP ) + ( 64 * m_nENVMAPMASK ) + 0;
 	}
 };
-#define shaderStaticTest_composite_ps30 psh_forgot_to_set_static_ALPHATEST + psh_forgot_to_set_static_TRANSLUCENT + psh_forgot_to_set_static_READNORMAL + psh_forgot_to_set_static_NOCULL + 0
+#define shaderStaticTest_composite_ps30 psh_forgot_to_set_static_ALPHATEST + psh_forgot_to_set_static_TRANSLUCENT + psh_forgot_to_set_static_READNORMAL + psh_forgot_to_set_static_NOCULL + psh_forgot_to_set_static_ENVMAP + psh_forgot_to_set_static_ENVMAPMASK + 0
 class composite_ps30_Dynamic_Index
 {
 private:
