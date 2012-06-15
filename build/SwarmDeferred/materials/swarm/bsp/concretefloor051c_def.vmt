@@ -5,10 +5,8 @@ $bumpmap "concrete\concretefloor051a_normal"
 $envmap env_cubemap
 $envmapsaturation 1
 $envmapcontrast 1
-$envmaptint "[ .11 .11 .11 ]"
-$normalmapalphaenvmapmask 1
+$envmaptint "[ 0.4 0.4 0.4 ]"
 
-	$PHONG_SCALE	1
+	$PHONG_SCALE	3.5
 	$PHONG_EXP		0.7
-	$PHONG_BOOST	3.5
 }

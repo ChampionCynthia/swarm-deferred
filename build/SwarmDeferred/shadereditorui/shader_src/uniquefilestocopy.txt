@@ -12,6 +12,6 @@ common_flashlight_fxc.h
 common_parallax.h
 ..\..\..\..\common\alien swarm\bin\shadercompile.exe
 ..\..\..\..\common\alien swarm\bin\shadercompile_dll.dll
-000002_dbg_general_pos_preview_vs30.fxc
-000002_dbg_general_preview_vs30.fxc
-000002_dbg_general_preview_ps30.fxc
+000000_dbg_general_pos_preview_vs30.fxc
+000000_dbg_general_preview_vs30.fxc
+000000_dbg_general_preview_ps30.fxc
