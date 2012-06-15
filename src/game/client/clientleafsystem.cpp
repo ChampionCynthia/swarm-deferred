@@ -28,10 +28,6 @@
 #include "con_nprint.h"
 //#include "tier0/miniprofiler.h" 
 
-// @Deferred - Biohazard
-// Requiring deferred status
-#include "deferred/deferred_shared_common.h"
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -2335,11 +2331,6 @@ int CClientLeafSystem::ExtractCulledRenderables( int nCount, RenderableInfo_t **
 	// FIXME: sort by area and inline cull. Should make it a bunch faster
 	int nUniqueCount = 0;
 
-// @Deferred - Biohazard
-// Frustum_t can't handle ortho views, skip its culling
-	static const bool bDefRendering = GetDeferredManager()->IsDeferredRenderingEnabled();
-	const bool bShadowDepth = bDefRendering && CurrentViewID() == VIEW_DEFERRED_SHADOW;
-
 	if ( bPortalTestEnts )
 	{
 		Frustum_t *list[MAX_MAP_AREAS];
@@ -2349,11 +2340,10 @@ int CClientLeafSystem::ExtractCulledRenderables( int nCount, RenderableInfo_t **
 			RenderableInfo_t *pInfo = ppRenderables[i];
 			BuildRenderListInfo_t &rlInfo = pRLInfo[i];
 
-// @Deferred - Biohazard
-// Frustum_t can't handle ortho views, skip its culling
-			if ( !bShadowDepth && !IsLeafMarker( pInfo ) )
+			if ( !IsLeafMarker( pInfo ) )
 			{
 				int frustumIndex = rlInfo.m_nArea + 1;
+
 				if ( list[frustumIndex]->CullBox( rlInfo.m_vecMins, rlInfo.m_vecMaxs ) )
 				{
 					// Necessary for dependent models to be grabbed
@@ -2374,9 +2364,7 @@ int CClientLeafSystem::ExtractCulledRenderables( int nCount, RenderableInfo_t **
 		RenderableInfo_t *pInfo = ppRenderables[i];
 		BuildRenderListInfo_t &rlInfo = pRLInfo[i];
 
-// @Deferred - Biohazard
-// Frustum_t can't handle ortho views, skip its culling
-		if ( !bShadowDepth && !IsLeafMarker( pInfo ) )
+		if ( !IsLeafMarker( pInfo ) )
 		{
 			// cull with main frustum
 			if ( engine->CullBox( rlInfo.m_vecMins, rlInfo.m_vecMaxs ) )

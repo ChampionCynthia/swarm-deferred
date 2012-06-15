@@ -132,12 +132,6 @@ extern ConVar r_eyewaterepsilon;
 //-----------------------------------------------------------------------------
 // Globals
 //-----------------------------------------------------------------------------
-static Vector g_vecCurrentRenderOrigin(0,0,0);
-static QAngle g_vecCurrentRenderAngles(0,0,0);
-static Vector g_vecCurrentVForward(0,0,0), g_vecCurrentVRight(0,0,0), g_vecCurrentVUp(0,0,0);
-static VMatrix g_matCurrentCamInverse;
-extern bool s_bCanAccessCurrentView;
-static bool	g_bRenderingView = false;			// For debugging...
 extern int g_CurrentViewID;
 extern bool g_bRenderingScreenshot;
 
@@ -149,145 +143,8 @@ extern FrustumCache_t *FrustumCache( void );
 // Describes a pruned set of leaves to be rendered this view. Reference counted
 // because potentially shared by a number of views
 //-----------------------------------------------------------------------------
-struct ClientWorldListInfo_t : public CRefCounted1<WorldListInfo_t>
-{
-	ClientWorldListInfo_t() 
-	{ 
-		memset( (WorldListInfo_t *)this, 0, sizeof(WorldListInfo_t) ); 
-		m_pOriginalLeafIndex = NULL;
-		m_bPooledAlloc = false;
-	}
 
-	// Allocate a list intended for pruning
-	static ClientWorldListInfo_t *AllocPooled( const ClientWorldListInfo_t &exemplar );
-
-	// Because we remap leaves to eliminate unused leaves, we need a remap
-	// when drawing translucent surfaces, which requires the *original* leaf index
-	// using m_pOriginalLeafIndex[ remapped leaf index ] == actual leaf index
-	uint16 *m_pOriginalLeafIndex;
-
-private:
-	virtual bool OnFinalRelease();
-
-	bool m_bPooledAlloc;
-	static CObjectPool<ClientWorldListInfo_t> gm_Pool;
-};
-
-
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-
-class CWorldListCache
-{
-public:
-	CWorldListCache()
-	{
-
-	}
-	void Flush()
-	{
-		for ( int i = m_Entries.FirstInorder(); i != m_Entries.InvalidIndex(); i = m_Entries.NextInorder( i ) )
-		{
-			delete m_Entries[i];
-		}
-		m_Entries.RemoveAll();
-	}
-
-	bool Find( const CViewSetup &viewSetup, IWorldRenderList **ppList, ClientWorldListInfo_t **ppListInfo )
-	{
-		Entry_t lookup( viewSetup );
-
-		int i = m_Entries.Find( &lookup );
-
-		if ( i != m_Entries.InvalidIndex() )
-		{
-			Entry_t *pEntry = m_Entries[i];
-			*ppList = InlineAddRef( pEntry->pList );
-			*ppListInfo = InlineAddRef( pEntry->pListInfo );
-			return true;
-		}
-
-		return false;
-	}
-
-	void Add( const CViewSetup &viewSetup, IWorldRenderList *pList, ClientWorldListInfo_t *pListInfo )
-	{
-		m_Entries.Insert( new Entry_t( viewSetup, pList, pListInfo ) );
-	}
-
-private:
-	struct Entry_t
-	{
-		Entry_t( const CViewSetup &viewSetup, IWorldRenderList *pList = NULL, ClientWorldListInfo_t *pListInfo = NULL ) :
-			pList( ( pList ) ? InlineAddRef( pList ) : NULL ),
-			pListInfo( ( pListInfo ) ? InlineAddRef( pListInfo ) : NULL )
-		{
-            // @NOTE (toml 8/18/2006): because doing memcmp, need to fill all of the fields and the padding!
-			memset( &m_bOrtho, 0, offsetof(Entry_t, pList ) - offsetof(Entry_t, m_bOrtho ) );
-			m_bOrtho = viewSetup.m_bOrtho;			
-			m_OrthoLeft = viewSetup.m_OrthoLeft;		
-			m_OrthoTop = viewSetup.m_OrthoTop;
-			m_OrthoRight = viewSetup.m_OrthoRight;
-			m_OrthoBottom = viewSetup.m_OrthoBottom;
-			fov = viewSetup.fov;				
-			origin = viewSetup.origin;					
-			angles = viewSetup.angles;				
-			zNear = viewSetup.zNear;			
-			zFar = viewSetup.zFar;			
-			m_flAspectRatio = viewSetup.m_flAspectRatio;
-			m_bOffCenter = viewSetup.m_bOffCenter;
-			m_flOffCenterTop = viewSetup.m_flOffCenterTop;
-			m_flOffCenterBottom = viewSetup.m_flOffCenterBottom;
-			m_flOffCenterLeft = viewSetup.m_flOffCenterLeft;
-			m_flOffCenterRight = viewSetup.m_flOffCenterRight;
-		}
-
-		~Entry_t()
-		{
-			if ( pList )
-				pList->Release();
-			if ( pListInfo )
-				pListInfo->Release();
-		}
-
-		// The fields from CViewSetup that would actually affect the list
-		float	m_OrthoLeft;		
-		float	m_OrthoTop;
-		float	m_OrthoRight;
-		float	m_OrthoBottom;
-		float	fov;				
-		Vector	origin;					
-		QAngle	angles;				
-		float	zNear;			
-		float	zFar;			
-		float	m_flAspectRatio;
-		float	m_flOffCenterTop;
-		float	m_flOffCenterBottom;
-		float	m_flOffCenterLeft;
-		float	m_flOffCenterRight;
-		bool	m_bOrtho;			
-		bool	m_bOffCenter;
-
-		IWorldRenderList *pList;
-		ClientWorldListInfo_t *pListInfo;
-	};
-
-	class CEntryComparator
-	{
-	public:
-		CEntryComparator( int ) {}
-		bool operator!() const { return false; }
-		bool operator()( const Entry_t *lhs, const Entry_t *rhs ) const 
-		{ 
-			return ( memcmp( lhs, rhs, sizeof(Entry_t) - ( sizeof(Entry_t) - offsetof(Entry_t, pList ) ) ) < 0 );
-		}
-	};
-
-	CUtlRBTree<Entry_t *, unsigned short, CEntryComparator> m_Entries;
-};
-
-extern CWorldListCache g_WorldListCache;
+extern void FlushWorldLists();
 
 
 //-----------------------------------------------------------------------------
@@ -310,7 +167,7 @@ protected:
 	// BUGBUG this causes all sorts of problems
 	virtual bool	ShouldCacheLists(){ return false; };
 
-	void			DrawOpaqueRenderablesDeferred( bool bShadowDepth, bool bNoDecals );
+	void			DrawOpaqueRenderablesDeferred( bool bNoDecals );
 
 protected:
 
@@ -330,6 +187,8 @@ public:
 
 	void			Setup( const CViewSetup &view, int nClearFlags, bool bDrawSkybox, const VisibleFogVolumeInfo_t &fogInfo, const WaterRenderInfo_t& info, ViewCustomVisibility_t *pCustomVisibility = NULL );
 	void			Draw();
+
+	virtual bool	ShouldCacheLists(){ return true; };
 
 private: 
 	VisibleFogVolumeInfo_t m_fogInfo;
@@ -367,8 +226,6 @@ public:
 		m_pSky3dParams( NULL )
 	  {
 	  }
-
-	virtual bool	ShouldCacheLists(){ return false; };
 
 	bool			Setup( const CViewSetup &view, bool bGBuffer, SkyboxVisibility_t *pSkyboxVisible );
 	void			Draw();
@@ -1147,8 +1004,6 @@ void CDeferredViewRender::RenderView( const CViewSetup &view, const CViewSetup &
 	pRenderContext.SafeRelease(); // don't want to hold for long periods in case in a locking active share thread mode
 
 	{
-		g_bRenderingView = true;
-
 		RenderPreScene( worldView );
 
 		// Must be first 
@@ -1467,8 +1322,6 @@ void CDeferredViewRender::RenderView( const CViewSetup &view, const CViewSetup &
 
 		Render2DEffectsPostHUD( hudViewSetup );
 
-		g_bRenderingView = false;
-
 		// We can no longer use the 'current view' stuff set up in ViewDrawScene
 		AllowCurrentViewAccess( false );
 
@@ -1481,7 +1334,7 @@ void CDeferredViewRender::RenderView( const CViewSetup &view, const CViewSetup &
 	}
 	pRenderContext.SafeRelease();
 
-	g_WorldListCache.Flush();
+	FlushWorldLists();
 
 	m_CurrentView = worldView;
 
@@ -1855,7 +1708,7 @@ static inline void DrawRenderable( IClientRenderable *pEnt, int flags, const Ren
 //-----------------------------------------------------------------------------
 // Draws all opaque renderables in leaves that were rendered
 //-----------------------------------------------------------------------------
-static inline void DrawOpaqueRenderable( IClientRenderable *pEnt, bool bTwoPass, bool bShadowDepth, bool bNoDecals )
+static inline void DrawOpaqueRenderable( IClientRenderable *pEnt, bool bTwoPass, bool bNoDecals )
 {
 	ASSERT_LOCAL_PLAYER_RESOLVABLE();
 	float color[3];
@@ -1869,11 +1722,6 @@ static inline void DrawOpaqueRenderable( IClientRenderable *pEnt, bool bTwoPass,
 	if ( bTwoPass )
 	{
 		flags |= STUDIO_TWOPASS;
-	}
-
-	if ( bShadowDepth )
-	{
-		flags |= STUDIO_SHADOWDEPTHTEXTURE;
 	}
 
 	if ( bNoDecals )
@@ -1895,16 +1743,16 @@ static void SetupBonesOnBaseAnimating( C_BaseAnimating *&pBaseAnimating )
 }
 
 
-static void DrawOpaqueRenderables_DrawBrushModels( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bShadowDepth, bool bNoDecals )
+static void DrawOpaqueRenderables_DrawBrushModels( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bNoDecals )
 {
 	for( int i = 0; i < nCount; ++i )
 	{
 		Assert( !ppEntities[i]->m_TwoPass );
-		DrawOpaqueRenderable( ppEntities[i]->m_pRenderable, false, bShadowDepth, bNoDecals );
+		DrawOpaqueRenderable( ppEntities[i]->m_pRenderable, false, bNoDecals );
 	}
 }
 
-static void DrawOpaqueRenderables_DrawStaticProps( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bShadowDepth )
+static void DrawOpaqueRenderables_DrawStaticProps( int nCount, CClientRenderablesList::CEntry **ppEntities )
 {
 	if ( nCount == 0 )
 		return;
@@ -1932,23 +1780,23 @@ static void DrawOpaqueRenderables_DrawStaticProps( int nCount, CClientRenderable
 		if ( -- numAvailable > 0 )
 			continue; // place a hint for compiler to predict more common case in the loop
 		
-		staticpropmgr->DrawStaticProps( pStatics, pInstances, numScheduled, bShadowDepth, vcollide_wireframe.GetBool() );
+		staticpropmgr->DrawStaticProps( pStatics, pInstances, numScheduled, false, vcollide_wireframe.GetBool() );
 		numScheduled = 0;
 		numAvailable = MAX_STATICS_PER_BATCH;
 	}
 	
 	if ( numScheduled )
-		staticpropmgr->DrawStaticProps( pStatics, pInstances, numScheduled, bShadowDepth, vcollide_wireframe.GetBool() );
+		staticpropmgr->DrawStaticProps( pStatics, pInstances, numScheduled, false, vcollide_wireframe.GetBool() );
 }
 
-static void DrawOpaqueRenderables_Range( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bShadowDepth, bool bNoDecals )
+static void DrawOpaqueRenderables_Range( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bNoDecals )
 {
 	for ( int i = 0; i < nCount; ++i )
 	{
 		CClientRenderablesList::CEntry *itEntity = ppEntities[i]; 
 		if ( itEntity->m_pRenderable )
 		{
-			DrawOpaqueRenderable( itEntity->m_pRenderable, ( itEntity->m_TwoPass != 0 ), bShadowDepth, bNoDecals );
+			DrawOpaqueRenderable( itEntity->m_pRenderable, ( itEntity->m_TwoPass != 0 ), bNoDecals );
 		}
 	}
 }
@@ -1956,20 +1804,20 @@ static void DrawOpaqueRenderables_Range( int nCount, CClientRenderablesList::CEn
 extern ConVar cl_modelfastpath;
 extern ConVar cl_skipslowpath;
 extern ConVar r_drawothermodels;
-static void	DrawOpaqueRenderables_ModelRenderables( int nCount, ModelRenderSystemData_t* pModelRenderables, bool bShadowDepth )
+static void	DrawOpaqueRenderables_ModelRenderables( int nCount, ModelRenderSystemData_t* pModelRenderables )
 {
-	g_pModelRenderSystem->DrawModels( pModelRenderables, nCount, bShadowDepth ? MODEL_RENDER_MODE_SHADOW_DEPTH : MODEL_RENDER_MODE_NORMAL );
+	g_pModelRenderSystem->DrawModels( pModelRenderables, nCount, MODEL_RENDER_MODE_NORMAL );
 }
 
-static void	DrawOpaqueRenderables_NPCs( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bShadowDepth, bool bNoDecals )
+static void	DrawOpaqueRenderables_NPCs( int nCount, CClientRenderablesList::CEntry **ppEntities, bool bNoDecals )
 {
-	DrawOpaqueRenderables_Range( nCount, ppEntities, bShadowDepth, bNoDecals );
+	DrawOpaqueRenderables_Range( nCount, ppEntities, bNoDecals );
 }
 
 //-----------------------------------------------------------------------------
 // Renders all translucent entities in the render list
 //-----------------------------------------------------------------------------
-static inline void DrawTranslucentRenderable( IClientRenderable *pEnt, const RenderableInstance_t &instance, bool twoPass, bool bShadowDepth )
+static inline void DrawTranslucentRenderable( IClientRenderable *pEnt, const RenderableInstance_t &instance, bool twoPass )
 {
 	ASSERT_LOCAL_PLAYER_RESOLVABLE();
 
@@ -1992,13 +1840,10 @@ static inline void DrawTranslucentRenderable( IClientRenderable *pEnt, const Ren
 	if ( twoPass )
 		flags |= STUDIO_TWOPASS;
 
-	if ( bShadowDepth )
-		flags |= STUDIO_SHADOWDEPTHTEXTURE;
-
 	DrawRenderable( pEnt, flags, instance );
 }
 
-void CBaseWorldViewDeferred::DrawOpaqueRenderablesDeferred( bool bShadowDepth, bool bNoDecals )
+void CBaseWorldViewDeferred::DrawOpaqueRenderablesDeferred( bool bNoDecals )
 {
 	VPROF("CViewRender::DrawOpaqueRenderables" );
 
@@ -2035,7 +1880,7 @@ void CBaseWorldViewDeferred::DrawOpaqueRenderablesDeferred( bool bShadowDepth, b
 	//
 	// First do the brush models
 	//
-	DrawOpaqueRenderables_DrawBrushModels( brushModels.Count(), brushModels.Base(), bShadowDepth, bNoDecals );
+	DrawOpaqueRenderables_DrawBrushModels( brushModels.Count(), brushModels.Base(), bNoDecals );
 
 	// Move all static props to modelrendersystem
 	bool bUseFastPath = ( cl_modelfastpath.GetInt() != 0 );
@@ -2114,7 +1959,7 @@ void CBaseWorldViewDeferred::DrawOpaqueRenderablesDeferred( bool bShadowDepth, b
 	//
 	// Draw model renderables now (ie. models that use the fast path)
 	//					 
-	DrawOpaqueRenderables_ModelRenderables( arrModelRenderables.Count(), arrModelRenderables.Base(), bShadowDepth );
+	DrawOpaqueRenderables_ModelRenderables( arrModelRenderables.Count(), arrModelRenderables.Base() );
 
 	// Turn off z pass here. Don't want non-fastpath models with potentially large dynamic VB requirements overwrite
 	// stuff in the dynamic VB ringbuffer. We're calling End360ZPass again in DrawExecute, but that's not a problem.
@@ -2124,19 +1969,19 @@ void CBaseWorldViewDeferred::DrawOpaqueRenderablesDeferred( bool bShadowDepth, b
 	//
 	// Draw static props + opaque entities that aren't using the fast path.
 	//
-	DrawOpaqueRenderables_Range( otherRenderables.Count(), otherRenderables.Base(), bShadowDepth, bNoDecals );
-	DrawOpaqueRenderables_DrawStaticProps( staticProps.Count(), staticProps.Base(), bShadowDepth );
+	DrawOpaqueRenderables_Range( otherRenderables.Count(), otherRenderables.Base(), bNoDecals );
+	DrawOpaqueRenderables_DrawStaticProps( staticProps.Count(), staticProps.Base() );
 
 	//
 	// Draw NPCs now
 	//
-	DrawOpaqueRenderables_NPCs( arrRenderEntsNpcsFirst.Count(), arrRenderEntsNpcsFirst.Base(), bShadowDepth, bNoDecals );
+	DrawOpaqueRenderables_NPCs( arrRenderEntsNpcsFirst.Count(), arrRenderEntsNpcsFirst.Base(), bNoDecals );
 
 	//
 	// Ropes and particles
 	//
-	RopeManager()->DrawRenderCache( bShadowDepth );
-	g_pParticleSystemMgr->DrawRenderCache( bShadowDepth );
+	RopeManager()->DrawRenderCache( false );
+	g_pParticleSystemMgr->DrawRenderCache( false );
 }
 
 
@@ -2746,7 +2591,7 @@ void CBaseWorldViewDeferred::DrawExecute( float waterHeight, view_id_t viewID, f
 	m_DrawFlags &= ~DF_SKIP_WORLD_DECALS_AND_OVERLAYS;
 	if ( m_DrawFlags & DF_DRAW_ENTITITES )
 	{
-		DrawOpaqueRenderablesDeferred( false, m_bDrawWorldNormal );
+		DrawOpaqueRenderablesDeferred( m_bDrawWorldNormal );
 	}
 	End360ZPass();		// DrawOpaqueRenderables currently already calls End360ZPass. No harm in calling it again to make sure we're always ending it
 

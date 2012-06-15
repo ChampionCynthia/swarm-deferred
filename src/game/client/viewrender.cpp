@@ -410,6 +410,12 @@ private:
 
 CWorldListCache g_WorldListCache;
 
+// @Deferred - Biohazard
+void FlushWorldLists()
+{
+	g_WorldListCache.Flush();
+}
+
 //-----------------------------------------------------------------------------
 // Standard 3d skybox view
 //-----------------------------------------------------------------------------
