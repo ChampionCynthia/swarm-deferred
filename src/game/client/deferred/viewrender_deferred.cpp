@@ -350,7 +350,7 @@ public:
 	virtual void	PushView( float waterHeight );
 	virtual void	PopView();
 
-	static void PushGBuffer( bool bInitial, float zScale = 1.0f );
+	static void PushGBuffer( bool bInitial, float zScale = 1.0f, bool bClearDepth = true );
 	static void PopGBuffer();
 
 private: 
@@ -1014,7 +1014,7 @@ void CDeferredViewRender::DrawViewModels( const CViewSetup &view, bool drawViewm
 	if ( bGBuffer )
 	{
 		const float flViewmodelScale = view.zFarViewmodel / view.zFar;
-		CGBufferView::PushGBuffer( false, flViewmodelScale );
+		CGBufferView::PushGBuffer( false, flViewmodelScale, false );
 	}
 	else
 	{
@@ -2478,7 +2478,7 @@ void CGBufferView::PopView()
 	PopGBuffer();
 }
 
-void CGBufferView::PushGBuffer( bool bInitial, float zScale )
+void CGBufferView::PushGBuffer( bool bInitial, float zScale, bool bClearDepth )
 {
 	static ITexture *pNormals = GetDefRT_Normals();
 	static ITexture *pDepth = GetDefRT_Depth();
@@ -2495,7 +2495,9 @@ void CGBufferView::PushGBuffer( bool bInitial, float zScale )
 	}
 
 	pRenderContext->PushRenderTargetAndViewport( pNormals );
-	pRenderContext->ClearBuffers( false, true );
+
+	if ( bClearDepth )
+		pRenderContext->ClearBuffers( false, true );
 
 	pRenderContext->SetRenderTargetEx( 1, pDepth );
 

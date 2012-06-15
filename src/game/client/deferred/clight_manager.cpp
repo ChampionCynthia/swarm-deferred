@@ -880,6 +880,9 @@ void CLightingManager::RenderLights( const CViewSetup &view, CDeferredViewRender
 		case SHADOWMAPPING_DEPTH_STENCIL__3X3_GAUSSIAN:
 			pszFilterName = "3x3 GAUSS";
 			break;
+		case SHADOWMAPPING_DEPTH_COLOR__4X4_SOFTWARE_BILINEAR_BOX:
+			pszFilterName = "4x4 BOX";
+			break;
 		case SHADOWMAPPING_DEPTH_COLOR__4X4_SOFTWARE_BILINEAR_GAUSSIAN:
 			pszFilterName = "4x4 GAUSS";
 			break;

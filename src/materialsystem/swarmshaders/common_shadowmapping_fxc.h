@@ -108,6 +108,62 @@ float ShadowColor_Raw( sampler depthMap, float3 uvw )
 	return saturate( ceil( shadowmapDepth - uvw.z ) );
 }
 
+
+float ShadowColor_3x3SoftwareBilinear_Box( sampler depthMap, float3 uvw, float4 offsets_0, float4 offsets_1 )
+{
+	uvw.xy *= offsets_1.xy;
+	float2 texel_min = floor( uvw.xy ) / offsets_1.xy + (offsets_0.xy * 0.5f);
+	float2 frac_uv = frac( uvw.xy );
+
+#define TWEAK_SUBTRACT_SELF_3x3 8333.3f
+
+	float3x3 pcf_samples = saturate(
+							float3x3(	float3(		uvw.z - tex2D( depthMap, texel_min + float2( -offsets_0.x, -offsets_0.y ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( 0, -offsets_0.y ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( offsets_0.x, -offsets_0.y ) ).r )
+										* TWEAK_SUBTRACT_SELF_3x3,
+
+										float3(		uvw.z - tex2D( depthMap, texel_min + float2( -offsets_0.x, 0 ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( 0, 0 ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( offsets_0.x, 0 ) ).r )
+										* TWEAK_SUBTRACT_SELF_3x3,
+
+										float3(		uvw.z - tex2D( depthMap, texel_min + float2( -offsets_0.x, offsets_0.y ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( 0, offsets_0.y ) ).r,
+													uvw.z - tex2D( depthMap, texel_min + float2( offsets_0.x, offsets_0.y ) ).r )
+										* TWEAK_SUBTRACT_SELF_3x3
+										)
+									);
+
+	// not optimizing this because it sucks anyway..
+	float flLight = lerp(
+							lerp( pcf_samples[0][0], pcf_samples[0][1], frac_uv.x ),
+							lerp( pcf_samples[1][0], pcf_samples[1][1], frac_uv.x ),
+							frac_uv.y
+						)
+						+ lerp(
+							lerp( pcf_samples[0][1], pcf_samples[0][2], frac_uv.x ),
+							lerp( pcf_samples[1][1], pcf_samples[1][2], frac_uv.x ),
+							frac_uv.y
+						)
+
+						+ lerp(
+							lerp( pcf_samples[1][0], pcf_samples[1][1], frac_uv.x ),
+							lerp( pcf_samples[2][0], pcf_samples[2][1], frac_uv.x ),
+							frac_uv.y
+						)
+						+ lerp(
+							lerp( pcf_samples[1][1], pcf_samples[1][2], frac_uv.x ),
+							lerp( pcf_samples[2][1], pcf_samples[2][2], frac_uv.x ),
+							frac_uv.y
+						);
+
+	flLight *= 1.0f / 4.0f;
+
+	return 1.0f - flLight;
+}
+
+
 float ShadowColor_4x4SoftwareBilinear_Box( sampler depthMap, float3 uvw, float4 offsets_0, float4 offsets_1 )
 {
 	uvw.xy *= offsets_1.xy;
