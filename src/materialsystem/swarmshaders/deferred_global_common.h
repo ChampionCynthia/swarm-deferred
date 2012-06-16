@@ -131,6 +131,13 @@
 #endif
 
 
+/* Vendor defs for specific hardware filters
+ * or goddamn stupid code because some amd cards are damn stupid and broken!!!
+ */
+#define VENDOR_FXC_NVIDIA 0
+#define VENDOR_FXC_AMD 1
+
+
 /* Volumetrics quality/tweaks
  */
 #define VOLUMQUALITY_POINT_SAMPLES 50

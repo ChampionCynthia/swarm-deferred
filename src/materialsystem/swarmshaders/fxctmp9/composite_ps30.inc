@@ -86,6 +86,27 @@ public:
 #endif
 	}
 private:
+	int m_nPHONGFRESNEL;
+#ifdef _DEBUG
+	bool m_bPHONGFRESNEL;
+#endif
+public:
+	void SetPHONGFRESNEL( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nPHONGFRESNEL = i;
+#ifdef _DEBUG
+		m_bPHONGFRESNEL = true;
+#endif
+	}
+	void SetPHONGFRESNEL( bool i )
+	{
+		m_nPHONGFRESNEL = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bPHONGFRESNEL = true;
+#endif
+	}
+private:
 	int m_nENVMAP;
 #ifdef _DEBUG
 	bool m_bENVMAP;
@@ -127,6 +148,48 @@ public:
 		m_bENVMAPMASK = true;
 #endif
 	}
+private:
+	int m_nENVMAPFRESNEL;
+#ifdef _DEBUG
+	bool m_bENVMAPFRESNEL;
+#endif
+public:
+	void SetENVMAPFRESNEL( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nENVMAPFRESNEL = i;
+#ifdef _DEBUG
+		m_bENVMAPFRESNEL = true;
+#endif
+	}
+	void SetENVMAPFRESNEL( bool i )
+	{
+		m_nENVMAPFRESNEL = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bENVMAPFRESNEL = true;
+#endif
+	}
+private:
+	int m_nRIMLIGHT;
+#ifdef _DEBUG
+	bool m_bRIMLIGHT;
+#endif
+public:
+	void SetRIMLIGHT( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nRIMLIGHT = i;
+#ifdef _DEBUG
+		m_bRIMLIGHT = true;
+#endif
+	}
+	void SetRIMLIGHT( bool i )
+	{
+		m_nRIMLIGHT = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bRIMLIGHT = true;
+#endif
+	}
 public:
 	composite_ps30_Static_Index( )
 	{
@@ -147,6 +210,10 @@ public:
 #endif // _DEBUG
 		m_nNOCULL = 0;
 #ifdef _DEBUG
+		m_bPHONGFRESNEL = false;
+#endif // _DEBUG
+		m_nPHONGFRESNEL = 0;
+#ifdef _DEBUG
 		m_bENVMAP = false;
 #endif // _DEBUG
 		m_nENVMAP = 0;
@@ -154,19 +221,27 @@ public:
 		m_bENVMAPMASK = false;
 #endif // _DEBUG
 		m_nENVMAPMASK = 0;
+#ifdef _DEBUG
+		m_bENVMAPFRESNEL = false;
+#endif // _DEBUG
+		m_nENVMAPFRESNEL = 0;
+#ifdef _DEBUG
+		m_bRIMLIGHT = false;
+#endif // _DEBUG
+		m_nRIMLIGHT = 0;
 	}
 	int GetIndex()
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bALPHATEST && m_bTRANSLUCENT && m_bREADNORMAL && m_bNOCULL && m_bENVMAP && m_bENVMAPMASK;
+		bool bAllStaticVarsDefined = m_bALPHATEST && m_bTRANSLUCENT && m_bREADNORMAL && m_bNOCULL && m_bPHONGFRESNEL && m_bENVMAP && m_bENVMAPMASK && m_bENVMAPFRESNEL && m_bRIMLIGHT;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 2 * m_nALPHATEST ) + ( 4 * m_nTRANSLUCENT ) + ( 8 * m_nREADNORMAL ) + ( 16 * m_nNOCULL ) + ( 32 * m_nENVMAP ) + ( 64 * m_nENVMAPMASK ) + 0;
+		return ( 2 * m_nALPHATEST ) + ( 4 * m_nTRANSLUCENT ) + ( 8 * m_nREADNORMAL ) + ( 16 * m_nNOCULL ) + ( 32 * m_nPHONGFRESNEL ) + ( 64 * m_nENVMAP ) + ( 128 * m_nENVMAPMASK ) + ( 256 * m_nENVMAPFRESNEL ) + ( 512 * m_nRIMLIGHT ) + 0;
 	}
 };
-#define shaderStaticTest_composite_ps30 psh_forgot_to_set_static_ALPHATEST + psh_forgot_to_set_static_TRANSLUCENT + psh_forgot_to_set_static_READNORMAL + psh_forgot_to_set_static_NOCULL + psh_forgot_to_set_static_ENVMAP + psh_forgot_to_set_static_ENVMAPMASK + 0
+#define shaderStaticTest_composite_ps30 psh_forgot_to_set_static_ALPHATEST + psh_forgot_to_set_static_TRANSLUCENT + psh_forgot_to_set_static_READNORMAL + psh_forgot_to_set_static_NOCULL + psh_forgot_to_set_static_PHONGFRESNEL + psh_forgot_to_set_static_ENVMAP + psh_forgot_to_set_static_ENVMAPMASK + psh_forgot_to_set_static_ENVMAPFRESNEL + psh_forgot_to_set_static_RIMLIGHT + 0
 class composite_ps30_Dynamic_Index
 {
 private:

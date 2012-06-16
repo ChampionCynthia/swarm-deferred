@@ -113,7 +113,7 @@ ConVar r_drawopaquerenderables( "r_drawopaquerenderables", "1", FCVAR_CHEAT );
 
 static ConVar r_flashlightdepth_drawtranslucents( "r_flashlightdepth_drawtranslucents", "0", FCVAR_NONE );
 
-ConVar r_flashlightvolumetrics( "r_flashlightvolumetrics", "1" );
+ConVar r_flashlightvolumetrics( "r_flashlightvolumetrics", "0" );
 
 
 // FIXME: This is not static because we needed to turn it off for TF2 playtests

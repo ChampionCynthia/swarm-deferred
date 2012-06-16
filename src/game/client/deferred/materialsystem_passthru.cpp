@@ -97,7 +97,7 @@ static void ShaderReplace( const char *szShadername, IMaterial *pMat )
 	}
 
 	bool alphaBlending = pMat->IsTranslucent() || pMat->GetMaterialVarFlag( MATERIAL_VAR_TRANSLUCENT );
-	bool translucentOverride = pMat->IsAlphaTested() || pMat->GetMaterialVarFlag( MATERIAL_VAR_ALPHATEST ) || alphaBlending;
+	bool alphaTesting = pMat->IsAlphaTested() || pMat->GetMaterialVarFlag( MATERIAL_VAR_ALPHATEST );
 
 	bool bDecal = pszOldShadername != NULL && Q_stristr( pszOldShadername,"decal" ) != NULL ||
 		pszMatname != NULL && Q_stristr( pszMatname, "decal" ) != NULL ||
@@ -106,13 +106,15 @@ static void ShaderReplace( const char *szShadername, IMaterial *pMat )
 	if ( bDecal )
 	{
 		msg->SetInt( "$decal", 1 );
-
-		if ( alphaBlending )
-			msg->SetInt( "$translucent", 1 );
 	}
-	else if ( translucentOverride )
+
+	if ( alphaTesting )
 	{
 		msg->SetInt( "$alphatest", 1 );
+	}
+	else if ( alphaBlending )
+	{
+		msg->SetInt( "$translucent", 1 );
 	}
 
 	if ( pMat->IsTwoSided() )

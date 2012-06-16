@@ -2,7 +2,7 @@
 // STATIC:		"MODEL"					"0..1"
 // STATIC:		"DECAL"					"0..1"
 // STATIC:		"MORPHING_VTEX"			"0..1"
-// STATIC:		"ENVMAP"				"0..1"
+// STATIC:		"EYEVEC"				"0..1"
 
 // DYNAMIC:		"COMPRESSED_VERTS"		"0..1"
 // DYNAMIC:		"SKINNING"				"0..1"
@@ -23,7 +23,7 @@ sampler2D morphSampler						: register( D3DVERTEXTEXTURESAMPLER0, s0 );
 
 #endif
 
-#if ENVMAP
+#if EYEVEC
 
 const float3 flEyepos						: register( SHADER_SPECIFIC_CONST_0 );
 
@@ -68,7 +68,7 @@ struct VS_OUTPUT
 	float3 vProjPosXYW				: TEXCOORD1;
 	float3 worldPos					: TEXCOORD2;
 
-#if ENVMAP
+#if EYEVEC
 	float3 worldToEye				: TEXCOORD3;
 #endif
 };
@@ -127,7 +127,7 @@ VS_OUTPUT main( const VS_INPUT In )
 
 	Out.worldPos = worldPos;
 
-#if ENVMAP
+#if EYEVEC
 	Out.worldToEye = flEyepos - worldPos;
 #endif
 

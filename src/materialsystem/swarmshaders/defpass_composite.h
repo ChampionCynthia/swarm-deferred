@@ -21,10 +21,22 @@ struct defParms_composite
 	int iEnvmapTint;
 	int iEnvmapSaturation;
 	int iEnvmapContrast;
+	int iEnvmapFresnel;
 
-	// control
+	// rimlight
+	int iRimlightEnable;
+	int iRimlightExponent;
+	int iRimlightAlbedoScale;
+	int iRimlightTint;
+
+	// alpha
 	int iAlphatestRef;
+
+	// phong
 	int iPhongScale;
+	int iPhongFresnel;
+
+	int iFresnelRanges;
 
 	// config
 	bool bModel;

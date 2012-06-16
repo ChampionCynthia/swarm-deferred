@@ -1,5 +1,4 @@
 
-
 #include "deferred_includes.h"
 
 #include "tier0/memdbgon.h"
@@ -15,14 +14,22 @@ BEGIN_VS_SHADER( DEFERRED_MODEL, "" )
 		SHADER_PARAM( PHONG_SCALE, SHADER_PARAM_TYPE_FLOAT, "", "" )
 		SHADER_PARAM( PHONG_EXP, SHADER_PARAM_TYPE_FLOAT, "", "" )
 		SHADER_PARAM( PHONG_MAP, SHADER_PARAM_TYPE_TEXTURE, "", "" )
+		SHADER_PARAM( PHONG_FRESNEL, SHADER_PARAM_TYPE_BOOL, "", "" )
 
+		SHADER_PARAM( FRESNELRANGES, SHADER_PARAM_TYPE_VEC3, "", "" )
 		SHADER_PARAM( ALPHATESTREFERENCE, SHADER_PARAM_TYPE_FLOAT, "", "" )
 
 		SHADER_PARAM( ENVMAP, SHADER_PARAM_TYPE_TEXTURE, "shadertest/shadertest_env", "envmap" )
 		SHADER_PARAM( ENVMAPTINT, SHADER_PARAM_TYPE_COLOR, "[1 1 1]", "envmap tint" )
 		SHADER_PARAM( ENVMAPCONTRAST, SHADER_PARAM_TYPE_FLOAT, "0.0", "contrast 0 == normal 1 == color*color" )
 		SHADER_PARAM( ENVMAPSATURATION, SHADER_PARAM_TYPE_FLOAT, "1.0", "saturation 0 == greyscale 1 == normal" )
+		SHADER_PARAM( ENVMAPFRESNEL, SHADER_PARAM_TYPE_BOOL, "", "" )
 		SHADER_PARAM( ENVMAPMASK, SHADER_PARAM_TYPE_TEXTURE, "shadertest/shadertest_envmask", "envmap mask" )
+
+		SHADER_PARAM( RIMLIGHT, SHADER_PARAM_TYPE_BOOL, "0", "enables rim lighting" )
+		SHADER_PARAM( RIMLIGHTEXPONENT, SHADER_PARAM_TYPE_FLOAT, "4.0", "Exponent for rim lights" )
+		SHADER_PARAM( RIMLIGHTALBEDOSCALE, SHADER_PARAM_TYPE_FLOAT, "0.0", "Albedo influence on rim light" )
+		SHADER_PARAM( RIMLIGHTTINT, SHADER_PARAM_TYPE_VEC3, "[1 1 1]", "Tint for rim lights" )
 
 	END_SHADER_PARAMS
 
@@ -56,9 +63,19 @@ BEGIN_VS_SHADER( DEFERRED_MODEL, "" )
 		p.iEnvmapTint = ENVMAPTINT;
 		p.iEnvmapContrast = ENVMAPCONTRAST;
 		p.iEnvmapSaturation = ENVMAPSATURATION;
+		p.iEnvmapFresnel = ENVMAPFRESNEL;
+
+		p.iRimlightEnable = RIMLIGHT;
+		p.iRimlightExponent = RIMLIGHTEXPONENT;
+		p.iRimlightAlbedoScale = RIMLIGHTALBEDOSCALE;
+		p.iRimlightTint = RIMLIGHTTINT;
 
 		p.iAlphatestRef = ALPHATESTREFERENCE;
+
 		p.iPhongScale = PHONG_SCALE;
+		p.iPhongFresnel = PHONG_FRESNEL;
+
+		p.iFresnelRanges = FRESNELRANGES;
 	}
 
 	bool DrawToGBuffer( IMaterialVar **params )

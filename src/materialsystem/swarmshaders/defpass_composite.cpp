@@ -16,8 +16,13 @@ void InitParmsComposite( const defParms_composite &info, CBaseVSShader *pShader,
 		PARM_VALID( info.iAlphatestRef ) && PARM_FLOAT( info.iAlphatestRef ) == 0.0f )
 		params[ info.iAlphatestRef ]->SetFloatValue( DEFAULT_ALPHATESTREF );
 
+
 	if ( PARM_NO_DEFAULT( info.iPhongScale ) )
 		params[ info.iPhongScale ]->SetFloatValue( DEFAULT_PHONG_SCALE );
+
+	if ( PARM_NO_DEFAULT( info.iPhongFresnel ) )
+		params[ info.iPhongFresnel ]->SetIntValue( 0 );
+
 
 	if ( PARM_NO_DEFAULT( info.iEnvmapContrast ) )
 		params[ info.iEnvmapContrast ]->SetFloatValue( 0.0f );
@@ -27,6 +32,24 @@ void InitParmsComposite( const defParms_composite &info, CBaseVSShader *pShader,
 
 	if ( PARM_NO_DEFAULT( info.iEnvmapTint ) )
 		params[ info.iEnvmapTint ]->SetVecValue( 1.0f, 1.0f, 1.0f );
+
+	if ( PARM_NO_DEFAULT( info.iEnvmapFresnel ) )
+		params[ info.iEnvmapFresnel ]->SetIntValue( 0 );
+
+
+	if ( PARM_NO_DEFAULT( info.iRimlightEnable ) )
+		params[ info.iRimlightEnable ]->SetIntValue( 0 );
+	else if ( PARM_VALID( info.iRimlightEnable ) )
+	{
+		if ( PARM_NO_DEFAULT( info.iRimlightExponent ) )
+			params[ info.iRimlightExponent ]->SetFloatValue( 4.0f );
+
+		if ( PARM_NO_DEFAULT( info.iRimlightAlbedoScale ) )
+			params[ info.iRimlightAlbedoScale ]->SetFloatValue( 0.0f );
+
+		if ( PARM_NO_DEFAULT( info.iRimlightTint ) )
+			params[ info.iRimlightTint ]->SetVecValue( 1.0f, 1.0f, 1.0f );
+	}
 }
 
 void InitPassComposite( const defParms_composite &info, CBaseVSShader *pShader, IMaterialVar **params )
@@ -56,11 +79,16 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 	const bool bNoCull = IS_FLAG_SET( MATERIAL_VAR_NOCULL );
 
 	const bool bUseSRGB = DEFCFG_USE_SRGB_CONVERSION != 0;
+	const bool bPhongFresnel = PARM_SET( info.iPhongFresnel );
 
 	const bool bEnvmap = PARM_TEX( info.iEnvmap );
 	const bool bEnvmapMask = bEnvmap && PARM_TEX( info.iEnvmapMask );
+	const bool bEnvmapFresnel = bEnvmap && PARM_SET( info.iEnvmapFresnel );
 
-	const bool bGBufferNormal = bEnvmap;
+	const bool bRimLight = PARM_SET( info.iRimlightEnable );
+
+	const bool bGBufferNormal = bEnvmap || bRimLight || bPhongFresnel || bEnvmapFresnel;
+	const bool bWorldEyeVec = bGBufferNormal;
 
 	AssertMsgOnce( IS_FLAG_SET( MATERIAL_VAR_NORMALMAPALPHAENVMAPMASK ) == false,
 		"Normal map sampling should stay out of composition pass." );
@@ -129,7 +157,7 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		SET_STATIC_VERTEX_SHADER_COMBO_OLD( MODEL, bModel );
 		SET_STATIC_VERTEX_SHADER_COMBO_OLD( MORPHING_VTEX, bModel && bFastVTex );
 		SET_STATIC_VERTEX_SHADER_COMBO_OLD( DECAL, bModel && bIsDecal );
-		SET_STATIC_VERTEX_SHADER_COMBO_OLD( ENVMAP, bEnvmap );
+		SET_STATIC_VERTEX_SHADER_COMBO_OLD( EYEVEC, bWorldEyeVec );
 		SET_STATIC_VERTEX_SHADER_OLD( composite_vs30 );
 
 		DECLARE_STATIC_PIXEL_SHADER_OLD( composite_ps30 );
@@ -139,6 +167,9 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( NOCULL, bNoCull );
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( ENVMAP, bEnvmap );
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( ENVMAPMASK, bEnvmapMask );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( ENVMAPFRESNEL, bEnvmapFresnel );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( PHONGFRESNEL, bPhongFresnel );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( RIMLIGHT, bRimLight );
 		SET_STATIC_PIXEL_SHADER_OLD( composite_ps30 );
 	}
 	DYNAMIC_STATE
@@ -184,6 +215,25 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 				fl6[0] = PARM_FLOAT( info.iEnvmapSaturation );
 				fl6[1] = PARM_FLOAT( info.iEnvmapContrast );
 				tmpBuf.SetPixelShaderConstant( 6, fl6 );
+			}
+
+			if ( bPhongFresnel || bEnvmapFresnel )
+			{
+				float fl7[4] = { 0 };
+				params[ info.iFresnelRanges ]->GetVecValue( fl7, 3 );
+				tmpBuf.SetPixelShaderConstant( 7, fl7 );
+			}
+
+			if ( bRimLight )
+			{
+				float fl8[4] = { 0 };
+				params[ info.iRimlightTint ]->GetVecValue( fl8, 3 );
+				tmpBuf.SetPixelShaderConstant( 8, fl8 );
+
+				float fl9[4] = { 0 };
+				fl9[0] = PARM_FLOAT( info.iRimlightExponent );
+				fl9[1] = PARM_FLOAT( info.iRimlightAlbedoScale );
+				tmpBuf.SetPixelShaderConstant( 9, fl9 );
 			}
 
 			int w, t;
@@ -232,7 +282,7 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 
 		CommitBaseDeferredConstants_Origin( pShaderAPI, 3 );
 
-		if ( bEnvmap )
+		if ( bWorldEyeVec )
 		{
 			float vEyepos[4] = {0,0,0,0};
 			pShaderAPI->GetWorldSpaceCameraPosition( vEyepos );

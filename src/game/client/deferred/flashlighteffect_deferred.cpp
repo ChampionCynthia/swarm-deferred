@@ -2,7 +2,9 @@
 #include "cbase.h"
 #include "deferred/deferred_shared_common.h"
 
+#include "iinput.h"
 
+extern ConVar r_flashlightvolumetrics;
 
 CFlashlightEffectDeferred::CFlashlightEffectDeferred( int nEntIndex, const char *pszTextureName, float flFov, float flFarZ, float flLinearAtten )
 	: CFlashlightEffect( nEntIndex, pszTextureName, flFov, flFarZ, flLinearAtten )
@@ -51,9 +53,13 @@ void CFlashlightEffectDeferred::UpdateLightProjection( FlashlightState_t &state 
 			m_pDefLight->iFlags &= ~DEFLIGHT_SHADOW_ENABLED;
 	}
 
-	if ( m_pDefLight->HasVolumetrics() != state.m_bVolumetric )
+	const bool bDoVolumetrics = ( r_flashlightvolumetrics.GetBool()
+		|| state.m_bVolumetric )
+		&& input->CAM_IsThirdPerson();
+
+	if ( m_pDefLight->HasVolumetrics() != bDoVolumetrics )
 	{
-		if ( state.m_bVolumetric )
+		if ( bDoVolumetrics )
 			m_pDefLight->iFlags |= DEFLIGHT_VOLUMETRICS_ENABLED;
 		else
 			m_pDefLight->iFlags &= ~DEFLIGHT_VOLUMETRICS_ENABLED;

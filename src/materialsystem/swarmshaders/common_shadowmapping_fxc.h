@@ -363,11 +363,23 @@ float PerformCascadedShadow( sampler sShadowMap, float3 worldPos,
 	float3 shadow_uvz = ToShadowSpace_Ortho( worldPos, viewFwdDot, flNormal, vecSlopeData[0], viewProjOrtho[0] );
 	float3 shadow_uvz_2 = ToShadowSpace_Ortho( worldPos, viewFwdDot, flNormal, vecSlopeData[1], viewProjOrtho[1] );
 
+#if VENDOR == VENDOR_FXC_AMD
+	float3 AMDVec = abs( floor( (shadow_uvz.xyz - 0.0015f) * 1.003f ) );
+	float AMDAmt = AMDVec.x + AMDVec.y + AMDVec.z;
+	int flLerpTo1 = step( 0.0001f, AMDAmt );
+#else
 	float flLerpTo1 = any( floor( (shadow_uvz.xyz - 0.0015f) * 1.003f) );
+#endif
 
 	shadow_uvz = lerp( shadow_uvz, shadow_uvz_2, flLerpTo1 );
 
+#if VENDOR == VENDOR_FXC_AMD
+	AMDVec = abs( floor( (shadow_uvz_2.xyz - 0.003f) * 1.006f ) );
+	AMDAmt = AMDVec.x + AMDVec.y + AMDVec.z;
+	int flLerpTo2 = step( 0.0001f, AMDAmt );
+#else
 	float flLerpTo2 = any( floor( (shadow_uvz_2.xyz - 0.003f) * 1.006f) );
+#endif
 
 	shadow_uvz.xy = shadow_uvz.xy * vecUVTransform[flLerpTo1].zw + vecUVTransform[flLerpTo1].xy;
 
