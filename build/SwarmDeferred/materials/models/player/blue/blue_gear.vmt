@@ -1,4 +1,4 @@
-"VertexLitGeneric"
+"deferred_model"
 {
 	"$basetexture"	"models\player\blue\blue_gear"
 	"$bumpmap" "models\player\blue\blue_gear_normal"	
@@ -6,8 +6,12 @@
 
 //	"$phongexponent" "5"
 	"$phongboost" "1"	
-	"$phongfresnelranges"	"[1 2 6]"
+	//"$phongfresnelranges"	"[1 2 6]"
 //	"$halflambert" "1"
 	"$phongexponenttexture" "models\player\blue\blue_gear_exp"
-//	"$phongalbedotint" "1"								
+//	"$phongalbedotint" "1"	
+
+
+	$PHONG_FRESNEL 1
+	"$fresnelranges"	"[0.5 2 50]"							
 }
