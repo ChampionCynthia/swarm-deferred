@@ -63,6 +63,8 @@ void CFlashlightEffectDeferred::UpdateLightProjection( FlashlightState_t &state 
 			m_pDefLight->iFlags |= DEFLIGHT_VOLUMETRICS_ENABLED;
 		else
 			m_pDefLight->iFlags &= ~DEFLIGHT_VOLUMETRICS_ENABLED;
+
+		m_pDefLight->MakeDirtyRenderMesh();
 	}
 
 	m_pDefLight->MakeDirtyXForms();

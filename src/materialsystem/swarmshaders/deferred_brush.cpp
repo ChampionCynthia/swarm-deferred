@@ -124,7 +124,9 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 
 	SHADER_FALLBACK
 	{
-		if ( !GetDeferredExt()->IsDeferredLightingEnabled() )
+		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
+
+		if ( !GetDeferredExt()->IsDeferredLightingEnabled() || bTranslucent )
 			return "LightmappedGeneric";
 
 		return 0;

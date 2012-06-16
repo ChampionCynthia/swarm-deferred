@@ -551,6 +551,10 @@ void CFlashlightEffect::UpdateFlashlightTexture( const char* pTextureName )
 bool CFlashlightEffect::ComputeLightPosAndOrientation( const Vector &vecPos, const Vector &vecForward, const Vector &vecRight, const Vector &vecUp,
 														Vector& vecFinalPos, Quaternion& quatOrientation, bool bTracePlayers )
 {
+	vecFinalPos = vecPos;
+	BasisToQuaternion( vecForward, vecRight, vecUp, quatOrientation );
+	return true;
+
 	const float flEpsilon = 0.1f;			// Offset flashlight position along vecUp
 	float flDistCutoff = r_flashlighttracedistcutoff.GetFloat();
 	const float flDistDrag = 0.2;

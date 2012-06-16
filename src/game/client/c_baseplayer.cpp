@@ -1223,12 +1223,14 @@ void C_BasePlayer::UpdateFlashlight()
 		if ( IsLocalPlayer() )
 		{
 			C_BaseAnimating *pParentEntity = NULL;
+			Vector vecBaseOffset( vec3_origin );
 
 			const char *pszAttachmentName = "muzzle";
 			if ( input->CAM_IsThirdPerson() )
 			{
 				pParentEntity = this;
 				pszAttachmentName = "anim_attachment_RH";
+				vecBaseOffset.x = 15;
 			}
 			else
 			{
@@ -1241,6 +1243,10 @@ void C_BasePlayer::UpdateFlashlight()
 				QAngle angles;
 				pParentEntity->GetAttachment( iAttachment, vecPos, angles );
 				AngleVectors( angles, &vecForward, &vecRight, &vecUp );
+
+				vecPos += vecBaseOffset.x * vecForward
+					+ vecBaseOffset.y * vecRight
+					+ vecBaseOffset.z * vecUp;
 			}
 		}
 
