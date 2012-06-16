@@ -277,7 +277,9 @@ void CLightingManager::SortLights()
 	{
 		FOR_EACH_VEC_FAST( def_light_t*, m_hPreSortedLights[ i * 2 ], l )
 		{
-			if ( l->HasVolumetrics() )
+			if ( l->HasShadow() ||
+				l->HasCookie() ||
+				l->HasVolumetrics() )
 				continue;
 
 			const bool bSpot = l->IsSpot();
