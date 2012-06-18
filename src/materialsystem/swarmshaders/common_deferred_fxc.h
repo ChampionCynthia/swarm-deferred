@@ -83,4 +83,24 @@ float2 GetLightAccumUVs( float3 projXYW, float2 halfScreenTexelSize )
 		halfScreenTexelSize;
 }
 
+float2 GetTransformedUVs( in float2 uv, in float4 transform[2] )
+{
+	float2 uvOut;
+
+	uvOut.x = dot( uv, transform[0] ) + transform[0].w;
+	uvOut.y = dot( uv, transform[1] ) + transform[1].w;
+
+	return uvOut;
+}
+
+float GetModulatedBlend( in float flAlphaBlend, in sampler sBlendTexture, in float2 flTexCoord )
+{
+	float2 modt = tex2D( sBlendTexture, flTexCoord ).rg;
+
+	float minb = max( 0, modt.g - modt.r );
+	float maxb = min( 1, modt.g + modt.r );
+
+	return smoothstep( minb, maxb, flAlphaBlend );
+}
+
 #endif

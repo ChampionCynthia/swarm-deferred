@@ -14,6 +14,7 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 
 		SHADER_PARAM( PHONG_SCALE, SHADER_PARAM_TYPE_FLOAT, "", "" )
 		SHADER_PARAM( PHONG_EXP, SHADER_PARAM_TYPE_FLOAT, "", "" )
+		SHADER_PARAM( PHONG_EXP2, SHADER_PARAM_TYPE_FLOAT, "", "" )
 		SHADER_PARAM( PHONG_MAP, SHADER_PARAM_TYPE_TEXTURE, "", "" )
 		SHADER_PARAM( PHONG_FRESNEL, SHADER_PARAM_TYPE_BOOL, "", "" )
 
@@ -27,6 +28,7 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		SHADER_PARAM( ENVMAPMASK, SHADER_PARAM_TYPE_TEXTURE, "shadertest/shadertest_envmask", "envmap mask" )
 
 		SHADER_PARAM( BASETEXTURE2, SHADER_PARAM_TYPE_TEXTURE, "", "" )
+		SHADER_PARAM( BUMPMAP2, SHADER_PARAM_TYPE_TEXTURE, "", "" )
 		SHADER_PARAM( BLENDMODULATETEXTURE, SHADER_PARAM_TYPE_TEXTURE, "", "texture to use r/g channels for blend range for" )
 		SHADER_PARAM( BLENDMASKTRANSFORM, SHADER_PARAM_TYPE_MATRIX, "center .5 .5 scale 1 1 rotate 0 translate 0 0", "$blendmodulatetexture texcoord transform" )
 
@@ -38,12 +40,16 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 
 		p.iAlbedo = BASETEXTURE;
 		p.iBumpmap = BUMPMAP;
-		p.iSSBump = SSBUMP;
 		p.iPhongmap = PHONG_MAP;
+		p.iBumpmap2 = BUMPMAP2;
+		p.iBlendmodulate = BLENDMODULATETEXTURE;
 
 		p.iAlphatestRef = ALPHATESTREFERENCE;
 		p.iLitface = LITFACE;
 		p.iPhongExp = PHONG_EXP;
+		p.iPhongExp2 = PHONG_EXP2;
+		p.iSSBump = SSBUMP;
+		p.iBlendmodulateTransform = BLENDMASKTRANSFORM;
 	}
 
 	void SetupParmsShadow( defParms_shadow &p )

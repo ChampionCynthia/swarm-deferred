@@ -57,7 +57,7 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 	const bool bFastVTex = g_pHardwareConfig->HasFastVertexTextures();
 
 	const bool bAlbedo = PARM_TEX( info.iAlbedo );
-	const bool bAlbedo2 = !bModel && PARM_TEX( info.iAlbedo2 );
+	const bool bAlbedo2 = !bModel && bAlbedo && PARM_TEX( info.iAlbedo2 );
 	const bool bAlphatest = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST ) && bAlbedo;
 	const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT ) && bAlbedo && !bAlphatest;
 
@@ -75,6 +75,9 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 
 	const bool bGBufferNormal = bEnvmap || bRimLight || bPhongFresnel || bEnvmapFresnel;
 	const bool bWorldEyeVec = bGBufferNormal;
+
+	AssertMsgOnce( !(bTranslucent || bAlphatest) || !bAlbedo2,
+		"blended albedo not supported by gbuffer pass!" );
 
 	AssertMsgOnce( IS_FLAG_SET( MATERIAL_VAR_NORMALMAPALPHAENVMAPMASK ) == false,
 		"Normal map sampling should stay out of composition pass." );

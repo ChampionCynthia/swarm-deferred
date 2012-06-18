@@ -34,9 +34,7 @@ const float3 flEyepos						: register( SHADER_SPECIFIC_CONST_0 );
 #endif
 
 #if BLENDMODULATE
-
-const float4 flBlendModTransform[2]			: register( SHADER_SPECIFIC_CONST_1 );
-
+const float4 flBlendModTransform[2]			: register( SHADER_SPECIFIC_CONST_1 ); // up to 2
 #endif
 
 struct VS_INPUT
@@ -68,7 +66,7 @@ struct VS_INPUT
 	float3 vTangentT				: BINORMAL;
 
 #if BASETEXTURE2
-	float4 vColor0					: COLOR0;
+	float4 vColor_0					: COLOR0;
 #endif
 
 #endif
@@ -91,7 +89,7 @@ struct VS_OUTPUT
 #endif
 
 #if BASETEXTURE2
-	float4 vColor0					: COLOR0;
+	float4 vColor_0					: COLOR0;
 #endif
 };
 
@@ -142,12 +140,11 @@ VS_OUTPUT main( const VS_INPUT In )
 	worldPos = mul( float4( In.vPos, 1 ), cModel[0] );
 
 #if BASETEXTURE2
-	Out.vColor0 = In.vColor0;
+	Out.vColor_0 = In.vColor_0;
 #endif
 
 #if BLENDMODULATE
-	Out.vTexCoord.z = dot( In.vTexCoord_0, flBlendModTransform[0] ) + flBlendModTransform[0].w;
-	Out.vTexCoord.w = dot( In.vTexCoord_0, flBlendModTransform[1] ) + flBlendModTransform[1].w;
+	Out.vTexCoord.zw = GetTransformedUVs( In.vTexCoord_0, flBlendModTransform );
 #endif
 
 #endif // NOT MODEL

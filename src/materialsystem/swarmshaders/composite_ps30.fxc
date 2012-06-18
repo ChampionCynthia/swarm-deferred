@@ -93,7 +93,7 @@ struct PS_INPUT
 #endif
 
 #if BASETEXTURE2
-	float4 vColor0					: COLOR0;
+	float4 vColor_0					: COLOR0;
 #endif
 
 #if NOCULL
@@ -116,19 +116,11 @@ PS_OUTPUT main( const PS_INPUT In )
 
 #if BASETEXTURE2
 	float4 flAlbedoSample2 = tex2D( sAlbedo2, In.vTexCoord.xy );
-
-	float flBlendfactor = In.vColor0.w;
-
+	float flBlendfactor = In.vColor_0.w;
 #if BLENDMODULATE
-	float4 modt = tex2D( sBlendmodulate, In.vTexCoord.zw );
-	float minb = max( 0, modt.g - modt.r );
-	float maxb = min( 1, modt.g + modt.r );
-
-	flBlendfactor = smoothstep( minb, maxb, flBlendfactor );
+	flBlendfactor = GetModulatedBlend( flBlendfactor, sBlendmodulate, In.vTexCoord.zw );
 #endif
-
 	flAlbedoSample = lerp( flAlbedoSample, flAlbedoSample2, flBlendfactor );
-
 #endif
 
 #if ALPHATEST

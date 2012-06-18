@@ -2,11 +2,15 @@
 // STATIC:		"MODEL"					"0..1"
 // STATIC:		"TANGENTSPACE"			"0..1"
 // STATIC:		"MORPHING_VTEX"			"0..1"
+// STATIC:		"BUMPMAP2"				"0..1"
+// STATIC:		"BLENDMODULATE"			"0..1"
 
 // DYNAMIC:		"COMPRESSED_VERTS"		"0..1"
 // DYNAMIC:		"SKINNING"				"0..1"
 // DYNAMIC:		"MORPHING"				"0..1"
 
+// SKIP:		!$BUMPMAP2 && $BLENDMODULATE
+// SKIP:		$MODEL && $BUMPMAP2
 
 #include "common_vs_fxc.h"
 #include "common_deferred_fxc.h"
@@ -24,6 +28,10 @@ const float3 cMorphTargetTextureDim			: register( SHADER_SPECIFIC_CONST_10 );
 const float4 cMorphSubrect					: register( SHADER_SPECIFIC_CONST_11 );
 sampler2D morphSampler						: register( D3DVERTEXTEXTURESAMPLER0, s0 );
 
+#endif
+
+#if BLENDMODULATE
+const float4 flBlendModTransform[2]			: register( SHADER_SPECIFIC_CONST_3 ); // up to 4
 #endif
 
 struct VS_INPUT
@@ -53,13 +61,21 @@ struct VS_INPUT
 	float3 vTangentS				: TANGENT;
 	float3 vTangentT				: BINORMAL;
 
+#if BUMPMAP2
+	float4 vColor_0					: COLOR0;
+#endif
+
 #endif
 };
 
 struct VS_OUTPUT
 {
 	float4 vProjPos					: POSITION;
+#if BLENDMODULATE
+	float4 vTexCoord				: TEXCOORD0;
+#else
 	float2 vTexCoord				: TEXCOORD0;
+#endif
 
 	float3 worldNormal				: TEXCOORD1;
 
@@ -69,6 +85,10 @@ struct VS_OUTPUT
 #endif
 
 	float depth						: TEXCOORD4;
+
+#if BUMPMAP2
+	float4 vColor_0					: COLOR0;
+#endif
 };
 
 VS_OUTPUT main( const VS_INPUT In )
@@ -142,12 +162,20 @@ VS_OUTPUT main( const VS_INPUT In )
 
 #endif // NOT TANGENTSPACE
 
+#if BUMPMAP2
+	Out.vColor_0 = In.vColor_0;
+#endif
+
+#if BLENDMODULATE
+	Out.vTexCoord.zw = GetTransformedUVs( In.vTexCoord_0, flBlendModTransform );
+#endif
+
 #endif // NOT MODEL
 
 	Out.vProjPos = mul( float4( worldPos, 1 ), cViewProj );
 	Out.depth = WriteDepth( worldPos, g_vecOrigin, g_vecForward, g_flDepthScale );
 
-	Out.vTexCoord = In.vTexCoord_0;
+	Out.vTexCoord.xy = In.vTexCoord_0;
 
 	Out.worldNormal = worldNormal;
 

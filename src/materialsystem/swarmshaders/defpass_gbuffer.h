@@ -15,13 +15,17 @@ struct defParms_gBuffer
 	// textures
 	int iAlbedo;
 	int iBumpmap;
-	int iSSBump;
+	int iBumpmap2;
 	int iPhongmap;
+	int iBlendmodulate;
 
 	// control
 	int iAlphatestRef;
 	int iLitface;
 	int iPhongExp;
+	int iPhongExp2;
+	int iSSBump;
+	int iBlendmodulateTransform;
 
 	// config
 	bool bModel;

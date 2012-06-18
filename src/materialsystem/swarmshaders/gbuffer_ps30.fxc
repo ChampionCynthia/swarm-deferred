@@ -2,9 +2,13 @@
 // STATIC:		"ALPHATEST"			"0..1"
 // STATIC:		"BUMPMAP"			"0..2"
 // STATIC:		"NOCULL"			"0..1"
-
 // STATIC:		"PHONGMAP"			"0..1"
+// STATIC:		"BUMPMAP2"			"0..1"
+// STATIC:		"BLENDMODULATE"		"0..1"
 
+// SKIP:		!$BUMPMAP && $BUMPMAP2
+// SKIP:		!$BUMPMAP2 && $BLENDMODULATE
+// SKIP:		$MODEL && $BUMPMAP2
 
 #include "common_ps_fxc.h"
 #include "common_deferred_fxc.h"
@@ -24,15 +28,26 @@ sampler sBumpmap						: register( s1 );
 #if PHONGMAP
 sampler sPhongmap						: register( s2 );
 #else
-const float g_flPhong_exp				: register( c2 );
+const float2 g_flPhong_exp				: register( c2 );
 #endif
 
 const float2 g_flHalflambert_Litface	: register( c1 );
 
+#if BUMPMAP2
+sampler sBumpmap2							: register( s3 );
+#endif
+
+#if BLENDMODULATE
+sampler sBlendmodulate						: register( s4 );
+#endif
 
 struct PS_INPUT
 {
+#if BLENDMODULATE
+	float4 vTexCoord				: TEXCOORD0;
+#else
 	float2 vTexCoord				: TEXCOORD0;
+#endif
 	float3 worldNormal				: TEXCOORD1;
 
 #if BUMPMAP
@@ -44,6 +59,10 @@ struct PS_INPUT
 
 #if NOCULL
 	float vDir						: VFACE;
+#endif
+
+#if BUMPMAP2
+	float4 vColor_0					: COLOR0;
 #endif
 };
 
@@ -63,13 +82,23 @@ PS_OUTPUT main( const PS_INPUT In )
 	PS_OUTPUT Out;
 
 #if ALPHATEST
-	float alpha = tex2D( sAlbedo, In.vTexCoord ).a;
+	float alpha = tex2D( sAlbedo, In.vTexCoord.xy ).a;
 
 	clip( alpha - g_flAlphaRef );
 #endif
 
 #if BUMPMAP
-	float3 bumpNormal = tex2D( sBumpmap, In.vTexCoord ).rgb;
+	float3 bumpNormal = tex2D( sBumpmap, In.vTexCoord.xy ).rgb;
+
+#if BUMPMAP2
+	float3 bumpNormal2 = tex2D( sBumpmap2, In.vTexCoord.xy ).rgb;
+	float flBlendfactor = In.vColor_0.w;
+#if BLENDMODULATE
+	flBlendfactor = GetModulatedBlend( flBlendfactor, sBlendmodulate, In.vTexCoord.zw );
+#endif
+	bumpNormal = lerp( bumpNormal, bumpNormal2, flBlendfactor );
+#endif
+
 	float3 tangentNormal;
 #if BUMPMAP == 1
 	tangentNormal = bumpNormal * 2.0f - 1.0f;
@@ -89,9 +118,13 @@ PS_OUTPUT main( const PS_INPUT In )
 
 #if ( TRANSLUCENT == 0 )
 #	if PHONGMAP
-	float phong_exp = tex2D( sPhongmap, In.vTexCoord ).x * 63.0f;
+	float phong_exp = tex2D( sPhongmap, In.vTexCoord.xy ).x * 63.0f;
 #	else
-	float phong_exp = g_flPhong_exp;
+#		if BUMPMAP2
+	float phong_exp = lerp( g_flPhong_exp.x, g_flPhong_exp.y, flBlendfactor );
+#		else
+	float phong_exp = g_flPhong_exp.x;
+#		endif
 #	endif
 #endif
 
