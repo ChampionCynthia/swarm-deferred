@@ -136,6 +136,12 @@ BEGIN_VS_SHADER( DEFERRED_MODEL, "" )
 		if ( !GetDeferredExt()->IsDeferredLightingEnabled() )
 			return "VertexlitGeneric";
 
+		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
+		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
+
+		if ( bTranslucent && !bIsDecal )
+			return "VertexlitGeneric";
+
 		return 0;
 	}
 

@@ -26,6 +26,10 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		SHADER_PARAM( ENVMAPSATURATION, SHADER_PARAM_TYPE_FLOAT, "1.0", "saturation 0 == greyscale 1 == normal" )
 		SHADER_PARAM( ENVMAPMASK, SHADER_PARAM_TYPE_TEXTURE, "shadertest/shadertest_envmask", "envmap mask" )
 
+		SHADER_PARAM( BASETEXTURE2, SHADER_PARAM_TYPE_TEXTURE, "", "" )
+		SHADER_PARAM( BLENDMODULATETEXTURE, SHADER_PARAM_TYPE_TEXTURE, "", "texture to use r/g channels for blend range for" )
+		SHADER_PARAM( BLENDMASKTRANSFORM, SHADER_PARAM_TYPE_MATRIX, "center .5 .5 scale 1 1 rotate 0 translate 0 0", "$blendmodulatetexture texcoord transform" )
+
 	END_SHADER_PARAMS
 
 	void SetupParmsGBuffer( defParms_gBuffer &p )
@@ -53,6 +57,7 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 	{
 		p.bModel = false;
 		p.iAlbedo = BASETEXTURE;
+		p.iAlbedo2 = BASETEXTURE2;
 
 		p.iEnvmap = ENVMAP;
 		p.iEnvmapMask = ENVMAPMASK;
@@ -64,6 +69,9 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 
 		p.iPhongScale = PHONG_SCALE;
 		p.iPhongFresnel = PHONG_FRESNEL;
+
+		p.iBlendmodulate = BLENDMODULATETEXTURE;
+		p.iBlendmodulateTransform = BLENDMASKTRANSFORM;
 
 		p.iFresnelRanges = FRESNELRANGES;
 	}
@@ -124,9 +132,13 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 
 	SHADER_FALLBACK
 	{
-		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
+		if ( !GetDeferredExt()->IsDeferredLightingEnabled() )
+			return "LightmappedGeneric";
 
-		if ( !GetDeferredExt()->IsDeferredLightingEnabled() || bTranslucent )
+		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
+		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
+
+		if ( bTranslucent && !bIsDecal )
 			return "LightmappedGeneric";
 
 		return 0;

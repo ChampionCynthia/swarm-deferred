@@ -14,8 +14,7 @@ void InitParmsGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMa
 		PARM_VALID( info.iAlphatestRef ) && PARM_FLOAT( info.iAlphatestRef ) == 0.0f )
 		params[ info.iAlphatestRef ]->SetFloatValue( DEFAULT_ALPHATESTREF );
 
-	if ( PARM_NO_DEFAULT( info.iPhongExp ) )
-		params[ info.iPhongExp ]->SetFloatValue( DEFAULT_PHONG_EXP );
+	PARM_INIT_FLOAT( info.iPhongExp, DEFAULT_PHONG_EXP );
 }
 
 void InitPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMaterialVar **params )

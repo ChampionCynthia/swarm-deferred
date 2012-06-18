@@ -59,6 +59,8 @@ public:
 	Activity		NPC_TranslateActivity( Activity baseAct );
 	virtual	bool	OverrideMoveFacing( const AILocalMoveGoal_t &move, float flInterval );
 
+	virtual const char *GetEyeAttachmentName(){ return "forward"; }
+
 	virtual float	GetIdealSpeed( ) const;
 	virtual float	GetSequenceGroundSpeed( CStudioHdr *pStudioHdr, int iSequence );
 

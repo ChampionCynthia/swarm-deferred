@@ -106,6 +106,8 @@ public:
 	virtual	bool			ClearSceneEvent( CSceneEventInfo *info, bool fastKill, bool canceled );
 	virtual bool			CheckSceneEventCompletion( CSceneEventInfo *info, float currenttime, CChoreoScene *scene, CChoreoEvent *event );
 
+	virtual const char *GetEyeAttachmentName();
+
 	Vector					EyePosition( );
 	virtual Vector			HeadDirection2D( void );
 	virtual Vector			HeadDirection3D( void );

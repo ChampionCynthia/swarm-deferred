@@ -190,6 +190,48 @@ public:
 		m_bRIMLIGHT = true;
 #endif
 	}
+private:
+	int m_nBASETEXTURE2;
+#ifdef _DEBUG
+	bool m_bBASETEXTURE2;
+#endif
+public:
+	void SetBASETEXTURE2( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nBASETEXTURE2 = i;
+#ifdef _DEBUG
+		m_bBASETEXTURE2 = true;
+#endif
+	}
+	void SetBASETEXTURE2( bool i )
+	{
+		m_nBASETEXTURE2 = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bBASETEXTURE2 = true;
+#endif
+	}
+private:
+	int m_nBLENDMODULATE;
+#ifdef _DEBUG
+	bool m_bBLENDMODULATE;
+#endif
+public:
+	void SetBLENDMODULATE( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nBLENDMODULATE = i;
+#ifdef _DEBUG
+		m_bBLENDMODULATE = true;
+#endif
+	}
+	void SetBLENDMODULATE( bool i )
+	{
+		m_nBLENDMODULATE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bBLENDMODULATE = true;
+#endif
+	}
 public:
 	composite_ps30_Static_Index( )
 	{
@@ -229,19 +271,27 @@ public:
 		m_bRIMLIGHT = false;
 #endif // _DEBUG
 		m_nRIMLIGHT = 0;
+#ifdef _DEBUG
+		m_bBASETEXTURE2 = false;
+#endif // _DEBUG
+		m_nBASETEXTURE2 = 0;
+#ifdef _DEBUG
+		m_bBLENDMODULATE = false;
+#endif // _DEBUG
+		m_nBLENDMODULATE = 0;
 	}
 	int GetIndex()
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bALPHATEST && m_bTRANSLUCENT && m_bREADNORMAL && m_bNOCULL && m_bPHONGFRESNEL && m_bENVMAP && m_bENVMAPMASK && m_bENVMAPFRESNEL && m_bRIMLIGHT;
+		bool bAllStaticVarsDefined = m_bALPHATEST && m_bTRANSLUCENT && m_bREADNORMAL && m_bNOCULL && m_bPHONGFRESNEL && m_bENVMAP && m_bENVMAPMASK && m_bENVMAPFRESNEL && m_bRIMLIGHT && m_bBASETEXTURE2 && m_bBLENDMODULATE;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 2 * m_nALPHATEST ) + ( 4 * m_nTRANSLUCENT ) + ( 8 * m_nREADNORMAL ) + ( 16 * m_nNOCULL ) + ( 32 * m_nPHONGFRESNEL ) + ( 64 * m_nENVMAP ) + ( 128 * m_nENVMAPMASK ) + ( 256 * m_nENVMAPFRESNEL ) + ( 512 * m_nRIMLIGHT ) + 0;
+		return ( 2 * m_nALPHATEST ) + ( 4 * m_nTRANSLUCENT ) + ( 8 * m_nREADNORMAL ) + ( 16 * m_nNOCULL ) + ( 32 * m_nPHONGFRESNEL ) + ( 64 * m_nENVMAP ) + ( 128 * m_nENVMAPMASK ) + ( 256 * m_nENVMAPFRESNEL ) + ( 512 * m_nRIMLIGHT ) + ( 1024 * m_nBASETEXTURE2 ) + ( 2048 * m_nBLENDMODULATE ) + 0;
 	}
 };
-#define shaderStaticTest_composite_ps30 psh_forgot_to_set_static_ALPHATEST + psh_forgot_to_set_static_TRANSLUCENT + psh_forgot_to_set_static_READNORMAL + psh_forgot_to_set_static_NOCULL + psh_forgot_to_set_static_PHONGFRESNEL + psh_forgot_to_set_static_ENVMAP + psh_forgot_to_set_static_ENVMAPMASK + psh_forgot_to_set_static_ENVMAPFRESNEL + psh_forgot_to_set_static_RIMLIGHT + 0
+#define shaderStaticTest_composite_ps30 psh_forgot_to_set_static_ALPHATEST + psh_forgot_to_set_static_TRANSLUCENT + psh_forgot_to_set_static_READNORMAL + psh_forgot_to_set_static_NOCULL + psh_forgot_to_set_static_PHONGFRESNEL + psh_forgot_to_set_static_ENVMAP + psh_forgot_to_set_static_ENVMAPMASK + psh_forgot_to_set_static_ENVMAPFRESNEL + psh_forgot_to_set_static_RIMLIGHT + psh_forgot_to_set_static_BASETEXTURE2 + psh_forgot_to_set_static_BLENDMODULATE + 0
 class composite_ps30_Dynamic_Index
 {
 private:

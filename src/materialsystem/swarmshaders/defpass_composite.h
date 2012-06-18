@@ -14,8 +14,10 @@ struct defParms_composite
 
 	// textures
 	int iAlbedo;
+	int iAlbedo2;
 	int iEnvmap;
 	int iEnvmapMask;
+	int iBlendmodulate;
 
 	// envmapping
 	int iEnvmapTint;
@@ -35,6 +37,9 @@ struct defParms_composite
 	// phong
 	int iPhongScale;
 	int iPhongFresnel;
+
+	// blendmod
+	int iBlendmodulateTransform;
 
 	int iFresnelRanges;
 

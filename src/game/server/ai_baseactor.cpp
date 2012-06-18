@@ -739,6 +739,10 @@ void CAI_BaseActor::InvalidateBoneCache()
 	BaseClass::InvalidateBoneCache();
 }
 
+const char *CAI_BaseActor::GetEyeAttachmentName()
+{
+	return "eyes";
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Returns true position of the eyeballs
@@ -750,7 +754,7 @@ void CAI_BaseActor::UpdateLatchedValues( )
 		// set head latch
 		m_fLatchedPositions |= HUMANOID_LATCHED_HEAD;
 
-		if ( CanSkipAnimation() || !GetAttachment( "eyes", m_latchedEyeOrigin, &m_latchedHeadDirection ))
+		if ( CanSkipAnimation() || !GetAttachment( GetEyeAttachmentName(), m_latchedEyeOrigin, &m_latchedHeadDirection ))
 		{
 			m_latchedEyeOrigin = BaseClass::EyePosition( );
 			AngleVectors( GetLocalAngles(), &m_latchedHeadDirection );

@@ -3,13 +3,16 @@
 // STATIC:		"TRANSLUCENT"		"0..1"
 // STATIC:		"READNORMAL"		"0..1"
 // STATIC:		"NOCULL"			"0..1"
-// STATIC:		"PHONGFRESNEL"			"0..1"
+// STATIC:		"PHONGFRESNEL"		"0..1"
 // STATIC:		"ENVMAP"			"0..1"
 // STATIC:		"ENVMAPMASK"		"0..1"
 // STATIC:		"ENVMAPFRESNEL"		"0..1"
 // STATIC:		"RIMLIGHT"			"0..1"
+// STATIC:		"BASETEXTURE2"		"0..1"
+// STATIC:		"BLENDMODULATE"		"0..1"
 
 // DYNAMIC:		"PIXELFOGTYPE"		"0..1"
+
 
 // SKIP:		$ALPHATEST && $TRANSLUCENT
 // SKIP:		!$ENVMAP && $ENVMAPFRESNEL
@@ -19,6 +22,9 @@
 // SKIP:		$ENVMAPFRESNEL && !$READNORMAL
 // SKIP:		$PHONGFRESNEL && !$READNORMAL
 // SKIP:		$RIMLIGHT && !$READNORMAL
+
+// SKIP:		!$BASETEXTURE2 && $BLENDMODULATE
+// SKIP:		$MODEL && $BASETEXTURE2
 
 #include "common_ps_fxc.h"
 #include "common_deferred_fxc.h"
@@ -54,6 +60,14 @@ sampler sEnvmapMask							: register( s4 );
 #	endif
 #endif
 
+#if BASETEXTURE2
+sampler sAlbedo2							: register( s5 );
+#endif
+
+#if BLENDMODULATE
+sampler sBlendmodulate						: register( s6 );
+#endif
+
 #if PHONGFRESNEL || ENVMAPFRESNEL
 const float3 g_flFresnelRanges				: register( c7 );
 #endif
@@ -65,13 +79,21 @@ const float2 g_flRimLight_Exponent_AlbedoScale		: register( c9 );
 
 struct PS_INPUT
 {
+#if BLENDMODULATE
+	float4 vTexCoord				: TEXCOORD0;
+#else
 	float2 vTexCoord				: TEXCOORD0;
+#endif
 
 	float3 vProjPosXYW				: TEXCOORD1;
 	float3 vWorldPos				: TEXCOORD2;
 
 #if ENVMAP || RIMLIGHT || PHONGFRESNEL || ENVMAPFRESNEL
 	float3 worldToEye				: TEXCOORD3;
+#endif
+
+#if BASETEXTURE2
+	float4 vColor0					: COLOR0;
 #endif
 
 #if NOCULL
@@ -90,7 +112,24 @@ PS_OUTPUT main( const PS_INPUT In )
 {
 	PS_OUTPUT Out;
 
-	float4 flAlbedoSample = tex2D( sAlbedo, In.vTexCoord );
+	float4 flAlbedoSample = tex2D( sAlbedo, In.vTexCoord.xy );
+
+#if BASETEXTURE2
+	float4 flAlbedoSample2 = tex2D( sAlbedo2, In.vTexCoord.xy );
+
+	float flBlendfactor = In.vColor0.w;
+
+#if BLENDMODULATE
+	float4 modt = tex2D( sBlendmodulate, In.vTexCoord.zw );
+	float minb = max( 0, modt.g - modt.r );
+	float maxb = min( 1, modt.g + modt.r );
+
+	flBlendfactor = smoothstep( minb, maxb, flBlendfactor );
+#endif
+
+	flAlbedoSample = lerp( flAlbedoSample, flAlbedoSample2, flBlendfactor );
+
+#endif
 
 #if ALPHATEST
 	clip( flAlbedoSample.a - g_flAlphaRef );
@@ -139,7 +178,7 @@ PS_OUTPUT main( const PS_INPUT In )
 #if ENVMAP
 	float flSpecularFactor =
 #if ENVMAPMASK
-		tex2D( sEnvmapMask, In.vTexCoord ).r;
+		tex2D( sEnvmapMask, In.vTexCoord.xy ).r;
 #else
 		flAlbedoSample.a;
 #endif

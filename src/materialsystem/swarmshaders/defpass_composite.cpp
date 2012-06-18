@@ -16,40 +16,18 @@ void InitParmsComposite( const defParms_composite &info, CBaseVSShader *pShader,
 		PARM_VALID( info.iAlphatestRef ) && PARM_FLOAT( info.iAlphatestRef ) == 0.0f )
 		params[ info.iAlphatestRef ]->SetFloatValue( DEFAULT_ALPHATESTREF );
 
+	PARM_INIT_FLOAT( info.iPhongScale, DEFAULT_PHONG_SCALE );
+	PARM_INIT_INT( info.iPhongFresnel, 0 );
 
-	if ( PARM_NO_DEFAULT( info.iPhongScale ) )
-		params[ info.iPhongScale ]->SetFloatValue( DEFAULT_PHONG_SCALE );
+	PARM_INIT_FLOAT( info.iEnvmapContrast, 0.0f );
+	PARM_INIT_FLOAT( info.iEnvmapSaturation, 1.0f );
+	PARM_INIT_VEC3( info.iEnvmapTint, 1.0f, 1.0f, 1.0f );
+	PARM_INIT_INT( info.iEnvmapFresnel, 0 );
 
-	if ( PARM_NO_DEFAULT( info.iPhongFresnel ) )
-		params[ info.iPhongFresnel ]->SetIntValue( 0 );
-
-
-	if ( PARM_NO_DEFAULT( info.iEnvmapContrast ) )
-		params[ info.iEnvmapContrast ]->SetFloatValue( 0.0f );
-
-	if ( PARM_NO_DEFAULT( info.iEnvmapSaturation ) )
-		params[ info.iEnvmapSaturation ]->SetFloatValue( 1.0f );
-
-	if ( PARM_NO_DEFAULT( info.iEnvmapTint ) )
-		params[ info.iEnvmapTint ]->SetVecValue( 1.0f, 1.0f, 1.0f );
-
-	if ( PARM_NO_DEFAULT( info.iEnvmapFresnel ) )
-		params[ info.iEnvmapFresnel ]->SetIntValue( 0 );
-
-
-	if ( PARM_NO_DEFAULT( info.iRimlightEnable ) )
-		params[ info.iRimlightEnable ]->SetIntValue( 0 );
-	else if ( PARM_VALID( info.iRimlightEnable ) )
-	{
-		if ( PARM_NO_DEFAULT( info.iRimlightExponent ) )
-			params[ info.iRimlightExponent ]->SetFloatValue( 4.0f );
-
-		if ( PARM_NO_DEFAULT( info.iRimlightAlbedoScale ) )
-			params[ info.iRimlightAlbedoScale ]->SetFloatValue( 0.0f );
-
-		if ( PARM_NO_DEFAULT( info.iRimlightTint ) )
-			params[ info.iRimlightTint ]->SetVecValue( 1.0f, 1.0f, 1.0f );
-	}
+	PARM_INIT_INT( info.iRimlightEnable, 0 );
+	PARM_INIT_FLOAT( info.iRimlightExponent, 4.0f );
+	PARM_INIT_FLOAT( info.iRimlightAlbedoScale, 0.0f );
+	PARM_INIT_VEC3( info.iRimlightTint, 1.0f, 1.0f, 1.0f );
 }
 
 void InitPassComposite( const defParms_composite &info, CBaseVSShader *pShader, IMaterialVar **params )
@@ -62,6 +40,12 @@ void InitPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 
 	if ( PARM_DEFINED( info.iEnvmapMask ) )
 		pShader->LoadTexture( info.iEnvmapMask );
+
+	if ( PARM_DEFINED( info.iAlbedo2 ) )
+		pShader->LoadTexture( info.iAlbedo2 );
+
+	if ( PARM_DEFINED( info.iBlendmodulate ) )
+		pShader->LoadTexture( info.iBlendmodulate );
 }
 
 void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, IMaterialVar **params,
@@ -73,6 +57,7 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 	const bool bFastVTex = g_pHardwareConfig->HasFastVertexTextures();
 
 	const bool bAlbedo = PARM_TEX( info.iAlbedo );
+	const bool bAlbedo2 = !bModel && PARM_TEX( info.iAlbedo2 );
 	const bool bAlphatest = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST ) && bAlbedo;
 	const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT ) && bAlbedo && !bAlphatest;
 
@@ -86,6 +71,7 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 	const bool bEnvmapFresnel = bEnvmap && PARM_SET( info.iEnvmapFresnel );
 
 	const bool bRimLight = PARM_SET( info.iRimlightEnable );
+	const bool bBlendmodulate = bAlbedo2 && PARM_TEX( info.iBlendmodulate );
 
 	const bool bGBufferNormal = bEnvmap || bRimLight || bPhongFresnel || bEnvmapFresnel;
 	const bool bWorldEyeVec = bGBufferNormal;
@@ -104,17 +90,21 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		}
 
 		int iVFmtFlags = VERTEX_POSITION;
+
 		if ( bModel )
+		{
 			iVFmtFlags |= VERTEX_NORMAL;
+			iVFmtFlags |= VERTEX_FORMAT_COMPRESSED;
+		}
+		else
+		{
+			if ( bAlbedo2 )
+				iVFmtFlags |= VERTEX_COLOR;
+		}
 
 		int iUserDataSize = 0;
 		int pTexCoordDim[3] = { 2, 0, 3 };
 		int iTexCoordNum = ( bModel && bIsDecal && bFastVTex ) ? 3 : 1;
-
-		if ( bModel )
-		{
-			iVFmtFlags |= VERTEX_FORMAT_COMPRESSED;
-		}
 
 		pShaderShadow->EnableTexture( SHADER_SAMPLER0, true );
 		pShaderShadow->EnableSRGBRead( SHADER_SAMPLER0, bUseSRGB );
@@ -146,6 +136,15 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 			}
 		}
 
+		if ( bAlbedo2 )
+		{
+			pShaderShadow->EnableTexture( SHADER_SAMPLER5, true );
+			pShaderShadow->EnableSRGBRead( SHADER_SAMPLER5, bUseSRGB );
+
+			if ( bBlendmodulate )
+				pShaderShadow->EnableTexture( SHADER_SAMPLER6, true );
+		}
+
 		pShaderShadow->EnableAlphaWrites( false );
 		pShaderShadow->EnableDepthWrites( !bTranslucent );
 
@@ -158,6 +157,8 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		SET_STATIC_VERTEX_SHADER_COMBO_OLD( MORPHING_VTEX, bModel && bFastVTex );
 		SET_STATIC_VERTEX_SHADER_COMBO_OLD( DECAL, bModel && bIsDecal );
 		SET_STATIC_VERTEX_SHADER_COMBO_OLD( EYEVEC, bWorldEyeVec );
+		SET_STATIC_VERTEX_SHADER_COMBO_OLD( BASETEXTURE2, bAlbedo2 );
+		SET_STATIC_VERTEX_SHADER_COMBO_OLD( BLENDMODULATE, bBlendmodulate );
 		SET_STATIC_VERTEX_SHADER_OLD( composite_vs30 );
 
 		DECLARE_STATIC_PIXEL_SHADER_OLD( composite_ps30 );
@@ -170,6 +171,8 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( ENVMAPFRESNEL, bEnvmapFresnel );
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( PHONGFRESNEL, bPhongFresnel );
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( RIMLIGHT, bRimLight );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( BASETEXTURE2, bAlbedo2 );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( BLENDMODULATE, bBlendmodulate );
 		SET_STATIC_PIXEL_SHADER_OLD( composite_ps30 );
 	}
 	DYNAMIC_STATE
@@ -234,6 +237,17 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 				fl9[0] = PARM_FLOAT( info.iRimlightExponent );
 				fl9[1] = PARM_FLOAT( info.iRimlightAlbedoScale );
 				tmpBuf.SetPixelShaderConstant( 9, fl9 );
+			}
+
+			if ( bAlbedo2 )
+			{
+				tmpBuf.BindTexture( pShader, SHADER_SAMPLER5, info.iAlbedo2 );
+
+				if ( bBlendmodulate )
+				{
+					tmpBuf.SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_1, info.iBlendmodulateTransform );
+					tmpBuf.BindTexture( pShader, SHADER_SAMPLER6, info.iBlendmodulate );
+				}
 			}
 
 			int w, t;

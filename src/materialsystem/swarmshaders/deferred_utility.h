@@ -27,6 +27,18 @@
 
 #define PARM_VALIDATE( x ) Assert( PARM_DEFINED( x ) );
 
+#define PARM_INIT_INT( x, val ) \
+	if ( PARM_VALID( x ) && !params[ x ]->IsDefined() )\
+	params[ x ]->SetIntValue( val );
+
+#define PARM_INIT_FLOAT( x, val ) \
+	if ( PARM_VALID( x ) && !params[ x ]->IsDefined() )\
+	params[ x ]->SetFloatValue( val );
+
+#define PARM_INIT_VEC3( x, val0, val1, val2 ) \
+	if ( PARM_VALID( x ) && !params[ x ]->IsDefined() )\
+	params[ x ]->SetVecValue( val0, val1, val2 );
+
 
 #include "defpass_gbuffer.h"
 

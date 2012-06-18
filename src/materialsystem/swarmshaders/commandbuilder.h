@@ -118,7 +118,7 @@ public:
 
 	FORCEINLINE IMaterialVar *Param( int nVar ) const
 	{
-		return CBaseShader::s_ppParams[nVar];
+		return CBaseVSShader::GetParam( nVar );
 	}
 	
 	FORCEINLINE void SetPixelShaderConstants( int nFirstConstant, int nConstants )

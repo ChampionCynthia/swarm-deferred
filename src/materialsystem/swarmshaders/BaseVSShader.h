@@ -74,6 +74,8 @@ public:
 
 	FORCEINLINE void SkipPass();
 
+	FORCEINLINE static IMaterialVar *GetParam( const int index );
+
 	// Loads bump lightmap coordinates into the pixel shader
 	void LoadBumpLightmapCoordinateAxes_PixelShader( int pixelReg );
 
@@ -385,6 +387,11 @@ FORCEINLINE void InitIntParam( int nIndex, IMaterialVar **params, int nValue )
 void CBaseVSShader::SkipPass()
 {
 	Draw( false );
+}
+
+IMaterialVar *CBaseVSShader::GetParam( const int index )
+{
+	return CBaseShader::s_ppParams[ index ];
 }
 
 class ConVar;
