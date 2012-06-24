@@ -1,6 +1,6 @@
 "config"
 {
-	"preview_visible"		"1"
+	"preview_visible"		"0"
 	"p_x"		"1138"
 	"p_y"		"559"
 	"p_sx"		"440"

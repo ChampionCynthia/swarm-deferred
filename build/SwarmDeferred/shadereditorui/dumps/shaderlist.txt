@@ -3,5 +3,4 @@
 	"shader_000"		"dbg_editor_depth"
 	"shader_001"		"dbg_editor_lighting"
 	"shader_002"		"dbg_editor_normals"
-	"shader_003"		"model_unlitseamless"
 }

@@ -1,0 +1,13 @@
+//"deferred_brush"
+"multiblend"
+{
+	$multiblend 1
+	
+	$basetexture		"nature/mblend_albedo_1"
+	
+	$basetexture2		"nature/mblend_albedo_2"
+	
+	$basetexture3		"nature/mblend_albedo_3"
+	
+	$basetexture4		"nature/mblend_albedo_4"
+}

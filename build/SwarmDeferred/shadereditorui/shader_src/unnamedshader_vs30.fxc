@@ -2,13 +2,12 @@
 // ** auto generated vertexshader **
 // *********************************
 
+#define SHADER_EDITOR_SWARM_COMPILE
+
 
 // Includes
 #include "common_vs_fxc.h"
 
-
-// Constants
-const float3 _g_VecOrig		: register( c48 );
 
 // Semantic structures
 struct VS_INPUT
@@ -20,6 +19,7 @@ struct VS_INPUT
 	float2 vTexCoord_0			:	TEXCOORD0;
 	float2 vTexCoord_1			:	TEXCOORD1;
 	float2 vTexCoord_2			:	TEXCOORD2;
+	float4 vColor_0				:	COLOR0;
 };
 
 struct VS_OUTPUT
@@ -32,8 +32,8 @@ struct VS_OUTPUT
 	float2 vTexCoord_4			:	TEXCOORD4;
 	float3 vTexCoord_5			:	TEXCOORD5;
 	float3 vTexCoord_6			:	TEXCOORD6;
-	float3 vTexCoord_7			:	TEXCOORD7;
 	float4 vColor_0				:	COLOR0;
+	float4 vColor_1				:	COLOR1;
 };
 
 // Entry point
@@ -50,18 +50,17 @@ VS_OUTPUT main( const VS_INPUT In )
 	_var2 = normalize( _var2 );
 	_var3 = normalize( _var3 );
 	_var4 = normalize( _var4 );
-	float3 _var7 = _var0 - _g_VecOrig;
-	float4 _var8 = float4( _var1, _var6 );
-	float2 _var9 = _var6 + In.vTexCoord_2;
+	float4 _var7 = float4( _var1, _var6 );
+	float2 _var8 = _var6 + In.vTexCoord_2;
 	Out.vProjPos = _var5;
 	Out.vTexCoord_0 = In.vTexCoord_0;
-	Out.vTexCoord_1 = _var8;
+	Out.vTexCoord_1 = _var7;
 	Out.vTexCoord_2 = _var2;
 	Out.vTexCoord_3 = _var0;
-	Out.vTexCoord_4 = _var9;
+	Out.vTexCoord_4 = _var8;
 	Out.vTexCoord_5 = _var3;
 	Out.vTexCoord_6 = _var4;
-	Out.vTexCoord_7 = _var7;
 	Out.vColor_0 = _var5;
+	Out.vColor_1 = In.vColor_0;
 	return Out;
 }

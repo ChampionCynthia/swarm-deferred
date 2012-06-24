@@ -1,8 +1,10 @@
-editor_shader
+DEFERRED_MODEL
 {
-	$shadername "model_unlitseamless"
-	$basetexture "models/deferred/cm_5"
+	$model 1
+	$basetexture "models/deferred/materialsphere"
 
-	$nocull 1
-	$seamless_Scale 0.02
+	$fresnelranges "[0 1 100]"
+	
+	$envmap "env_cubemap"
+	$envmapfresnel	1
 }

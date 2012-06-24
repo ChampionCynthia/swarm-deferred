@@ -1,4 +1,4 @@
-VertexLitGeneric
+deferred_model
 {
 	"$basetexture"	"models\weapons\v_models\hands\v_hands"
 	"$envmap" "env_cubemap"

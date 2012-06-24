@@ -18,7 +18,7 @@ sampler _Sampler_00		: register( s0 );
 sampler _Sampler_01		: register( s1 );
 
 // User code - function bodies
-void UserFunction_43( in float4 rgba, in float depth, out float4 final )
+void UserFunction_240( in float4 rgba, in float depth, out float4 final )
 {
 	final = lerp( float4( 0.5, 0.5, 0.5, 0.5 ), rgba, any( depth ) );
 }
@@ -41,7 +41,7 @@ PS_OUTPUT main( const PS_INPUT In )
 	float4 _var0 = tex2D( _Sampler_00, In.vTexCoord_0 ).rgba;
 	float _var1 = tex2D( _Sampler_01, In.vTexCoord_0 ).r;
 	float4 _var2 = (float4)0;
-	UserFunction_43( _var0, _var1, _var2 );
+	UserFunction_240( _var0, _var1, _var2 );
 	Out.vColor_0 = _var2;
 	return Out;
 }

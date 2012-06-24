@@ -1,8 +1,7 @@
-editor_shader
+DEFERRED_MODEL
 {
-	$shadername "model_unlitseamless"
-	$basetexture "models/deferred/cm_4"
+	$model 1
+	$basetexture "models/deferred/materialsphere"
 
-	$nocull 1
-	$seamless_Scale 0.02
+	$rimlight 1
 }
