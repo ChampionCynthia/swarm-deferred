@@ -7,9 +7,17 @@
 // STATIC:		"ENVMAP"			"0..1"
 // STATIC:		"ENVMAPMASK"		"0..1"
 // STATIC:		"ENVMAPFRESNEL"		"0..1"
-// STATIC:		"RIMLIGHT"			"0..1"
+
+// STATIC:		"RIMLIGHT"						"0..1"
+// STATIC:		"RIMLIGHTMODULATELIGHT"			"0..1"
+
 // STATIC:		"BASETEXTURE2"		"0..1"
 // STATIC:		"BLENDMODULATE"		"0..1"
+// STATIC:		"MULTIBLEND"		"0..1"
+
+// STATIC:		"SELFILLUM"					"0..1"
+// STATIC:		"SELFILLUM_MASK"			"0..1"
+// STATIC:		"SELFILLUM_ENVMAP_ALPHA"	"0..1"
 
 // DYNAMIC:		"PIXELFOGTYPE"		"0..1"
 
@@ -22,9 +30,19 @@
 // SKIP:		$ENVMAPFRESNEL && !$READNORMAL
 // SKIP:		$PHONGFRESNEL && !$READNORMAL
 // SKIP:		$RIMLIGHT && !$READNORMAL
+// SKIP:		!$RIMLIGHT && $RIMLIGHTMODULATELIGHT
 
 // SKIP:		!$BASETEXTURE2 && $BLENDMODULATE
 // SKIP:		$MODEL && $BASETEXTURE2
+// SKIP:		$MODEL && $MULTIBLEND
+// SKIP:		$BASETEXTURE2 && $MULTIBLEND
+// SKIP:		$BLENDMODULATE && $MULTIBLEND
+
+// SKIP:		!$SELFILLUM && $SELFILLUM_MASK
+// SKIP:		!$SELFILLUM && $SELFILLUM_ENVMAP_ALPHA
+// SKIP:		$SELFILLUM_MASK && $SELFILLUM_ENVMAP_ALPHA
+// SKIP:		$SELFILLUM_MASK && $ENVMAPMASK
+// SKIP:		$SELFILLUM_ENVMAP_ALPHA && !$ENVMAPMASK
 
 #include "common_ps_fxc.h"
 #include "common_deferred_fxc.h"
@@ -44,7 +62,7 @@ sampler sNormals						: register( s1 );
 
 sampler sLightAccum						: register( s2 );
 
-const float2 g_vecHalfScreenTexel		: register( c1 );
+const float2 g_vecFullScreenTexel		: register( c1 );
 const float4 g_vecFogParams				: register( c2 );
 const float3 g_vecOrigin				: register( c3 );
 
@@ -77,6 +95,29 @@ const float3 g_flRimLight_Tint						: register( c8 );
 const float2 g_flRimLight_Exponent_AlbedoScale		: register( c9 );
 #endif
 
+#if ENVMAPMASK && BASETEXTURE2
+sampler sEnvmapMask2						: register( s7 );
+#endif
+
+#if MULTIBLEND
+sampler sAlbedo2							: register( s5 );
+sampler sAlbedo3							: register( s6 );
+sampler sAlbedo4							: register( s7 );
+
+#if ENVMAP && ENVMAPMASK
+sampler sEnvmapMask2						: register( s8 );
+sampler sEnvmapMask3						: register( s9 );
+sampler sEnvmapMask4						: register( s10 );
+#endif
+#endif
+
+#if SELFILLUM
+const float3 g_flSelfIllum_Tint				: register( c10 );
+#if SELFILLUM_MASK
+sampler sSelfIllumMask						: register( s4 ); // override envmap mask
+#endif
+#endif
+
 struct PS_INPUT
 {
 #if BLENDMODULATE
@@ -85,20 +126,25 @@ struct PS_INPUT
 	float2 vTexCoord				: TEXCOORD0;
 #endif
 
-	float3 vProjPosXYW				: TEXCOORD1;
+	//float3 vProjPosXYW				: TEXCOORD1;
 	float3 vWorldPos				: TEXCOORD2;
 
 #if ENVMAP || RIMLIGHT || PHONGFRESNEL || ENVMAPFRESNEL
 	float3 worldToEye				: TEXCOORD3;
 #endif
 
-#if BASETEXTURE2
+#if BASETEXTURE2 || MULTIBLEND
 	float4 vColor_0					: COLOR0;
+#endif
+#if MULTIBLEND
+	float4 vColor_1					: COLOR1;
 #endif
 
 #if NOCULL
 	float vDir						: VFACE;
 #endif
+
+	float2 vScreenPos				: VPOS;
 };
 
 
@@ -123,6 +169,11 @@ PS_OUTPUT main( const PS_INPUT In )
 	flAlbedoSample = lerp( flAlbedoSample, flAlbedoSample2, flBlendfactor );
 #endif
 
+#if MULTIBLEND
+	//TODO: implement after weights have been found
+	flAlbedoSample = In.vColor_1;
+#endif
+
 #if ALPHATEST
 	clip( flAlbedoSample.a - g_flAlphaRef );
 #endif
@@ -133,7 +184,9 @@ PS_OUTPUT main( const PS_INPUT In )
 	Out.vColor_0.w = 1;
 #endif
 
-	float2 screenPos = GetLightAccumUVs( In.vProjPosXYW, g_vecHalfScreenTexel );
+	//float2 screenPos = GetLightAccumUVs( In.vProjPosXYW, g_vecHalfScreenTexel );
+	float2 screenPos = ( In.vScreenPos + 0.5f ) * g_vecFullScreenTexel;
+
 	float4 flLighting = ReadLighting( tex2D( sLightAccum, screenPos ) );
 
 #if READNORMAL
@@ -162,17 +215,26 @@ PS_OUTPUT main( const PS_INPUT In )
 	float3 rimLighting = pow( dotEyeVec, g_flRimLight_Exponent_AlbedoScale.x );
 	rimLighting *= lerp( 1, flAlbedoSample.rgb, g_flRimLight_Exponent_AlbedoScale.y );
 	rimLighting *= g_flRimLight_Tint;
+#if RIMLIGHTMODULATELIGHT
+	rimLighting *= dot( flLighting.rgb, float3( 0.299f, 0.587f, 0.114f ) );
+#endif
 
 	flSpecularLighting += rimLighting;
 #endif
 
 
 #if ENVMAP
-	float flSpecularFactor =
+	float flSpecularFactor;
 #if ENVMAPMASK
-		tex2D( sEnvmapMask, In.vTexCoord.xy ).r;
+	float4 vecEnvmapmaskColor = tex2D( sEnvmapMask, In.vTexCoord.xy );
+#if BASETEXTURE2
+	vecEnvmapmaskColor = lerp( vecEnvmapmaskColor,
+		tex2D( sEnvmapMask2, In.vTexCoord.xy ),
+		flBlendfactor );
+#endif
+	flSpecularFactor = vecEnvmapmaskColor.r;
 #else
-		flAlbedoSample.a;
+	flSpecularFactor = flAlbedoSample.a;
 #endif
 
 #if RIMLIGHT
@@ -195,6 +257,19 @@ PS_OUTPUT main( const PS_INPUT In )
 	flCubemap = lerp( greyScale, flCubemap, g_flEnvmapSaturationContrast.x );
 
 	flSpecularLighting += flCubemap;
+#endif
+
+#if SELFILLUM
+	float flSelfIllumAmount;
+#if SELFILLUM_MASK
+	flSelfIllumAmount = tex2D( sSelfIllumMask, In.vTexCoord.xy ).r;
+#elif SELFILLUM_ENVMAP_ALPHA
+	flSelfIllumAmount = vecEnvmapmaskColor.a;
+#else
+	flSelfIllumAmount = flAlbedoSample.a;
+#endif
+	flLighting.rgb = max( flLighting.rgb,
+		flAlbedoSample.rgb * g_flSelfIllum_Tint * flSelfIllumAmount );
 #endif
 
 	float flLightScale =

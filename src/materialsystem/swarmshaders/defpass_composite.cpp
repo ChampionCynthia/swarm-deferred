@@ -28,6 +28,11 @@ void InitParmsComposite( const defParms_composite &info, CBaseVSShader *pShader,
 	PARM_INIT_FLOAT( info.iRimlightExponent, 4.0f );
 	PARM_INIT_FLOAT( info.iRimlightAlbedoScale, 0.0f );
 	PARM_INIT_VEC3( info.iRimlightTint, 1.0f, 1.0f, 1.0f );
+	PARM_INIT_INT( info.iRimlightModLight, 0 );
+
+	PARM_INIT_VEC3( info.iSelfIllumTint, 1.0f, 1.0f, 1.0f );
+	PARM_INIT_INT( info.iSelfIllumMaskInEnvmapAlpha, 0 );
+	PARM_INIT_INT( info.iSelfIllumFresnelModulate, 0 );
 }
 
 void InitPassComposite( const defParms_composite &info, CBaseVSShader *pShader, IMaterialVar **params )
@@ -44,8 +49,26 @@ void InitPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 	if ( PARM_DEFINED( info.iAlbedo2 ) )
 		pShader->LoadTexture( info.iAlbedo2 );
 
+	if ( PARM_DEFINED( info.iAlbedo3 ) )
+		pShader->LoadTexture( info.iAlbedo3 );
+
+	if ( PARM_DEFINED( info.iAlbedo4 ) )
+		pShader->LoadTexture( info.iAlbedo4 );
+
+	if ( PARM_DEFINED( info.iEnvmapMask2 ) )
+		pShader->LoadTexture( info.iEnvmapMask2 );
+
+	if ( PARM_DEFINED( info.iEnvmapMask3 ) )
+		pShader->LoadTexture( info.iEnvmapMask3 );
+
+	if ( PARM_DEFINED( info.iEnvmapMask4 ) )
+		pShader->LoadTexture( info.iEnvmapMask4 );
+
 	if ( PARM_DEFINED( info.iBlendmodulate ) )
 		pShader->LoadTexture( info.iBlendmodulate );
+
+	if ( PARM_DEFINED( info.iSelfIllumMask ) )
+		pShader->LoadTexture( info.iSelfIllumMask );
 }
 
 void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, IMaterialVar **params,
@@ -58,6 +81,9 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 
 	const bool bAlbedo = PARM_TEX( info.iAlbedo );
 	const bool bAlbedo2 = !bModel && bAlbedo && PARM_TEX( info.iAlbedo2 );
+	const bool bAlbedo3 = !bModel && bAlbedo && PARM_TEX( info.iAlbedo3 );
+	const bool bAlbedo4 = !bModel && bAlbedo && PARM_TEX( info.iAlbedo4 );
+
 	const bool bAlphatest = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST ) && bAlbedo;
 	const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT ) && bAlbedo && !bAlphatest;
 
@@ -68,19 +94,39 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 
 	const bool bEnvmap = PARM_TEX( info.iEnvmap );
 	const bool bEnvmapMask = bEnvmap && PARM_TEX( info.iEnvmapMask );
+	const bool bEnvmapMask2 = bEnvmapMask && PARM_TEX( info.iEnvmapMask2 );
+	const bool bEnvmapMask3 = bEnvmapMask && PARM_TEX( info.iEnvmapMask3 );
+	const bool bEnvmapMask4 = bEnvmapMask && PARM_TEX( info.iEnvmapMask4 );
 	const bool bEnvmapFresnel = bEnvmap && PARM_SET( info.iEnvmapFresnel );
 
 	const bool bRimLight = PARM_SET( info.iRimlightEnable );
+	const bool bRimLightModLight = bRimLight && PARM_SET( info.iRimlightModLight );
 	const bool bBlendmodulate = bAlbedo2 && PARM_TEX( info.iBlendmodulate );
 
-	const bool bGBufferNormal = bEnvmap || bRimLight || bPhongFresnel || bEnvmapFresnel;
+	const bool bMultiBlend = PARM_SET( info.iMultiblend ) && !bBlendmodulate
+		&& bAlbedo && bAlbedo2 && bAlbedo3;
+
+	const bool bSelfIllum = !bAlbedo2 && IS_FLAG_SET( MATERIAL_VAR_SELFILLUM );
+	const bool bSelfIllumMaskInEnvmapMask = bSelfIllum && bEnvmapMask && PARM_SET( info.iSelfIllumMaskInEnvmapAlpha );
+	const bool bSelfIllumMask = bSelfIllum && !bSelfIllumMaskInEnvmapMask && !bEnvmapMask && PARM_TEX( info.iSelfIllumMask );
+
+	const bool bNeedsFresnel = bPhongFresnel || bEnvmapFresnel;
+	const bool bGBufferNormal = bEnvmap || bRimLight || bNeedsFresnel;
 	const bool bWorldEyeVec = bGBufferNormal;
+
 
 	AssertMsgOnce( !(bTranslucent || bAlphatest) || !bAlbedo2,
 		"blended albedo not supported by gbuffer pass!" );
 
 	AssertMsgOnce( IS_FLAG_SET( MATERIAL_VAR_NORMALMAPALPHAENVMAPMASK ) == false,
 		"Normal map sampling should stay out of composition pass." );
+
+	AssertMsgOnce( !bMultiBlend,
+		"Multiblend is not implemented." );
+
+	AssertMsgOnce( !PARM_TEX( info.iSelfIllumMask ) || !bEnvmapMask,
+		"Can't use separate selfillum mask with envmap mask - use SELFILLUM_ENVMAPMASK_ALPHA instead." );
+
 
 	SHADOW_STATE
 	{
@@ -93,6 +139,9 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		}
 
 		int iVFmtFlags = VERTEX_POSITION;
+		int iUserDataSize = 0;
+		int pTexCoordDim[3] = { 2, 0, 3 };
+		int iTexCoordNum = ( bModel && bIsDecal && bFastVTex ) ? 3 : 1;
 
 		if ( bModel )
 		{
@@ -103,11 +152,13 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		{
 			if ( bAlbedo2 )
 				iVFmtFlags |= VERTEX_COLOR;
-		}
 
-		int iUserDataSize = 0;
-		int pTexCoordDim[3] = { 2, 0, 3 };
-		int iTexCoordNum = ( bModel && bIsDecal && bFastVTex ) ? 3 : 1;
+			//TODO: no idea if/what has to be added for multiblending
+			if ( bMultiBlend )
+			{
+				iVFmtFlags |= VERTEX_SPECULAR;
+			}
+		}
 
 		pShaderShadow->EnableTexture( SHADER_SAMPLER0, true );
 		pShaderShadow->EnableSRGBRead( SHADER_SAMPLER0, bUseSRGB );
@@ -136,7 +187,24 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 			if ( bEnvmapMask )
 			{
 				pShaderShadow->EnableTexture( SHADER_SAMPLER4, true );
+
+				if ( bMultiBlend )
+				{
+					pShaderShadow->EnableTexture( SHADER_SAMPLER8, true );
+					pShaderShadow->EnableTexture( SHADER_SAMPLER9, true );
+
+					if ( bAlbedo4 )
+						pShaderShadow->EnableTexture( SHADER_SAMPLER10, true );
+				}
+				else if ( bAlbedo2 )
+				{
+					pShaderShadow->EnableTexture( SHADER_SAMPLER7, true );
+				}
 			}
+		}
+		else if ( bSelfIllumMask )
+		{
+			pShaderShadow->EnableTexture( SHADER_SAMPLER4, true );
 		}
 
 		if ( bAlbedo2 )
@@ -146,6 +214,18 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 
 			if ( bBlendmodulate )
 				pShaderShadow->EnableTexture( SHADER_SAMPLER6, true );
+		}
+
+		if ( bMultiBlend )
+		{
+			pShaderShadow->EnableTexture( SHADER_SAMPLER6, true );
+			pShaderShadow->EnableSRGBRead( SHADER_SAMPLER6, bUseSRGB );
+
+			if ( bAlbedo4 )
+			{
+				pShaderShadow->EnableTexture( SHADER_SAMPLER7, true );
+				pShaderShadow->EnableSRGBRead( SHADER_SAMPLER7, bUseSRGB );
+			}
 		}
 
 		pShaderShadow->EnableAlphaWrites( false );
@@ -160,8 +240,9 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		SET_STATIC_VERTEX_SHADER_COMBO_OLD( MORPHING_VTEX, bModel && bFastVTex );
 		SET_STATIC_VERTEX_SHADER_COMBO_OLD( DECAL, bModel && bIsDecal );
 		SET_STATIC_VERTEX_SHADER_COMBO_OLD( EYEVEC, bWorldEyeVec );
-		SET_STATIC_VERTEX_SHADER_COMBO_OLD( BASETEXTURE2, bAlbedo2 );
+		SET_STATIC_VERTEX_SHADER_COMBO_OLD( BASETEXTURE2, bAlbedo2 && !bMultiBlend );
 		SET_STATIC_VERTEX_SHADER_COMBO_OLD( BLENDMODULATE, bBlendmodulate );
+		SET_STATIC_VERTEX_SHADER_COMBO_OLD( MULTIBLEND, bMultiBlend );
 		SET_STATIC_VERTEX_SHADER_OLD( composite_vs30 );
 
 		DECLARE_STATIC_PIXEL_SHADER_OLD( composite_ps30 );
@@ -174,8 +255,13 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( ENVMAPFRESNEL, bEnvmapFresnel );
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( PHONGFRESNEL, bPhongFresnel );
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( RIMLIGHT, bRimLight );
-		SET_STATIC_PIXEL_SHADER_COMBO_OLD( BASETEXTURE2, bAlbedo2 );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( RIMLIGHTMODULATELIGHT, bRimLightModLight );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( BASETEXTURE2, bAlbedo2 && !bMultiBlend );
 		SET_STATIC_PIXEL_SHADER_COMBO_OLD( BLENDMODULATE, bBlendmodulate );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( MULTIBLEND, bMultiBlend );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( SELFILLUM, bSelfIllum );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( SELFILLUM_MASK, bSelfIllumMask );
+		SET_STATIC_PIXEL_SHADER_COMBO_OLD( SELFILLUM_ENVMAP_ALPHA, bSelfIllumMaskInEnvmapMask );
 		SET_STATIC_PIXEL_SHADER_OLD( composite_ps30 );
 	}
 	DYNAMIC_STATE
@@ -213,9 +299,35 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 				if ( bEnvmapMask )
 					tmpBuf.BindTexture( pShader, SHADER_SAMPLER4, info.iEnvmapMask );
 
-				float fl5[4] = { 0 };
-				params[ info.iEnvmapTint ]->GetVecValue( fl5, 3 );
-				tmpBuf.SetPixelShaderConstant( 5, fl5 );
+				if ( bMultiBlend )
+				{
+					if ( bEnvmapMask2 )
+						tmpBuf.BindTexture( pShader, SHADER_SAMPLER8, info.iEnvmapMask2 );
+					else
+						tmpBuf.BindStandardTexture( SHADER_SAMPLER8, TEXTURE_WHITE );
+
+					if ( bEnvmapMask3 )
+						tmpBuf.BindTexture( pShader, SHADER_SAMPLER9, info.iEnvmapMask3 );
+					else
+						tmpBuf.BindStandardTexture( SHADER_SAMPLER9, TEXTURE_WHITE );
+
+					if ( bAlbedo4 )
+					{
+						if ( bEnvmapMask4 )
+							tmpBuf.BindTexture( pShader, SHADER_SAMPLER10, info.iEnvmapMask4 );
+						else
+							tmpBuf.BindStandardTexture( SHADER_SAMPLER10, TEXTURE_WHITE );
+					}
+				}
+				else if ( bAlbedo2 )
+				{
+					if ( bEnvmapMask2 )
+						tmpBuf.BindTexture( pShader, SHADER_SAMPLER7, info.iEnvmapMask2 );
+					else
+						tmpBuf.BindStandardTexture( SHADER_SAMPLER7, TEXTURE_WHITE );
+				}
+
+				tmpBuf.SetPixelShaderConstant( 5, info.iEnvmapTint );
 
 				float fl6[4] = { 0 };
 				fl6[0] = PARM_FLOAT( info.iEnvmapSaturation );
@@ -223,19 +335,13 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 				tmpBuf.SetPixelShaderConstant( 6, fl6 );
 			}
 
-			if ( bPhongFresnel || bEnvmapFresnel )
+			if ( bNeedsFresnel )
 			{
-				float fl7[4] = { 0 };
-				params[ info.iFresnelRanges ]->GetVecValue( fl7, 3 );
-				tmpBuf.SetPixelShaderConstant( 7, fl7 );
+				tmpBuf.SetPixelShaderConstant( 7, info.iFresnelRanges );
 			}
 
 			if ( bRimLight )
 			{
-				float fl8[4] = { 0 };
-				params[ info.iRimlightTint ]->GetVecValue( fl8, 3 );
-				tmpBuf.SetPixelShaderConstant( 8, fl8 );
-
 				float fl9[4] = { 0 };
 				fl9[0] = PARM_FLOAT( info.iRimlightExponent );
 				fl9[1] = PARM_FLOAT( info.iRimlightAlbedoScale );
@@ -253,9 +359,24 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 				}
 			}
 
+			if ( bMultiBlend )
+			{
+				tmpBuf.BindTexture( pShader, SHADER_SAMPLER6, info.iAlbedo3 );
+
+				if ( bAlbedo4 )
+					tmpBuf.BindTexture( pShader, SHADER_SAMPLER7, info.iAlbedo4 );
+				else
+					tmpBuf.BindStandardTexture( SHADER_SAMPLER7, TEXTURE_WHITE );
+			}
+
+			if ( bSelfIllum && bSelfIllumMask )
+			{
+				tmpBuf.BindTexture( pShader, SHADER_SAMPLER4, info.iSelfIllumMask );
+			}
+
 			int w, t;
 			pShaderAPI->GetBackBufferDimensions( w, t );
-			float fl1[4] = { 0.5f / w, 0.5f / t, 0, 0 };
+			float fl1[4] = { 1.0f / w, 1.0f / t, 0, 0 };
 
 			tmpBuf.SetPixelShaderConstant( 1, fl1 );
 
@@ -304,6 +425,16 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 			float vEyepos[4] = {0,0,0,0};
 			pShaderAPI->GetWorldSpaceCameraPosition( vEyepos );
 			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_0, vEyepos );
+		}
+
+		if ( bRimLight )
+		{
+			pShaderAPI->SetPixelShaderConstant( 8, params[ info.iRimlightTint ]->GetVecValue() );
+		}
+
+		if ( bSelfIllum )
+		{
+			pShaderAPI->SetPixelShaderConstant( 10, params[ info.iSelfIllumTint ]->GetVecValue() );
 		}
 	}
 

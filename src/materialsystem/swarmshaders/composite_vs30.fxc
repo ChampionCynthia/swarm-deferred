@@ -5,6 +5,7 @@
 // STATIC:		"EYEVEC"				"0..1"
 // STATIC:		"BASETEXTURE2"			"0..1"
 // STATIC:		"BLENDMODULATE"			"0..1"
+// STATIC:		"MULTIBLEND"			"0..1"
 
 // DYNAMIC:		"COMPRESSED_VERTS"		"0..1"
 // DYNAMIC:		"SKINNING"				"0..1"
@@ -13,6 +14,8 @@
 // SKIP:		!$MODEL && $DECAL
 // SKIP:		!$BASETEXTURE2 && $BLENDMODULATE
 // SKIP:		$MODEL && $BASETEXTURE2
+// SKIP:		$MODEL && $MULTIBLEND
+// SKIP:		$BASETEXTURE2 && $MULTIBLEND
 
 #include "common_vs_fxc.h"
 #include "common_deferred_fxc.h"
@@ -65,8 +68,14 @@ struct VS_INPUT
 	float3 vTangentS				: TANGENT;
 	float3 vTangentT				: BINORMAL;
 
-#if BASETEXTURE2
+#if BASETEXTURE2 || MULTIBLEND
 	float4 vColor_0					: COLOR0;
+#endif
+#if MULTIBLEND
+	//TODO: figure out where the albedo/alpha weights + colors are actually stored...
+	float4 vColor_1					: COLOR1;
+	float4 vColor_2					: COLOR2;
+	float4 vColor_3					: COLOR3;
 #endif
 
 #endif
@@ -81,15 +90,18 @@ struct VS_OUTPUT
 	float2 vTexCoord				: TEXCOORD0;
 #endif
 
-	float3 vProjPosXYW				: TEXCOORD1;
+	//float3 vProjPosXYW				: TEXCOORD1;
 	float3 worldPos					: TEXCOORD2;
 
 #if EYEVEC
 	float3 worldToEye				: TEXCOORD3;
 #endif
 
-#if BASETEXTURE2
+#if BASETEXTURE2 || MULTIBLEND
 	float4 vColor_0					: COLOR0;
+#endif
+#if MULTIBLEND
+	float4 vColor_1					: COLOR1;
 #endif
 };
 
@@ -139,8 +151,14 @@ VS_OUTPUT main( const VS_INPUT In )
 
 	worldPos = mul( float4( In.vPos, 1 ), cModel[0] );
 
-#if BASETEXTURE2
+#if BASETEXTURE2 || MULTIBLEND
 	Out.vColor_0 = In.vColor_0;
+#endif
+#if MULTIBLEND
+	Out.vColor_1 = float4( In.vColor_0.a,
+		In.vColor_1.a,
+		In.vColor_2.a,
+		In.vColor_3.a );
 #endif
 
 #if BLENDMODULATE
@@ -151,7 +169,7 @@ VS_OUTPUT main( const VS_INPUT In )
 
 	Out.vProjPos = mul( float4( worldPos, 1 ), cViewProj );
 	Out.vTexCoord.xy = In.vTexCoord_0;
-	Out.vProjPosXYW = Out.vProjPos.xyw;
+	//Out.vProjPosXYW = Out.vProjPos.xyw;
 
 	Out.worldPos = worldPos;
 

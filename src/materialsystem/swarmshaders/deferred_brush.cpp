@@ -29,8 +29,19 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 
 		SHADER_PARAM( BASETEXTURE2, SHADER_PARAM_TYPE_TEXTURE, "", "" )
 		SHADER_PARAM( BUMPMAP2, SHADER_PARAM_TYPE_TEXTURE, "", "" )
+		SHADER_PARAM( ENVMAPMASK2, SHADER_PARAM_TYPE_TEXTURE, "shadertest/shadertest_envmask", "envmap mask" )
 		SHADER_PARAM( BLENDMODULATETEXTURE, SHADER_PARAM_TYPE_TEXTURE, "", "texture to use r/g channels for blend range for" )
 		SHADER_PARAM( BLENDMASKTRANSFORM, SHADER_PARAM_TYPE_MATRIX, "center .5 .5 scale 1 1 rotate 0 translate 0 0", "$blendmodulatetexture texcoord transform" )
+
+		SHADER_PARAM( MULTIBLEND, SHADER_PARAM_TYPE_BOOL, "", "" )
+
+		SHADER_PARAM( BASETEXTURE3, SHADER_PARAM_TYPE_TEXTURE, "", "" )
+		SHADER_PARAM( BUMPMAP3, SHADER_PARAM_TYPE_TEXTURE, "", "" )
+		SHADER_PARAM( ENVMAPMASK3, SHADER_PARAM_TYPE_TEXTURE, "shadertest/shadertest_envmask", "envmap mask" )
+
+		SHADER_PARAM( BASETEXTURE4, SHADER_PARAM_TYPE_TEXTURE, "", "" )
+		SHADER_PARAM( BUMPMAP4, SHADER_PARAM_TYPE_TEXTURE, "", "" )
+		SHADER_PARAM( ENVMAPMASK4, SHADER_PARAM_TYPE_TEXTURE, "shadertest/shadertest_envmask", "envmap mask" )
 
 	END_SHADER_PARAMS
 
@@ -40,8 +51,9 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 
 		p.iAlbedo = BASETEXTURE;
 		p.iBumpmap = BUMPMAP;
-		p.iPhongmap = PHONG_MAP;
 		p.iBumpmap2 = BUMPMAP2;
+
+		p.iPhongmap = PHONG_MAP;
 		p.iBlendmodulate = BLENDMODULATETEXTURE;
 
 		p.iAlphatestRef = ALPHATESTREFERENCE;
@@ -64,9 +76,14 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		p.bModel = false;
 		p.iAlbedo = BASETEXTURE;
 		p.iAlbedo2 = BASETEXTURE2;
+		p.iAlbedo3 = BASETEXTURE3;
+		p.iAlbedo4 = BASETEXTURE4;
 
 		p.iEnvmap = ENVMAP;
 		p.iEnvmapMask = ENVMAPMASK;
+		p.iEnvmapMask2 = ENVMAPMASK2;
+		p.iEnvmapMask3 = ENVMAPMASK3;
+		p.iEnvmapMask4 = ENVMAPMASK4;
 		p.iEnvmapTint = ENVMAPTINT;
 		p.iEnvmapContrast = ENVMAPCONTRAST;
 		p.iEnvmapSaturation = ENVMAPSATURATION;
@@ -78,6 +95,7 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 
 		p.iBlendmodulate = BLENDMODULATETEXTURE;
 		p.iBlendmodulateTransform = BLENDMASKTRANSFORM;
+		p.iMultiblend = MULTIBLEND;
 
 		p.iFresnelRanges = FRESNELRANGES;
 	}

@@ -96,10 +96,10 @@ static void ShaderReplace( const char *szShadername, IMaterial *pMat )
 		}
 	}
 
-	bool alphaBlending = pMat->IsTranslucent() || pMat->GetMaterialVarFlag( MATERIAL_VAR_TRANSLUCENT );
-	bool alphaTesting = pMat->IsAlphaTested() || pMat->GetMaterialVarFlag( MATERIAL_VAR_ALPHATEST );
-
-	bool bDecal = pszOldShadername != NULL && Q_stristr( pszOldShadername,"decal" ) != NULL ||
+	const bool bAlphaBlending = pMat->IsTranslucent() || pMat->GetMaterialVarFlag( MATERIAL_VAR_TRANSLUCENT );
+	const bool bAlphaTesting = pMat->IsAlphaTested() || pMat->GetMaterialVarFlag( MATERIAL_VAR_ALPHATEST );
+	const bool bSelfillum = pMat->GetMaterialVarFlag( MATERIAL_VAR_SELFILLUM );
+	const bool bDecal = pszOldShadername != NULL && Q_stristr( pszOldShadername,"decal" ) != NULL ||
 		pszMatname != NULL && Q_stristr( pszMatname, "decal" ) != NULL ||
 		pMat->GetMaterialVarFlag( MATERIAL_VAR_DECAL );
 
@@ -108,11 +108,11 @@ static void ShaderReplace( const char *szShadername, IMaterial *pMat )
 		msg->SetInt( "$decal", 1 );
 	}
 
-	if ( alphaTesting )
+	if ( bAlphaTesting )
 	{
 		msg->SetInt( "$alphatest", 1 );
 	}
-	else if ( alphaBlending )
+	else if ( bAlphaBlending )
 	{
 		msg->SetInt( "$translucent", 1 );
 	}
@@ -120,6 +120,11 @@ static void ShaderReplace( const char *szShadername, IMaterial *pMat )
 	if ( pMat->IsTwoSided() )
 	{
 		msg->SetInt( "$nocull", 1 );
+	}
+
+	if ( bSelfillum )
+	{
+		msg->SetInt( "$selfillum", 1 );
 	}
 
 	pMat->SetShaderAndParams(msg);
@@ -134,6 +139,7 @@ static const char *pszShaderReplaceDict[][2] = {
 
 	"lightmappedgeneric",		"DEFERRED_BRUSH",
 	"worldvertextransition",	"DEFERRED_BRUSH",
+	"multiblend",				"DEFERRED_BRUSH",
 };
 static const int iNumShaderReplaceDict = ARRAYSIZE( pszShaderReplaceDict );
 
