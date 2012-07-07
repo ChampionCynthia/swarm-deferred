@@ -283,7 +283,7 @@ PS_OUTPUT main( const PS_INPUT In )
 		+ flSpecularLighting ) * flLightScale;
 
 #if PIXELFOGTYPE == 0
-	float fogAmt = CalcRangeFog( g_vecOrigin, In.vWorldPos, g_vecFogParams.x, g_vecFogParams.z, g_vecFogParams.w );
+	float fogAmt = CalcPixelFogFactor( PIXELFOGTYPE, g_vecFogParams, g_vecOrigin, In.vWorldPos, 0 );
 
 	Out.vColor_0.xyz = lerp( Out.vColor_0.xyz, g_LinearFogColor, fogAmt );
 #endif

@@ -1,4 +1,4 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//========== Copyright (c) Valve Corporation, All rights reserved. ==========//
 //
 // Purpose: This is where all common code for vertex shaders go.
 //
@@ -71,8 +71,9 @@ const int g_nLightCountRegister			: register(i0);
 
 #define g_nLightCount					g_nLightCountRegister.x
 
-const float4 cEyePosWaterZ				: register(c2);
-#define cEyePos			cEyePosWaterZ.xyz
+const float4 cEyePos_WaterHeightW			: register(c2);
+#define cEyePos			cEyePos_WaterHeightW.xyz
+#define cWaterHeight	cEyePos_WaterHeightW.w
 
 // This is still used by asm stuff.
 const float4 cObsoleteLightIndex		: register(c3);
@@ -86,8 +87,8 @@ const float4 cFlexScale					: register(c13);
 
 const float4 cFogParams					: register(c16);
 #define cFogEndOverFogRange cFogParams.x
-#define cFogOne cFogParams.y
-#define cFogMaxDensity cFogParams.z
+// cFogParams.y unused
+#define cRadialFogMaxDensity cFogParams.z  //radial fog max density in fractional portion. height fog max density stored in integer portion and is multiplied by 1e10
 #define cOOFogRange cFogParams.w
 
 const float4x4 cViewModel				: register(c17);
@@ -155,6 +156,7 @@ const float4 cModulationColor			: register( c47 );
 #define SHADER_SPECIFIC_CONST_9 c57
 #define SHADER_SPECIFIC_CONST_10 c14
 #define SHADER_SPECIFIC_CONST_11 c15
+#define SHADER_SPECIFIC_CONST_12 c12
 
 static const int cModel0Index = 58;
 const float4x3 cModel[53]					: register( c58 );
@@ -507,81 +509,38 @@ bool ApplyMorph( sampler2D morphSampler, const float3 vMorphTargetTextureDim, co
 
 #endif   // SHADER_MODEL_VS_3_0
 
-
-float RangeFog( const float3 projPos )
+float CalcFixedFunctionFog( const float3 worldPos, const bool bWaterFog )
 {
-	return max( cFogMaxDensity, ( -projPos.z * cOOFogRange + cFogEndOverFogRange ) );
-}
-
-float WaterFog( const float3 worldPos, const float3 projPos )
-{
-	float4 tmp;
-	
-	tmp.xy = cEyePosWaterZ.wz - worldPos.z;
-
-	// tmp.x is the distance from the water surface to the vert
-	// tmp.y is the distance from the eye position to the vert
-
-	// if $tmp.x < 0, then set it to 0
-	// This is the equivalent of moving the vert to the water surface if it's above the water surface
-	
-	tmp.x = max( 0.0f, tmp.x );
-
-	// $tmp.w = $tmp.x / $tmp.y
-	tmp.w = tmp.x / tmp.y;
-
-	tmp.w *= projPos.z;
-
-	// $tmp.w is now the distance that we see through water.
-
-	return max( cFogMaxDensity, ( -tmp.w * cOOFogRange + cFogOne ) );
-}
-
-float CalcFog( const float3 worldPos, const float3 projPos, const int fogType )
-{
-#if defined( _X360 )
-	// 360 only does pixel fog
-	return 1.0f;
-#endif
-
-	if( fogType == FOGTYPE_RANGE )
-	{
-		return RangeFog( projPos );
-	}
-	else
-	{
-#if SHADERMODEL_VS_2_0 == 1
-		// We do this work in the pixel shader in dx9, so don't do any fog here.
-		return 1.0f;
-#else
-		return WaterFog( worldPos, projPos );
-#endif
-	}
-}
-
-float CalcFog( const float3 worldPos, const float3 projPos, const bool bWaterFog )
-{
-#if defined( _X360 )
-	// 360 only does pixel fog
-	return 1.0f;
-#endif
-
-	float flFog;
 	if( !bWaterFog )
 	{
-		flFog = RangeFog( projPos );
+		return CalcRangeFogFactorFixedFunction( worldPos, cEyePos, cRadialFogMaxDensity, cFogEndOverFogRange, cOOFogRange );
 	}
 	else
 	{
-#if SHADERMODEL_VS_2_0 == 1
-		// We do this work in the pixel shader in dx9, so don't do any fog here.
-		flFog = 1.0f;
-#else
-		flFog = WaterFog( worldPos, projPos );
-#endif
+		return 0.0f; //all done in the pixel shader as of ps20 (current min-spec)
 	}
+}
 
-	return flFog;
+float CalcFixedFunctionFog( const float3 worldPos, const int fogType )
+{
+	return CalcFixedFunctionFog( worldPos, fogType != FOGTYPE_RANGE );
+}
+
+float CalcNonFixedFunctionFog( const float3 worldPos, const bool bWaterFog )
+{
+	if( !bWaterFog )
+	{
+		return CalcRangeFogFactorNonFixedFunction( worldPos, cEyePos, cRadialFogMaxDensity, cFogEndOverFogRange, cOOFogRange );
+	}
+	else
+	{
+		return 0.0f; //all done in the pixel shader as of ps20 (current min-spec)
+	}
+}
+
+float CalcNonFixedFunctionFog( const float3 worldPos, const int fogType )
+{
+	return CalcNonFixedFunctionFog( worldPos, fogType != FOGTYPE_RANGE );
 }
 
 float4 DecompressBoneWeights( const float4 weights )
@@ -849,12 +808,7 @@ float3 DoLighting( const float3 worldPos, const float3 worldNormal,
 
 	if( bStaticLight )			// Static light
 	{
-		float3 col = staticLightingColor * cOverbright;
-#if defined ( _X360 )
-		linearColor += col * col;
-#else
-		linearColor += GammaToLinear( col );
-#endif
+		linearColor += GammaToLinear( staticLightingColor.rgb * cOverbright );
 	}
 
 	if( bDynamicLight )			// Dynamic light

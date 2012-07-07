@@ -70,9 +70,7 @@ REM MOD ARGS - look for -game or the vproject environment variable
 REM ****************
 :set_mod_args
 
-REM if not exist %SDKBINDIR%\shadercompile.exe goto NoShaderCompile
-REM set ChangeToDir=%SDKBINDIR%
-if not exist "%SDKBINDIR%\shadercompile.exe" goto NoShaderCompile
+if not exist %SDKBINDIR%\shadercompile.exe goto NoShaderCompile
 set ChangeToDir=%SDKBINDIR%
 
 if /i "%4" NEQ "-source" goto NoSourceDirSpecified
@@ -159,8 +157,6 @@ if /i "%DIRECTX_SDK_VER%" == "pc09.30" (
 )
 
 echo %SrcDirBase%\%DIRECTX_SDK_BIN_DIR%\dx_proxy.dll >> filestocopy.txt
-
-rem == %SDKBINDIR%\
 
 echo %SDKBINDIR%\shadercompile.exe >> filestocopy.txt
 echo %SDKBINDIR%\shadercompile_dll.dll >> filestocopy.txt

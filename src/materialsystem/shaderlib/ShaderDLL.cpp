@@ -14,8 +14,7 @@
 #include "materialsystem/ishaderapi.h"
 #include "shaderlib_cvar.h"
 #include "mathlib/mathlib.h"
-#include "tier1/tier1.h"
-#include "shaderapi/ishaderutil.h"
+#include "tier2/tier2.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -100,16 +99,11 @@ CShaderDLL::CShaderDLL()
 }
 
 
-//CreateInterfaceFn baseFactory;
-//#include "filesystem.h"
-
 //-----------------------------------------------------------------------------
 // Connect, disconnect...
 //-----------------------------------------------------------------------------
 bool CShaderDLL::Connect( CreateInterfaceFn factory, bool bIsMaterialSystem )
 {
-	//baseFactory = factory;
-
 	g_pHardwareConfig =  (IMaterialSystemHardwareConfig*)factory( MATERIALSYSTEM_HARDWARECONFIG_INTERFACE_VERSION, NULL );
 	g_pConfig = (const MaterialSystem_Config_t*)factory( MATERIALSYSTEM_CONFIG_VERSION, NULL );
 	g_pSLShaderSystem =  (IShaderSystem*)factory( SHADERSYSTEM_INTERFACE_VERSION, NULL );
@@ -117,7 +111,7 @@ bool CShaderDLL::Connect( CreateInterfaceFn factory, bool bIsMaterialSystem )
 	if ( !bIsMaterialSystem )
 	{
 		ConnectTier1Libraries( &factory, 1 );
-		InitShaderLibCVars( factory );
+  		InitShaderLibCVars( factory );
 	}
 
 	return ( g_pConfig != NULL ) && (g_pHardwareConfig != NULL) && ( g_pSLShaderSystem != NULL );

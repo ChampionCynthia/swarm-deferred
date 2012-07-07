@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2007, Valve Corporation, All rights reserved. =======//
+//========== Copyright (c) Valve Corporation, All rights reserved. ==========//
 //
 // Purpose: Common pixel shader code specific to flashlights
 //
@@ -9,6 +9,65 @@
 #define COMMON_FLASHLIGHT_FXC_H_
 
 #include "common_ps_fxc.h"
+
+
+// Superellipse soft clipping
+//
+// Input:
+//   - Point Q on the x-y plane
+//   - The equations of two superellipses (with major/minor axes given by
+//     a,b and A,B for the inner and outer ellipses, respectively)
+//   - This is changed a bit from the original RenderMan code to be better vectorized
+//
+// Return value:
+//   - 0 if Q was inside the inner ellipse
+//   - 1 if Q was outside the outer ellipse
+//   - smoothly varying from 0 to 1 in between
+float2 ClipSuperellipse( float2 Q,			// Point on the xy plane
+						 float4 aAbB,		// Dimensions of superellipses
+						 float2 rounds )	// Same roundness for both ellipses
+{
+	float2 qr, Qabs = abs(Q);				// Project to +x +y quadrant
+
+	float2 bx_Bx = Qabs.x * aAbB.zw;
+	float2 ay_Ay = Qabs.y * aAbB.xy;
+
+	qr.x = pow( pow(bx_Bx.x, rounds.x) + pow(ay_Ay.x, rounds.x), rounds.y );  // rounds.x = 2 / roundness
+	qr.y = pow( pow(bx_Bx.y, rounds.x) + pow(ay_Ay.y, rounds.x), rounds.y );  // rounds.y = -roundness/2
+
+	return qr * aAbB.xy * aAbB.zw;
+}
+
+// Volumetric light shaping
+//
+// Inputs:
+//   - the point being shaded, in the local light space
+//   - all information about the light shaping, including z smooth depth
+//     clipping, superellipse xy shaping, and distance falloff.
+// Return value:
+//   - attenuation factor based on the falloff and shaping
+float uberlight(float3 PL,					// Point in light space
+
+				float3 smoothEdge0,			// edge0 for three smooth steps
+				float3 smoothEdge1,			// edge1 for three smooth steps
+				float3 smoothOneOverWidth,	// width of three smooth steps
+
+				float2 shear,				// shear in X and Y
+				float4 aAbB,				// Superellipse dimensions
+				float2 rounds )				// two functions of roundness packed together
+{
+	float2 qr = ClipSuperellipse( (PL / PL.z) - shear, aAbB, rounds );
+
+	smoothEdge0.x = qr.x;					// Fill in the dynamic parts of the smoothsteps
+	smoothEdge1.x = qr.y;					// The other components are pre-computed outside of the shader
+	smoothOneOverWidth.x = 1.0f / ( qr.y - qr.x );
+	float3 x = float3( 1, PL.z, PL.z );
+
+	float3 atten3 = smoothstep3( smoothEdge0, smoothEdge1, smoothOneOverWidth, x );
+
+	// Modulate the three resulting attenuations (flipping the sense of the attenuation from the superellipse and the far clip)
+	return (1.0f - atten3.x) * atten3.y * (1.0f - atten3.z);
+}
 
 
 // JasonM - TODO: remove this simpleton version
@@ -192,7 +251,7 @@ float DoShadowNvidiaPCF5x5Gaussian( sampler DepthSampler, const float4 shadowMap
 	float flCenterTap = tex2Dproj( DepthSampler, float4( shadowMapCenter, objDepth, 1 ) ).x * (55.0f / 331.0f);
 
 	// Sum all 25 Taps
-	return flOneTaps + flSevenTaps + +flFourTapsA + flFourTapsB + fl20Taps + fl33Taps + flCenterTap;
+	return flOneTaps + flSevenTaps + flFourTapsA + flFourTapsB + fl20Taps + fl33Taps + flCenterTap;
 }
 
 
@@ -209,16 +268,10 @@ float DoShadowATICheap( sampler DepthSampler, const float4 shadowMapPos )
 
 
 // Poisson disc, randomly rotated at different UVs
-float DoShadowPoisson16Sample( sampler DepthSampler, sampler RandomRotationSampler, const float3 vProjCoords, const float2 vScreenPos, const float4 vShadowTweaks, bool bNvidiaHardwarePCF, bool bFetch4 )
+float DoShadowPoisson16Sample( sampler DepthSampler, sampler RandomRotationSampler, const float3 vProjCoords, const float2 vScreenPos, const float4 vShadowTweaks, bool bForceSimple, bool bNvidiaHardwarePCF, bool bFetch4 )
 {
-	float2 vPoissonOffset[8] = { float2(  0.3475f,  0.0042f ),
-								 float2(  0.8806f,  0.3430f ),
-								 float2( -0.0041f, -0.6197f ),
-								 float2(  0.0472f,  0.4964f ),
-								 float2( -0.3730f,  0.0874f ),
-								 float2( -0.9217f, -0.3177f ),
-								 float2( -0.6289f,  0.7388f ),
-								 float2(  0.5744f, -0.7741f ) };
+	float2 vPoissonOffset[8] = { float2(  0.3475f,  0.0042f ), float2(  0.8806f,  0.3430f ), float2( -0.0041f, -0.6197f ), float2(  0.0472f,  0.4964f ),
+								 float2( -0.3730f,  0.0874f ), float2( -0.9217f, -0.3177f ), float2( -0.6289f,  0.7388f ), float2(  0.5744f, -0.7741f ) };
 
 	float flScaleOverMapSize = vShadowTweaks.x * 2;		// Tweak parameters to shader
 	float2 vNoiseOffset = vShadowTweaks.zw;
@@ -245,108 +298,109 @@ float DoShadowPoisson16Sample( sampler DepthSampler, sampler RandomRotationSampl
 
 	if ( bNvidiaHardwarePCF )
 	{
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[0].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[0].xy) + RMatBottom.z;
-		vLightDepths.x += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
+		if ( bForceSimple )
+		{
+			rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[1].xy ) + RMatTop.z;
+			rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[1].xy ) + RMatBottom.z;
+			return tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
+		}
+		else
+		{
+			rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[0].xy ) + RMatTop.z;
+			rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[0].xy ) + RMatBottom.z;
+			vLightDepths.x += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[1].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[1].xy) + RMatBottom.z;
-		vLightDepths.y += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
+			rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[1].xy ) + RMatTop.z;
+			rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[1].xy ) + RMatBottom.z;
+			vLightDepths.y += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[2].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[2].xy) + RMatBottom.z;
-		vLightDepths.z += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
+			rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[2].xy ) + RMatTop.z;
+			rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[2].xy ) + RMatBottom.z;
+			vLightDepths.z += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[3].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[3].xy) + RMatBottom.z;
-		vLightDepths.w += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
+			rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[3].xy ) + RMatTop.z;
+			rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[3].xy ) + RMatBottom.z;
+			vLightDepths.w += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[4].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[4].xy) + RMatBottom.z;
-		vLightDepths.x += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
+			rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[4].xy ) + RMatTop.z;
+			rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[4].xy ) + RMatBottom.z;
+			vLightDepths.x += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[5].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[5].xy) + RMatBottom.z;
-		vLightDepths.y += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
+			rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[5].xy ) + RMatTop.z;
+			rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[5].xy ) + RMatBottom.z;
+			vLightDepths.y += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[6].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[6].xy) + RMatBottom.z;
-		vLightDepths.z += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
+			rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[6].xy ) + RMatTop.z;
+			rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[6].xy ) + RMatBottom.z;
+			vLightDepths.z += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[7].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[7].xy) + RMatBottom.z;
-		vLightDepths.w += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
+			rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[7].xy ) + RMatTop.z;
+			rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[7].xy ) + RMatBottom.z;
+			vLightDepths.w += tex2Dproj( DepthSampler, float4(rotOffset, objDepth, 1) ).x;
 
-		fResult = dot( vLightDepths, float4( 0.25, 0.25, 0.25, 0.25) );
+			// This should actually be float4( 0.125, 0.125, 0.125, 0.125) but we've tuned so many shots in the SFM
+			// relying on this bug that it doesn't seem right to fix until we have done something like move
+			// this code out to a staging branch for a shipping game.
+			// This is certainly one source of difference between ATI and nVidia in SFM layoffs
+			return dot( vLightDepths, float4( 0.25, 0.25, 0.25, 0.25) );
+		}
 	}
 	else if ( bFetch4 )
 	{
-/*
-
-TODO: Fix this contact hardening stuff
-
-		float flNumCloserSamples = 1;
-		float flAccumulatedCloserSamples = objDepth;
-		float4 vBlockerDepths;
-
-		// First, search for blockers
-		for( int j=0; j<8; j++ )
+		if ( bForceSimple )
 		{
-			rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[j].xy) + RMatTop.z;
-			rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[j].xy) + RMatBottom.z;
-			vBlockerDepths = tex2D( DepthSampler, rotOffset.xy );
-
-			// Which samples are closer than the pixel we're rendering?
-			float4 vCloserSamples = (vBlockerDepths < objDepth.xxxx );				// Binary comparison results
-			flNumCloserSamples += dot( vCloserSamples, float4(1, 1, 1, 1) );		// How many samples are closer than receiver?
-			flAccumulatedCloserSamples += dot (vCloserSamples, vBlockerDepths );	// Total depths from samples closer than receiver
-		}
-
-		float flBlockerDepth = flAccumulatedCloserSamples / flNumCloserSamples;
-		float flContactHardeningScale = (objDepth - flBlockerDepth) / flBlockerDepth;
-
-		// Scale the kernel
-		RMatTop.xy    *= flContactHardeningScale;
-		RMatBottom.xy *= flContactHardeningScale;
-*/
-
-		for( int i=0; i<8; i++ )
-		{
-			rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[i].xy) + RMatTop.z;
-			rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[i].xy) + RMatBottom.z;
+			rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[1].xy ) + RMatTop.z;
+			rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[1].xy ) + RMatBottom.z;
 			vLightDepths = tex2D( DepthSampler, rotOffset.xy );
-			accum += (vLightDepths > objDepth.xxxx);
+			return dot( vLightDepths > objDepth.xxxx, float4( 0.25f, 0.25f, 0.25f, 0.25f ) );
 		}
+		else
+		{
+			for( int i=0; i<8; i++ )
+			{
+				rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[i].xy ) + RMatTop.z;
+				rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[i].xy ) + RMatBottom.z;
+				vLightDepths = tex2D( DepthSampler, rotOffset.xy );
+				accum += (vLightDepths > objDepth.xxxx);
+			}
 
-		fResult = dot( accum, float4( 1.0f/32.0f, 1.0f/32.0f, 1.0f/32.0f, 1.0f/32.0f) );
+			return dot( accum, float4( 1.0f/32.0f, 1.0f/32.0f, 1.0f/32.0f, 1.0f/32.0f) );
+		}
 	}
 	else	// ATI vanilla hardware shadow mapping
 	{
-		for( int i=0; i<2; i++ )
+		if ( bForceSimple )
 		{
-			rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[4*i+0].xy) + RMatTop.z;
-			rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[4*i+0].xy) + RMatBottom.z;
-			vLightDepths.x = tex2D( DepthSampler, rotOffset.xy ).x;
-
-			rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[4*i+1].xy) + RMatTop.z;
-			rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[4*i+1].xy) + RMatBottom.z;
-			vLightDepths.y = tex2D( DepthSampler, rotOffset.xy ).x;
-
-			rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[4*i+2].xy) + RMatTop.z;
-			rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[4*i+2].xy) + RMatBottom.z;
-			vLightDepths.z = tex2D( DepthSampler, rotOffset.xy ).x;
-
-			rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[4*i+3].xy) + RMatTop.z;
-			rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[4*i+3].xy) + RMatBottom.z;
-			vLightDepths.w = tex2D( DepthSampler, rotOffset.xy ).x;
-
-			accum += (vLightDepths > objDepth.xxxx);
+			rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[1].xy ) + RMatTop.z;
+			rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[1].xy ) + RMatBottom.z;
+			return tex2D( DepthSampler, rotOffset.xy ).x > objDepth;
 		}
+		else
+		{
+			for( int i=0; i<2; i++ )
+			{
+				rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[4*i+0].xy ) + RMatTop.z;
+				rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[4*i+0].xy ) + RMatBottom.z;
+				vLightDepths.x = tex2D( DepthSampler, rotOffset.xy ).x;
 
-		fResult = dot( accum, float4( 0.125, 0.125, 0.125, 0.125) );
+				rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[4*i+1].xy ) + RMatTop.z;
+				rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[4*i+1].xy ) + RMatBottom.z;
+				vLightDepths.y = tex2D( DepthSampler, rotOffset.xy ).x;
+
+				rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[4*i+2].xy ) + RMatTop.z;
+				rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[4*i+2].xy ) + RMatBottom.z;
+				vLightDepths.z = tex2D( DepthSampler, rotOffset.xy ).x;
+
+				rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[4*i+3].xy ) + RMatTop.z;
+				rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[4*i+3].xy ) + RMatBottom.z;
+				vLightDepths.w = tex2D( DepthSampler, rotOffset.xy ).x;
+
+				accum += (vLightDepths > objDepth.xxxx);
+			}
+
+			return dot( accum, float4( 0.125, 0.125, 0.125, 0.125 ) );
+		}
 	}
-
-	return fResult;
 }
 
 #if defined( _X360 )
@@ -556,36 +610,36 @@ float DoShadowPoisson360( sampler DepthSampler, sampler RandomRotationSampler, c
 		float2 rotOffset = float2(0,0);
 		float4 vAccum = 0;
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[0].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[0].xy) + RMatBottom.z;
+		rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[0].xy) + RMatTop.z;
+		rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[0].xy) + RMatBottom.z;
 		vAccum.x  = Do360NearestFetch( DepthSampler, rotOffset, objDepth );
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[1].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[1].xy) + RMatBottom.z;
+		rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[1].xy) + RMatTop.z;
+		rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[1].xy) + RMatBottom.z;
 		vAccum.y  = Do360NearestFetch( DepthSampler, rotOffset, objDepth );
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[2].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[2].xy) + RMatBottom.z;
+		rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[2].xy) + RMatTop.z;
+		rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[2].xy) + RMatBottom.z;
 		vAccum.z  = Do360NearestFetch( DepthSampler, rotOffset, objDepth );
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[3].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[3].xy) + RMatBottom.z;
+		rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[3].xy) + RMatTop.z;
+		rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[3].xy) + RMatBottom.z;
 		vAccum.w  = Do360NearestFetch( DepthSampler, rotOffset, objDepth );
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[4].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[4].xy) + RMatBottom.z;
+		rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[4].xy) + RMatTop.z;
+		rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[4].xy) + RMatBottom.z;
 		vAccum.x += Do360NearestFetch( DepthSampler, rotOffset, objDepth );
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[5].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[5].xy) + RMatBottom.z;
+		rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[5].xy) + RMatTop.z;
+		rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[5].xy) + RMatBottom.z;
 		vAccum.y += Do360NearestFetch( DepthSampler, rotOffset, objDepth );
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[6].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[6].xy) + RMatBottom.z;
+		rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[6].xy) + RMatTop.z;
+		rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[6].xy) + RMatBottom.z;
 		vAccum.z += Do360NearestFetch( DepthSampler, rotOffset, objDepth );
 
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[7].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[7].xy) + RMatBottom.z;
+		rotOffset.x = dot( RMatTop.xy,    vPoissonOffset[7].xy) + RMatTop.z;
+		rotOffset.y = dot( RMatBottom.xy, vPoissonOffset[7].xy) + RMatBottom.z;
 		vAccum.w += Do360NearestFetch( DepthSampler, rotOffset, objDepth );
 
 		return dot( vAccum, float4( 0.25, 0.25, 0.25, 0.25) );
@@ -595,17 +649,18 @@ float DoShadowPoisson360( sampler DepthSampler, sampler RandomRotationSampler, c
 #endif // _X360
 
 
-float DoFlashlightShadow( sampler DepthSampler, sampler RandomRotationSampler, float3 vProjCoords, float2 vScreenPos, int nShadowLevel, float4 vShadowTweaks, bool bAllowHighQuality )
+float DoFlashlightShadow( sampler DepthSampler, sampler RandomRotationSampler, float3 vProjCoords, float2 vScreenPos, int nShadowLevel, float4 vShadowTweaks, bool bAllowHighQuality, bool bForceSimple = false )
 {
 	float flShadow = 1.0f;
 
 #if !defined( _X360 ) //PC
+
 	if( nShadowLevel == NVIDIA_PCF_POISSON )
-		flShadow = DoShadowPoisson16Sample( DepthSampler, RandomRotationSampler, vProjCoords, vScreenPos, vShadowTweaks, true, false );
+		flShadow = DoShadowPoisson16Sample( DepthSampler, RandomRotationSampler, vProjCoords, vScreenPos, vShadowTweaks, bForceSimple, true, false );
 	else if( nShadowLevel == ATI_NOPCF )
-		flShadow = DoShadowPoisson16Sample( DepthSampler, RandomRotationSampler, vProjCoords, vScreenPos, vShadowTweaks, false, false );
+		flShadow = DoShadowPoisson16Sample( DepthSampler, RandomRotationSampler, vProjCoords, vScreenPos, vShadowTweaks, bForceSimple, false, false );
 	else if( nShadowLevel == ATI_NO_PCF_FETCH4 )
-		flShadow = DoShadowPoisson16Sample( DepthSampler, RandomRotationSampler, vProjCoords, vScreenPos, vShadowTweaks, false, true );
+		flShadow = DoShadowPoisson16Sample( DepthSampler, RandomRotationSampler, vProjCoords, vScreenPos, vShadowTweaks, bForceSimple, false, true );
 
 	return flShadow;
 #else
@@ -652,7 +707,7 @@ float3 SpecularLight( const float3 vWorldNormal, const float3 vLightDir, const f
 void DoSpecularFlashlight( float3 flashlightPos, float3 worldPos, float4 flashlightSpacePosition, float3 worldNormal,  
 					float3 attenuationFactors, float farZ, sampler FlashlightSampler, sampler FlashlightDepthSampler, sampler RandomRotationSampler,
 					int nShadowLevel, bool bDoShadows, bool bAllowHighQuality, const float2 vScreenPos, const float fSpecularExponent, const float3 vEyeDir,
-					const bool bDoSpecularWarp, sampler specularWarpSampler, float fFresnel, float4 vShadowTweaks,
+					const bool bDoDiffuseWarp, sampler DiffuseWarpSampler, const bool bDoSpecularWarp, sampler specularWarpSampler, float fFresnel, float4 vShadowTweaks,
 
 					// Outputs of this shader...separate shadowed diffuse and specular from the flashlight
 					out float3 diffuseLighting, out float3 specularLighting )
@@ -660,34 +715,13 @@ void DoSpecularFlashlight( float3 flashlightPos, float3 worldPos, float4 flashli
 	float3 vProjCoords = flashlightSpacePosition.xyz / flashlightSpacePosition.w;
 	float3 flashlightColor = float3(1,1,1);
 
-#if ( defined( _X360 ) )
-
-	float3 ltz = vProjCoords.xyz < float3( 0.0f, 0.0f, 0.0f );
-	float3 gto = vProjCoords.xyz > float3( 1.0f, 1.0f, 1.0f );
-
-	[branch]
-	if ( dot(ltz + gto, float3(1,1,1)) > 0 )
-	{
-		clip(-1);
-		diffuseLighting = specularLighting = float3(0,0,0);
-		return;
-	}
-	else
-	{
-		flashlightColor = tex2D( FlashlightSampler, vProjCoords );
-
-		[branch]
-		if ( dot(flashlightColor.xyz, float3(1,1,1)) <= 0 )
-		{
-			clip(-1);
-			diffuseLighting = specularLighting = float3(0,0,0);
-			return;
-		}
-	}
-#else
 	flashlightColor = tex2D( FlashlightSampler, vProjCoords );
-#endif
 
+#if	!defined( _X360 )
+#if defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0)
+	flashlightColor *= flashlightSpacePosition.www > float3(0,0,0);	// Catch back projection (PC-only, ps2b and up)
+#endif
+#endif
 
 #if defined(SHADER_MODEL_PS_2_0) || defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0)
 	flashlightColor *= cFlashlightColor.xyz;						// Flashlight color
@@ -715,11 +749,22 @@ void DoSpecularFlashlight( float3 flashlightPos, float3 worldPos, float4 flashli
 #endif
 
 	diffuseLighting = fAtten;
+	float NdotL = dot( L.xyz, worldNormal.xyz );
+
+	// JasonM - experimenting with light-warping the flashlight
+	if ( false )//bDoDiffuseWarp )
+	{
+		float warpCoord = saturate(NdotL * 0.5f + 0.5f);							// 0..1
+		diffuseLighting *= tex2D( DiffuseWarpSampler, float2( warpCoord, 0.0f) );	// Look up warped light
+	}
+	else // common path
+	{
 #if defined(SHADER_MODEL_PS_2_0) || defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0)
-		diffuseLighting *= saturate( dot( L.xyz, worldNormal.xyz ) + flFlashlightNoLambertValue ); // Lambertian term
-#else
-		diffuseLighting *= saturate( dot( L.xyz, worldNormal.xyz ) ); // Lambertian (not Half-Lambert) term
+		NdotL += flFlashlightNoLambertValue;
 #endif
+		diffuseLighting *= saturate( NdotL ); // Lambertian term
+	}
+
 	diffuseLighting *= flashlightColor;
 	diffuseLighting *= endFalloffFactor;
 
@@ -731,31 +776,19 @@ void DoSpecularFlashlight( float3 flashlightPos, float3 worldPos, float4 flashli
 float3 DoFlashlight( float3 flashlightPos, float3 worldPos, float4 flashlightSpacePosition, float3 worldNormal, 
 					float3 attenuationFactors, float farZ, sampler FlashlightSampler, sampler FlashlightDepthSampler,
 					sampler RandomRotationSampler, int nShadowLevel, bool bDoShadows, bool bAllowHighQuality,
-					const float2 vScreenPos, bool bClip, float4 vShadowTweaks = float4(3/1024.0f, 0.0005f, 0.0f, 0.0f), bool bHasNormal = true )
+					const float2 vScreenPos, bool bClip, float4 vShadowTweaks = float4(3/1024.0f, 0.0005f, 0.0f, 0.0f), bool bHasNormal = true, bool bForceSimple = false )
 {
 	float3 vProjCoords = flashlightSpacePosition.xyz / flashlightSpacePosition.w;
 	float3 flashlightColor = float3(1,1,1);
 
-#if ( defined( _X360 ) )
-
-	float3 ltz = vProjCoords.xyz < float3( 0.0f, 0.0f, 0.0f );
-	float3 gto = vProjCoords.xyz > float3( 1.0f, 1.0f, 1.0f );
-
-	[branch]
-	if ( dot(ltz + gto, float3(1,1,1)) > 0 )
+	#if ( defined( _X360 ) )
 	{
-		if ( bClip )
-		{
-			clip(-1);
-		}
-		return float3(0,0,0);
-	}
-	else
-	{
-		flashlightColor = tex2D( FlashlightSampler, vProjCoords );
-
+		float3 ltz = vProjCoords.xyz < float3( 0.0f, 0.0f, 0.0f );
+		ltz.z = 0.0f; // don't clip the near plane per pixel since we don't do that on the PC.
+		float3 gto = vProjCoords.xyz > float3( 1.0f, 1.0f, 1.0f );
+	
 		[branch]
-		if ( dot(flashlightColor.xyz, float3(1,1,1)) <= 0 )
+		if ( dot(ltz + gto, float3(1,1,1)) > 0 )
 		{
 			if ( bClip )
 			{
@@ -763,14 +796,26 @@ float3 DoFlashlight( float3 flashlightPos, float3 worldPos, float4 flashlightSpa
 			}
 			return float3(0,0,0);
 		}
+		else
+		{
+			flashlightColor = tex2D( FlashlightSampler, vProjCoords );
+		}
 	}
-#else
-	flashlightColor = tex2D( FlashlightSampler, vProjCoords );
-#endif
+	#else
+	{
+		flashlightColor = tex2D( FlashlightSampler, vProjCoords );
+	
+		#if	( defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0) )
+			flashlightColor *= flashlightSpacePosition.www > float3(0,0,0);	// Catch back projection (PC-only, ps2b and up)
+		#endif
+	}
+	#endif
 
-#if defined(SHADER_MODEL_PS_2_0) || defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0)
-	flashlightColor *= cFlashlightColor.xyz;						// Flashlight color
-#endif
+	#if defined(SHADER_MODEL_PS_2_0) || defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0)
+	{
+		flashlightColor *= cFlashlightColor.xyz;						// Flashlight color
+	}
+	#endif
 
 	float3 delta = flashlightPos - worldPos;
 	float3 L = normalize( delta );
@@ -786,8 +831,8 @@ float3 DoFlashlight( float3 flashlightPos, float3 worldPos, float4 flashlightSpa
 #if (defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0))
 	if ( bDoShadows )
 	{
-		float flShadow = DoFlashlightShadow( FlashlightDepthSampler, RandomRotationSampler, vProjCoords, vScreenPos, nShadowLevel, vShadowTweaks, bAllowHighQuality );
-		float flAttenuated = lerp( flShadow, 1.0f, vShadowTweaks.y );	// Blend between fully attenuated and not attenuated
+		float flShadow = DoFlashlightShadow( FlashlightDepthSampler, RandomRotationSampler, vProjCoords, vScreenPos, nShadowLevel, vShadowTweaks, bAllowHighQuality, bForceSimple );
+		float flAttenuated = lerp( saturate( flShadow ), 1.0f, vShadowTweaks.y );	// Blend between fully attenuated and not attenuated
 		flShadow = saturate( lerp( flAttenuated, flShadow, fAtten ) );	// Blend between shadow and above, according to light attenuation
 		flashlightColor *= flShadow;									// Shadow term
 	}

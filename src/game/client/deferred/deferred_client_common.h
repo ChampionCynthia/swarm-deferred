@@ -220,21 +220,21 @@ FORCEINLINE void VectorSourceToDeviceSpace( Vector &v )
 
 FORCEINLINE void MatrixDeviceToSourceSpace( VMatrix &m )
 {
-	Vector x, y, z, p;
+	Vector x, y, z;
 	m.GetBasisVectors( x, y, z );
 	m.SetBasisVectors( -z, -x, y );
 }
 
 FORCEINLINE void MatrixSourceToDeviceSpace( VMatrix &m )
 {
-	Vector x, y, z, p;
+	Vector x, y, z;
 	m.GetBasisVectors( x, y, z );
 	m.SetBasisVectors( -y, z, -x );
 }
 
 FORCEINLINE void MatrixSourceToDeviceSpaceInv( VMatrix &m )
 {
-	Vector x, y, z, p;
+	Vector x, y, z;
 	m.GetBasisVectors( x, y, z );
 	m.SetBasisVectors( y, -z, x );
 }

@@ -23,6 +23,7 @@ public:
 	static void DestroyEditor();
 	static void ToggleEditor();
 	static bool IsEditorVisible();
+	static VPANEL GetEditorPanel();
 
 	~CVGUILightEditor();
 
@@ -136,6 +137,14 @@ bool CVGUILightEditor::IsEditorVisible()
 	CVGUILightEditor *pPanel = CVGUILightEditor::m_refInstance.GetObject();
 
 	return pPanel && pPanel->IsVisible();
+}
+
+VPANEL CVGUILightEditor::GetEditorPanel()
+{
+	if ( !m_refInstance.IsValid() )
+		return (VPANEL)0;
+
+	return m_refInstance->GetVPanel();
 }
 
 CVGUILightEditor::CVGUILightEditor( VPANEL pParent )
@@ -952,9 +961,13 @@ static class CLightEditorHelper : public CAutoGameSystemPerFrame
 		static bool bWasTabDown = false;
 		bool bIsTabDown = vgui::input()->IsKeyDown( KEY_TAB );
 
+		VPANEL focusedPanel = input()->GetFocus();
+
 		if ( bIsTabDown != bWasTabDown )
 		{
-			if ( bIsTabDown )
+			if ( bIsTabDown &&
+				( focusedPanel == 0 || CVGUILightEditor::GetEditorPanel() == 0 ||
+				ipanel()->HasParent( focusedPanel, CVGUILightEditor::GetEditorPanel() ) ) )
 				CVGUILightEditor::ToggleEditor();
 
 			bWasTabDown = bIsTabDown;

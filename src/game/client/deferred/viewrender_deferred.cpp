@@ -1367,6 +1367,7 @@ void CDeferredViewRender::ProcessDeferredGlobals( const CViewSetup &view )
 	matView.SetupMatrixOrgAngles( vec3_origin, view.angles );
 
 	MatrixSourceToDeviceSpace( matView );
+	g_ShaderEditorSystem->SetMainViewMatrix( matView );
 
 	matView = matView.Transpose3x3();
 	Vector viewPosition;

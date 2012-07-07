@@ -1,10 +1,11 @@
-//====== Copyright © 1996-2007, Valve Corporation, All rights reserved. =======//
+//========== Copyright (c) Valve Corporation, All rights reserved. ==========//
 //
 // Purpose: Common pixel shader code
 //
 // $NoKeywords: $
 //
-//=============================================================================//
+//===========================================================================//
+
 #ifndef COMMON_PS_FXC_H_
 #define COMMON_PS_FXC_H_
 
@@ -14,17 +15,8 @@
 // so these aren't used on the wrong shaders!
 
 // --------------------------------------------------------------------------------
-// HDR should never be enabled if we don't aren't running in float or integer HDR mode.
-// SKIP: defined $HDRTYPE && defined $HDRENABLED && !$HDRTYPE && $HDRENABLED
-// --------------------------------------------------------------------------------
 // We don't ever write water fog to dest alpha if we aren't doing water fog.
-// SKIP: defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
-// --------------------------------------------------------------------------------
-// We don't need fog in the pixel shader if we aren't in float fog mode2
-// NOSKIP: defined $HDRTYPE && defined $HDRENABLED && defined $PIXELFOGTYPE && $HDRTYPE != HDR_TYPE_FLOAT && $FOGTYPE != 0
-// --------------------------------------------------------------------------------
-// We don't do HDR and LIGHTING_PREVIEW at the same time since it's running LDR in hammer.
-//  SKIP: defined $LIGHTING_PREVIEW && defined $HDRTYPE && $LIGHTING_PREVIEW && $HDRTYPE != 0
+//  SKIP: defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
 // --------------------------------------------------------------------------------
 // Ditch all fastpath attempts if we are doing LIGHTING_PREVIEW.
 //	SKIP: defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
@@ -57,6 +49,11 @@ const float4 cLightScale : register( c30 );
  const float4 cFlashlightColor       : register( c28 );
  const float4 cFlashlightScreenScale : register( c31 ); // .zw are currently unused
  #define flFlashlightNoLambertValue cFlashlightColor.w // This is either 0.0 or 2.0
+#endif
+
+// 3.0 standard constants
+#if defined( SHADER_MODEL_PS_3_0 )
+const float4 cScreenSize : register( c32 ); // Used for converting VPOS to useful 2D coordinates
 #endif
 
 #define HDR_INPUT_MAP_SCALE 16.0f
@@ -183,6 +180,7 @@ float4 DecompressNormal( sampler NormalSampler, float2 tc, int nDecompressionMod
 	return result;
 }
 
+
 float4 DecompressNormal( sampler NormalSampler, float2 tc, int nDecompressionMode )
 {
 	return DecompressNormal( NormalSampler, tc, nDecompressionMode, NormalSampler );
@@ -209,8 +207,28 @@ HALF4 EnvReflect( sampler envmapSampler,
 }
 */
 
+#if defined( SHADER_MODEL_PS_3_0 )
+// cScreenSize.xy contains { 1.0/w, 1.0/h }
+// cScreenSize.zw contains { 0.5/w, 0.5/h }
+float2 ComputeScreenPos( float2 vPos )
+{
+	return vPos * cScreenSize.xy + cScreenSize.zw;
+}
+#endif
+
+
+// Vectorized smoothstep for doing three smoothsteps at once.  Used by uberlight
+float3 smoothstep3( float3 edge0, float3 edge1, float3 OneOverWidth, float3 x )
+{
+	x = saturate((x - edge0) * OneOverWidth);	// Scale, bias and saturate x to the range of zero to one
+	return x*x*(3-2*x);							// Evaluate polynomial
+}
+
+
 float CalcWaterFogAlpha( const float flWaterZ, const float flEyePosZ, const float flWorldPosZ, const float flProjPosZ, const float flFogOORange )
 {
+#if 0
+	// This version is what you use if you want a line-integral throught he water for water fog.
 //	float flDepthFromWater = flWaterZ - flWorldPosZ + 2.0f; // hackity hack . .this is for the DF_FUDGE_UP in view_scene.cpp
 	float flDepthFromWater = flWaterZ - flWorldPosZ;
 
@@ -226,23 +244,16 @@ float CalcWaterFogAlpha( const float flWaterZ, const float flEyePosZ, const floa
 
 	// $tmp.w is now the distance that we see through water.
 	return saturate( f * flFogOORange );
-}
-
-float CalcRangeFog( const float flProjPosZ, const float flFogEndOverRange, const float flFogMaxDensity, const float flFogOORange )
-{
-#if !(defined(SHADER_MODEL_PS_1_1) || defined(SHADER_MODEL_PS_1_4) || defined(SHADER_MODEL_PS_2_0)) //Minimum requirement of ps2b
-	return min( flFogMaxDensity, ( saturate( 1.0 - (flFogEndOverRange - (flProjPosZ * flFogOORange)) ) ) );
 #else
-	return 0.0f; //ps20 shaders will never have range fog enabled because too many ran out of slots.
+	// This version is simply using the depth of the water to determine fog factor,
+	// which is cheaper than doing the line integral and also fixes some problems with having 
+	// a hard line on the shore when the water surface is viewed tangentially.
+	// hackity hack . .the 2.0 is for the DF_FUDGE_UP in view_scene.cpp
+	return saturate( ( flWaterZ - flWorldPosZ - 2.0f ) * flFogOORange );
 #endif
 }
 
-float CalcRangeFog( const float3 flEyePos, const float3 flWorldPos, const float flFogEndOverRange, const float flFogMaxDensity, const float flFogOORange )
-{
-	return min( flFogMaxDensity, saturate( flFogEndOverRange + ( distance( flEyePos, flWorldPos ) * flFogOORange ) ) );
-}
-
-float CalcPixelFogFactor( int iPIXELFOGTYPE, const float4 fogParams, const float flEyePosZ, const float flWorldPosZ, const float flProjPosZ )
+float CalcPixelFogFactor( int iPIXELFOGTYPE, const float4 fogParams, const float3 vEyePos, const float3 vWorldPos, const float flProjPosZ )
 {
 	float retVal;
 	if ( iPIXELFOGTYPE == PIXEL_FOG_TYPE_NONE )
@@ -251,14 +262,31 @@ float CalcPixelFogFactor( int iPIXELFOGTYPE, const float4 fogParams, const float
 	}
 	if ( iPIXELFOGTYPE == PIXEL_FOG_TYPE_RANGE ) //range fog, or no fog depending on fog parameters
 	{
-		retVal = CalcRangeFog( flProjPosZ, fogParams.x, fogParams.z, fogParams.w );
+		// This is one only path that we go down for L4D.
+		float flFogMaxDensity = fogParams.z;
+		float flFogEndOverRange = fogParams.x;
+		float flFogOORange = fogParams.w;
+		retVal = CalcRangeFogFactorNonFixedFunction( vWorldPos, vEyePos, flFogMaxDensity, flFogEndOverRange, flFogOORange );
 	}
 	else if ( iPIXELFOGTYPE == PIXEL_FOG_TYPE_HEIGHT ) //height fog
 	{
-		retVal = CalcWaterFogAlpha( fogParams.y, flEyePosZ, flWorldPosZ, flProjPosZ, fogParams.w );
+		retVal = CalcWaterFogAlpha( fogParams.y, vEyePos.z, vWorldPos.z, flProjPosZ, fogParams.w );
 	}
 
 	return retVal;
+}
+
+float CalcPixelFogFactorSupportsVertexFog( int iPIXELFOGTYPE, const float4 fogParams, const float3 vEyePos, const float3 vWorldPos, const float flProjPosZ, const float flVertexFogFactor )
+{
+	#if ( DOPIXELFOG )
+	{
+		return CalcPixelFogFactor( iPIXELFOGTYPE, fogParams, vEyePos, vWorldPos, flProjPosZ );
+	}
+	#else
+	{
+		return flVertexFogFactor;
+	}
+	#endif
 }
 
 //g_FogParams not defined by default, but this is the same layout for every shader that does define it
@@ -266,50 +294,25 @@ float CalcPixelFogFactor( int iPIXELFOGTYPE, const float4 fogParams, const float
 #define g_WaterZ			g_FogParams.y
 #define g_FogMaxDensity		g_FogParams.z
 #define g_FogOORange		g_FogParams.w
-
 float3 BlendPixelFog( const float3 vShaderColor, float pixelFogFactor, const float3 vFogColor, const int iPIXELFOGTYPE )
 {
 	if( iPIXELFOGTYPE == PIXEL_FOG_TYPE_RANGE ) //either range fog or no fog depending on fog parameters and whether this is ps20 or ps2b
 	{
-#	if !(defined(SHADER_MODEL_PS_1_1) || defined(SHADER_MODEL_PS_1_4) || defined(SHADER_MODEL_PS_2_0)) //Minimum requirement of ps2b
-		pixelFogFactor = saturate( pixelFogFactor );
-		return lerp( vShaderColor.rgb, vFogColor.rgb, pixelFogFactor * pixelFogFactor ); //squaring the factor will get the middle range mixing closer to hardware fog
-#	else
-		return vShaderColor;
-#	endif
+		#if !(defined(SHADER_MODEL_PS_1_1) || defined(SHADER_MODEL_PS_1_4) || defined(SHADER_MODEL_PS_2_0)) //Minimum requirement of ps2b
+			return lerp( vShaderColor.rgb, vFogColor.rgb, pixelFogFactor * pixelFogFactor ); //squaring the factor will get the middle range mixing closer to hardware fog
+		#else
+			return vShaderColor;
+		#endif
 	}
 	else if( iPIXELFOGTYPE == PIXEL_FOG_TYPE_HEIGHT )
 	{
-		return lerp( vShaderColor.rgb, vFogColor.rgb, saturate( pixelFogFactor ) );
+		return lerp( vShaderColor.rgb, vFogColor.rgb, pixelFogFactor );
 	}
 	else if( iPIXELFOGTYPE == PIXEL_FOG_TYPE_NONE )
 	{
 		return vShaderColor;
 	}
 }
-
-
-#if ((defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0)) && ( CONVERT_TO_SRGB != 0 ) )
-sampler1D GammaTableSampler : register( s15 );
-
-float3 SRGBOutput( const float3 vShaderColor )
-{	
-	//On ps2b capable hardware we always have the linear->gamma conversion table texture in sampler s15.
-	float3 result;
-	result.r = tex1D( GammaTableSampler, vShaderColor.r ).r;
-	result.g = tex1D( GammaTableSampler, vShaderColor.g ).r;
-	result.b = tex1D( GammaTableSampler, vShaderColor.b ).r;
-	return result;	
-}
-
-#else
-
-float3 SRGBOutput( const float3 vShaderColor )
-{
-	return vShaderColor; //ps 1.1, 1.4, and 2.0 never do srgb conversion in the pixel shader
-}
-
-#endif
 
 
 float SoftParticleDepth( float flDepth )
@@ -320,13 +323,12 @@ float SoftParticleDepth( float flDepth )
 
 float DepthToDestAlpha( const float flProjZ )
 {
-#if !(defined(SHADER_MODEL_PS_1_1) || defined(SHADER_MODEL_PS_1_4) || defined(SHADER_MODEL_PS_2_0)) //Minimum requirement of ps2b
-	return SoftParticleDepth( flProjZ );
-#else
-	return 1.0f;
-#endif
+	#if !(defined(SHADER_MODEL_PS_1_1) || defined(SHADER_MODEL_PS_1_4) || defined(SHADER_MODEL_PS_2_0)) //Minimum requirement of ps2b
+		return SoftParticleDepth( flProjZ );
+	#else
+		return 1.0f;
+	#endif
 }
-
 
 float4 FinalOutput( const float4 vShaderColor, float pixelFogFactor, const int iPIXELFOGTYPE, const int iTONEMAP_SCALE_TYPE, const bool bWriteDepthToDestAlpha = false, const float flProjZ = 1.0f )
 {
@@ -349,11 +351,11 @@ float4 FinalOutput( const float4 vShaderColor, float pixelFogFactor, const int i
 	else
 		result.a = vShaderColor.a;
 
-	result.rgb = BlendPixelFog( result.rgb, pixelFogFactor, g_LinearFogColor.rgb, iPIXELFOGTYPE );
-	
-#if !(defined(SHADER_MODEL_PS_1_1) || defined(SHADER_MODEL_PS_1_4) || defined(SHADER_MODEL_PS_2_0)) //Minimum requirement of ps2b
-	result.rgb = SRGBOutput( result.rgb ); //SRGB in pixel shader conversion
-#endif
+	if ( iPIXELFOGTYPE == PIXEL_FOG_TYPE_RANGE )
+	{
+		result.rgb = BlendPixelFog( result.rgb, pixelFogFactor, g_LinearFogColor.rgb, iPIXELFOGTYPE );
+	}
+
 
 	return result;
 }
@@ -362,19 +364,17 @@ LPREVIEW_PS_OUT FinalOutput( const LPREVIEW_PS_OUT vShaderColor, float pixelFogF
 {
 	LPREVIEW_PS_OUT result;
 	result.color = FinalOutput( vShaderColor.color, pixelFogFactor, iPIXELFOGTYPE, iTONEMAP_SCALE_TYPE );
-	result.normal.rgb = SRGBOutput( vShaderColor.normal.rgb );
+	result.normal.rgb = vShaderColor.normal.rgb;
 	result.normal.a = vShaderColor.normal.a;
 
-	result.position.rgb = SRGBOutput( vShaderColor.position.rgb );
+	result.position.rgb = vShaderColor.position.rgb;
 	result.position.a = vShaderColor.position.a;
 
-	result.flags.rgb = SRGBOutput( vShaderColor.flags.rgb );	
+	result.flags.rgb = vShaderColor.flags.rgb;
 	result.flags.a = vShaderColor.flags.a;
 
 	return result;
 }
-
-
 
 
 float RemapValClamped( float val, float A, float B, float C, float D)
@@ -680,6 +680,7 @@ float4 HSLtoRGB( float4 hsl )
 #define TCOMBINE_MASK_BASE_BY_DETAIL_ALPHA 9                // use alpha channel of detail to mask base
 #define TCOMBINE_SSBUMP_BUMP 10								// use detail to modulate lighting as an ssbump
 #define TCOMBINE_SSBUMP_NOBUMP 11					// detail is an ssbump but use it as an albedo. shader does the magic here - no user needs to specify mode 11
+#define TCOMBINE_NONE 12									// there is no detail texture
 
 float4 TextureCombine( float4 baseColor, float4 detailColor, int combine_mode,
 					   float fBlendFactor )

@@ -48,25 +48,25 @@ void DrawPassLightPassVolum( const lightPassParms &info, CBaseVSShader *pShader,
 
 		pShaderShadow->VertexShaderVertexFormat( VERTEX_POSITION, 1, NULL, 0 );
 
-		DECLARE_STATIC_VERTEX_SHADER_OLD( defconstruct_vs30 );
-		SET_STATIC_VERTEX_SHADER_COMBO_OLD( USEWORLDTRANSFORM, bWorldProjection ? 1 : 0 );
-		SET_STATIC_VERTEX_SHADER_COMBO_OLD( SENDWORLDPOS, bWorldProjection ? 1 : 0 );
-		SET_STATIC_VERTEX_SHADER_OLD( defconstruct_vs30 );
+		DECLARE_STATIC_VERTEX_SHADER( defconstruct_vs30 );
+		SET_STATIC_VERTEX_SHADER_COMBO( USEWORLDTRANSFORM, bWorldProjection ? 1 : 0 );
+		SET_STATIC_VERTEX_SHADER_COMBO( SENDWORLDPOS, bWorldProjection ? 1 : 0 );
+		SET_STATIC_VERTEX_SHADER( defconstruct_vs30 );
 
 		switch ( iLightType )
 		{
 		case DEFLIGHTTYPE_POINT:
 			{
-				DECLARE_STATIC_PIXEL_SHADER_OLD( volumpass_point_ps30 );
-				SET_STATIC_PIXEL_SHADER_COMBO_OLD( USEWORLDTRANSFORM, bWorldProjection ? 1 : 0 );
-				SET_STATIC_PIXEL_SHADER_OLD( volumpass_point_ps30 );
+				DECLARE_STATIC_PIXEL_SHADER( volumpass_point_ps30 );
+				SET_STATIC_PIXEL_SHADER_COMBO( USEWORLDTRANSFORM, bWorldProjection ? 1 : 0 );
+				SET_STATIC_PIXEL_SHADER( volumpass_point_ps30 );
 			}
 			break;
 		case DEFLIGHTTYPE_SPOT:
 			{
-				DECLARE_STATIC_PIXEL_SHADER_OLD( volumpass_spot_ps30 );
-				SET_STATIC_PIXEL_SHADER_COMBO_OLD( USEWORLDTRANSFORM, bWorldProjection ? 1 : 0 );
-				SET_STATIC_PIXEL_SHADER_OLD( volumpass_spot_ps30 );
+				DECLARE_STATIC_PIXEL_SHADER( volumpass_spot_ps30 );
+				SET_STATIC_PIXEL_SHADER_COMBO( USEWORLDTRANSFORM, bWorldProjection ? 1 : 0 );
+				SET_STATIC_PIXEL_SHADER( volumpass_spot_ps30 );
 			}
 			break;
 		}
@@ -89,25 +89,25 @@ void DrawPassLightPassVolum( const lightPassParms &info, CBaseVSShader *pShader,
 		Assert( iNumShadowedCookied <= pExt->GetNumActiveLights_ShadowedCookied() );
 		Assert( iNumShadowed <= pExt->GetNumActiveLights_Shadowed() );
 
-		DECLARE_DYNAMIC_VERTEX_SHADER_OLD( defconstruct_vs30 );
-		SET_DYNAMIC_VERTEX_SHADER_OLD( defconstruct_vs30 );
+		DECLARE_DYNAMIC_VERTEX_SHADER( defconstruct_vs30 );
+		SET_DYNAMIC_VERTEX_SHADER( defconstruct_vs30 );
 
 		switch ( iLightType )
 		{
 		case DEFLIGHTTYPE_POINT:
 			{
-				DECLARE_DYNAMIC_PIXEL_SHADER_OLD( volumpass_point_ps30 );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO_OLD( NUM_SHADOWED_COOKIE, iNumShadowedCookied );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO_OLD( NUM_SHADOWED, iNumShadowed );
-				SET_DYNAMIC_PIXEL_SHADER_OLD( volumpass_point_ps30 );
+				DECLARE_DYNAMIC_PIXEL_SHADER( volumpass_point_ps30 );
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_SHADOWED_COOKIE, iNumShadowedCookied );
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_SHADOWED, iNumShadowed );
+				SET_DYNAMIC_PIXEL_SHADER( volumpass_point_ps30 );
 			}
 			break;
 		case DEFLIGHTTYPE_SPOT:
 			{
-				DECLARE_DYNAMIC_PIXEL_SHADER_OLD( volumpass_spot_ps30 );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO_OLD( NUM_SHADOWED_COOKIE, iNumShadowedCookied );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO_OLD( NUM_SHADOWED, iNumShadowed );
-				SET_DYNAMIC_PIXEL_SHADER_OLD( volumpass_spot_ps30 );
+				DECLARE_DYNAMIC_PIXEL_SHADER( volumpass_spot_ps30 );
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_SHADOWED_COOKIE, iNumShadowedCookied );
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_SHADOWED, iNumShadowed );
+				SET_DYNAMIC_PIXEL_SHADER( volumpass_spot_ps30 );
 			}
 			break;
 		}

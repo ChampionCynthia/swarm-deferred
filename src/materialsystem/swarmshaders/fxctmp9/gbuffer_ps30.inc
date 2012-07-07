@@ -1,3 +1,16 @@
+// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
+// !$BUMPMAP && $BUMPMAP2
+// !$BUMPMAP2 && $BLENDMODULATE
+// $MODEL && $BUMPMAP2
+// defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
+// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
+// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
+// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
+// ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
+// !$MODEL && $MORPHING_VTEX
+// !$MODEL && $COMPRESSED_VERTS
+// !$MODEL && $SKINNING
+// !$MODEL && $MORPHING_VTEX
 #include "shaderlib/cshader.h"
 class gbuffer_ps30_Static_Index
 {
@@ -128,7 +141,8 @@ public:
 #endif
 	}
 public:
-	gbuffer_ps30_Static_Index( )
+	// CONSTRUCTOR
+	gbuffer_ps30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
 	{
 #ifdef _DEBUG
 		m_bALPHATEST = false;
@@ -170,7 +184,8 @@ public:
 class gbuffer_ps30_Dynamic_Index
 {
 public:
-	gbuffer_ps30_Dynamic_Index()
+	// CONSTRUCTOR
+	gbuffer_ps30_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
 	{
 	}
 	int GetIndex()

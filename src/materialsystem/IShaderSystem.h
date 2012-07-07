@@ -29,7 +29,7 @@ class IShader;
 //-----------------------------------------------------------------------------
 // The Shader system interface version
 //-----------------------------------------------------------------------------
-#define SHADERSYSTEM_INTERFACE_VERSION		"ShaderSystem002" // 002.9001
+#define SHADERSYSTEM_INTERFACE_VERSION		"ShaderSystem002"
 
 
 //-----------------------------------------------------------------------------
@@ -37,12 +37,21 @@ class IShader;
 //-----------------------------------------------------------------------------
 enum
 {
-	SHADER_USING_COLOR_MODULATION		= 0x1,
-	SHADER_USING_ALPHA_MODULATION		= 0x2,
-	SHADER_USING_FLASHLIGHT				= 0x4,
-	SHADER_USING_FIXED_FUNCTION_BAKED_LIGHTING		= 0x8,
-	SHADER_USING_EDITOR					= 0x10,
+	SHADER_USING_ALPHA_MODULATION				= 0x1,
+	SHADER_USING_FLASHLIGHT						= 0x2,
+	SHADER_USING_FIXED_FUNCTION_BAKED_LIGHTING	= 0x4,
+	SHADER_USING_EDITOR							= 0x8,
+
+	// the BUFFER0 and GBUFFER1 bits provide 3 g-buffermodes plus the normal modes.
+	// the modes are:
+	// Normal rendering = ( gbuffer1 = 0, gbuffer0 = 0 )
+	// Output pos, normal, albedo via mrts = (0,1)
+	// output fixed lighted single image = (1,0)
+	// output the normal = (1,1)
+	SHADER_USING_GBUFFER0                       = 0x10,
+	SHADER_USING_GBUFFER1                       = 0x20,
 };
+
 
 //-----------------------------------------------------------------------------
 // The shader system (a singleton)
@@ -60,7 +69,7 @@ public:
 	virtual void TakeSnapshot( ) = 0;
 
 	// Draws a snapshot
-	virtual void DrawSnapshot( const uint8 *cmds, bool bMakeActualDrawCall = true ) = 0;
+	virtual void DrawSnapshot( const unsigned char *pInstanceCommandBuffer, bool bMakeActualDrawCall = true ) = 0;
 
 	// Are we using graphics?
 	virtual bool IsUsingGraphics() const = 0;
@@ -68,7 +77,8 @@ public:
 	// Are editor materials enabled?
 	virtual bool CanUseEditorMaterials() const = 0;
 
-	virtual void BindVertexTexture( VertexTextureSampler_t sampler1, ITexture *pTexture, int nFrameVar = 0 ) = 0;
+	// Bind vertex texture
+	virtual void BindVertexTexture( VertexTextureSampler_t vtSampler, ITexture *pTexture, int nFrameVar = 0 ) = 0;
 };
 
 

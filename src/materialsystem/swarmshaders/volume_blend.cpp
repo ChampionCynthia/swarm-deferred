@@ -41,21 +41,21 @@ BEGIN_VS_SHADER( VOLUME_BLEND, "" )
 
 			pShaderShadow->VertexShaderVertexFormat( VERTEX_POSITION, 1, NULL, 0 );
 
-			DECLARE_STATIC_VERTEX_SHADER_OLD( screenspace_vs30 );
-			SET_STATIC_VERTEX_SHADER_OLD( screenspace_vs30 );
+			DECLARE_STATIC_VERTEX_SHADER( screenspace_vs30 );
+			SET_STATIC_VERTEX_SHADER( screenspace_vs30 );
 
-			DECLARE_STATIC_PIXEL_SHADER_OLD( volume_blend_ps30 );
-			SET_STATIC_PIXEL_SHADER_OLD( volume_blend_ps30 );
+			DECLARE_STATIC_PIXEL_SHADER( volume_blend_ps30 );
+			SET_STATIC_PIXEL_SHADER( volume_blend_ps30 );
 		}
 		DYNAMIC_STATE
 		{
 			pShaderAPI->SetDefaultState();
 
-			DECLARE_DYNAMIC_VERTEX_SHADER_OLD( screenspace_vs30 );
-			SET_DYNAMIC_VERTEX_SHADER_OLD( screenspace_vs30 );
+			DECLARE_DYNAMIC_VERTEX_SHADER( screenspace_vs30 );
+			SET_DYNAMIC_VERTEX_SHADER( screenspace_vs30 );
 
-			DECLARE_DYNAMIC_PIXEL_SHADER_OLD( volume_blend_ps30 );
-			SET_DYNAMIC_PIXEL_SHADER_OLD( volume_blend_ps30 );
+			DECLARE_DYNAMIC_PIXEL_SHADER( volume_blend_ps30 );
+			SET_DYNAMIC_PIXEL_SHADER( volume_blend_ps30 );
 
 			BindTexture( SHADER_SAMPLER0, BASETEXTURE );
 		}

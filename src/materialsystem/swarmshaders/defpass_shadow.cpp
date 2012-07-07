@@ -62,14 +62,14 @@ void DrawPassShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, IM
 
 		pShaderShadow->VertexShaderVertexFormat( iVFmtFlags, iTexCoordNum, pTexCoordDim, iUserDataSize );
 
-		DECLARE_STATIC_VERTEX_SHADER_OLD( shadowpass_vs30 );
-		SET_STATIC_VERTEX_SHADER_COMBO_OLD( MODEL, bModel );
-		SET_STATIC_VERTEX_SHADER_COMBO_OLD( MORPHING_VTEX, bModel && bFastVTex );
-		SET_STATIC_VERTEX_SHADER_OLD( shadowpass_vs30 );
+		DECLARE_STATIC_VERTEX_SHADER( shadowpass_vs30 );
+		SET_STATIC_VERTEX_SHADER_COMBO( MODEL, bModel );
+		SET_STATIC_VERTEX_SHADER_COMBO( MORPHING_VTEX, bModel && bFastVTex );
+		SET_STATIC_VERTEX_SHADER( shadowpass_vs30 );
 
-		DECLARE_STATIC_PIXEL_SHADER_OLD( shadowpass_ps30 );
-		SET_STATIC_PIXEL_SHADER_COMBO_OLD( ALPHATEST, bAlphatest );
-		SET_STATIC_PIXEL_SHADER_OLD( shadowpass_ps30 );
+		DECLARE_STATIC_PIXEL_SHADER( shadowpass_ps30 );
+		SET_STATIC_PIXEL_SHADER_COMBO( ALPHATEST, bAlphatest );
+		SET_STATIC_PIXEL_SHADER( shadowpass_ps30 );
 	}
 	DYNAMIC_STATE
 	{
@@ -98,16 +98,16 @@ void DrawPassShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, IM
 		if ( bModel && bFastVTex )
 			pShader->SetHWMorphVertexShaderState( VERTEX_SHADER_SHADER_SPECIFIC_CONST_10, VERTEX_SHADER_SHADER_SPECIFIC_CONST_11, SHADER_VERTEXTEXTURE_SAMPLER0 );
 
-		DECLARE_DYNAMIC_VERTEX_SHADER_OLD( shadowpass_vs30 );
-		SET_DYNAMIC_VERTEX_SHADER_COMBO_OLD( COMPRESSED_VERTS, (bModel && (int)vertexCompression) ? 1 : 0 );
-		SET_DYNAMIC_VERTEX_SHADER_COMBO_OLD( SKINNING, (bModel && pShaderAPI->GetCurrentNumBones() > 0) ? 1 : 0 );
-		SET_DYNAMIC_VERTEX_SHADER_COMBO_OLD( MORPHING, (bModel && pShaderAPI->IsHWMorphingEnabled()) ? 1 : 0 );
-		SET_DYNAMIC_VERTEX_SHADER_COMBO_OLD( SHADOW_MODE, shadowMode );
-		SET_DYNAMIC_VERTEX_SHADER_OLD( shadowpass_vs30 );
+		DECLARE_DYNAMIC_VERTEX_SHADER( shadowpass_vs30 );
+		SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (bModel && (int)vertexCompression) ? 1 : 0 );
+		SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING, (bModel && pShaderAPI->GetCurrentNumBones() > 0) ? 1 : 0 );
+		SET_DYNAMIC_VERTEX_SHADER_COMBO( MORPHING, (bModel && pShaderAPI->IsHWMorphingEnabled()) ? 1 : 0 );
+		SET_DYNAMIC_VERTEX_SHADER_COMBO( SHADOW_MODE, shadowMode );
+		SET_DYNAMIC_VERTEX_SHADER( shadowpass_vs30 );
 
-		DECLARE_DYNAMIC_PIXEL_SHADER_OLD( shadowpass_ps30 );
-		SET_DYNAMIC_PIXEL_SHADER_COMBO_OLD( SHADOW_MODE, shadowMode );
-		SET_DYNAMIC_PIXEL_SHADER_OLD( shadowpass_ps30 );
+		DECLARE_DYNAMIC_PIXEL_SHADER( shadowpass_ps30 );
+		SET_DYNAMIC_PIXEL_SHADER_COMBO( SHADOW_MODE, shadowMode );
+		SET_DYNAMIC_PIXEL_SHADER( shadowpass_ps30 );
 
 		if ( bModel && bFastVTex )
 		{

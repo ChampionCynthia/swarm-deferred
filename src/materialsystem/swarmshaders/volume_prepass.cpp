@@ -36,21 +36,21 @@ BEGIN_VS_SHADER( VOLUME_PREPASS, "" )
 
 			pShaderShadow->VertexShaderVertexFormat( VERTEX_POSITION, 1, NULL, 0 );
 
-			DECLARE_STATIC_VERTEX_SHADER_OLD( volume_prepass_vs30 );
-			SET_STATIC_VERTEX_SHADER_OLD( volume_prepass_vs30 );
+			DECLARE_STATIC_VERTEX_SHADER( volume_prepass_vs30 );
+			SET_STATIC_VERTEX_SHADER( volume_prepass_vs30 );
 
-			DECLARE_STATIC_PIXEL_SHADER_OLD( volume_prepass_ps30 );
-			SET_STATIC_PIXEL_SHADER_OLD( volume_prepass_ps30 );
+			DECLARE_STATIC_PIXEL_SHADER( volume_prepass_ps30 );
+			SET_STATIC_PIXEL_SHADER( volume_prepass_ps30 );
 		}
 		DYNAMIC_STATE
 		{
 			pShaderAPI->SetDefaultState();
 
-			DECLARE_DYNAMIC_VERTEX_SHADER_OLD( volume_prepass_vs30 );
-			SET_DYNAMIC_VERTEX_SHADER_OLD( volume_prepass_vs30 );
+			DECLARE_DYNAMIC_VERTEX_SHADER( volume_prepass_vs30 );
+			SET_DYNAMIC_VERTEX_SHADER( volume_prepass_vs30 );
 
-			DECLARE_DYNAMIC_PIXEL_SHADER_OLD( volume_prepass_ps30 );
-			SET_DYNAMIC_PIXEL_SHADER_OLD( volume_prepass_ps30 );
+			DECLARE_DYNAMIC_PIXEL_SHADER( volume_prepass_ps30 );
+			SET_DYNAMIC_PIXEL_SHADER( volume_prepass_ps30 );
 
 			float vPos[4] = {0,0,0,0};
 			pShaderAPI->GetWorldSpaceCameraPosition( vPos );

@@ -1,3 +1,14 @@
+// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
+// !$NUM_SHADOWED_COOKIE && !$NUM_SHADOWED && !$NUM_COOKIE && !$NUM_SIMPLE
+// defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
+// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
+// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
+// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
+// ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
+// !$MODEL && $MORPHING_VTEX
+// !$MODEL && $COMPRESSED_VERTS
+// !$MODEL && $SKINNING
+// !$MODEL && $MORPHING_VTEX
 #include "shaderlib/cshader.h"
 class lightingpass_spot_ps30_Static_Index
 {
@@ -23,7 +34,8 @@ public:
 #endif
 	}
 public:
-	lightingpass_spot_ps30_Static_Index( )
+	// CONSTRUCTOR
+	lightingpass_spot_ps30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
 	{
 #ifdef _DEBUG
 		m_bUSEWORLDTRANSFORM = false;
@@ -129,7 +141,8 @@ public:
 #endif
 	}
 public:
-	lightingpass_spot_ps30_Dynamic_Index()
+	// CONSTRUCTOR
+	lightingpass_spot_ps30_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
 	{
 #ifdef _DEBUG
 		m_bNUM_SHADOWED_COOKIE = false;

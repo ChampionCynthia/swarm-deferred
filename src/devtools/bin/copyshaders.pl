@@ -105,7 +105,7 @@ while( $src = <TXTFILE> )
 	# build the dest filename.
 	$dst = $src;
 
-	$dst =~ s/shaders\\/..\\..\\..\\game\\hl2\\shaders\\/i;
+	$dst =~ s/shaders\\/..\\..\\..\\game\\platform\\shaders\\/i;
 
 	# Does the dst exist?
 	my $dstexists = -e $dst;

@@ -1,3 +1,14 @@
+// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
+// !$MODEL && $DECAL
+// !$BASETEXTURE2 && $BLENDMODULATE
+// $MODEL && $BASETEXTURE2
+// $MODEL && $MULTIBLEND
+// $BASETEXTURE2 && $MULTIBLEND
+// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
+// !$MODEL && $MORPHING_VTEX
+// !$MODEL && $COMPRESSED_VERTS
+// !$MODEL && $SKINNING
+// !$MODEL && $MORPHING_VTEX
 #include "shaderlib/cshader.h"
 class composite_vs30_Static_Index
 {
@@ -149,7 +160,8 @@ public:
 #endif
 	}
 public:
-	composite_vs30_Static_Index( )
+	// CONSTRUCTOR
+	composite_vs30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
 	{
 #ifdef _DEBUG
 		m_bMODEL = false;
@@ -258,7 +270,8 @@ public:
 #endif
 	}
 public:
-	composite_vs30_Dynamic_Index()
+	// CONSTRUCTOR
+	composite_vs30_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
 	{
 #ifdef _DEBUG
 		m_bCOMPRESSED_VERTS = false;

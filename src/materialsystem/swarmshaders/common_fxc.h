@@ -1,10 +1,10 @@
-//========= Copyright © 1996-2007, Valve Corporation, All rights reserved. ============//
+//========== Copyright (c) Valve Corporation, All rights reserved. ==========//
 //
 // Purpose: 
 //
 // $NoKeywords: $
 //
-//=============================================================================//
+//===========================================================================//
 #ifndef COMMON_FXC_H_
 #define COMMON_FXC_H_
 
@@ -31,6 +31,8 @@
 #	define HALF_CONSTANT( _constant )	_constant
 #endif
 
+#define FP16_MAX	65504.0f
+
 // This is where all common code for both vertex and pixel shaders.
 #define OO_SQRT_3 0.57735025882720947f
 static const HALF3 bumpBasis[3] = {
@@ -48,6 +50,15 @@ static const HALF3 bumpBasisTranspose[3] = {
 #define REVERSE_DEPTH_ON_X360 //uncomment to use D3DFMT_D24FS8 with an inverted depth viewport for better performance. Keep this in sync with the same named #define in public/shaderapi/shareddefs.h
 //Note that the reversal happens in the viewport. So ONLY reading back from a depth texture should be affected. Projected math is unaffected.
 #endif
+
+bool IsX360( void )
+{
+	#if defined( _X360 )
+		return true;
+	#else
+		return false;
+	#endif
+}
 
 HALF3 CalcReflectionVectorNormalized( HALF3 normal, HALF3 eyeVector )
 {
@@ -170,6 +181,11 @@ float4 CompressHDR( float3 input )
 	return output;
 }
 
+// 2.2 gamma conversion routines
+float LinearToGamma( const float f1linear )
+{
+	return pow( f1linear, 1.0f / 2.2f );
+}
 
 float3 LinearToGamma( const float3 f3linear )
 {
@@ -181,9 +197,9 @@ float4 LinearToGamma( const float4 f4linear )
 	return float4( pow( f4linear.xyz, 1.0f / 2.2f ), f4linear.w );
 }
 
-float LinearToGamma( const float f1linear )
+float GammaToLinear( const float gamma )
 {
-	return pow( f1linear, 1.0f / 2.2f );
+	return pow( gamma, 2.2f );
 }
 
 float3 GammaToLinear( const float3 gamma )
@@ -196,64 +212,55 @@ float4 GammaToLinear( const float4 gamma )
 	return float4( pow( gamma.xyz, 2.2f ), gamma.w );
 }
 
-float GammaToLinear( const float gamma )
+// sRGB gamma conversion routines
+float3 SrgbGammaToLinear( float3 vSrgbGammaColor )
 {
-	return pow( gamma, 2.2f );
+	// 15 asm instructions
+	float3 vLinearSegment = vSrgbGammaColor.rgb / 12.92f;
+	float3 vExpSegment = pow( ( ( vSrgbGammaColor.rgb / 1.055f ) + ( 0.055f / 1.055f ) ), 2.4f );
+
+	float3 vLinearColor = { ( vSrgbGammaColor.r <= 0.04045f ) ? vLinearSegment.r : vExpSegment.r,
+							( vSrgbGammaColor.g <= 0.04045f ) ? vLinearSegment.g : vExpSegment.g,
+							( vSrgbGammaColor.b <= 0.04045f ) ? vLinearSegment.b : vExpSegment.b };
+
+	return vLinearColor.rgb;
 }
 
-// These two functions use the actual sRGB math
-float SrgbGammaToLinear( float flSrgbGammaValue )
+float3 SrgbLinearToGamma( float3 vLinearColor )
 {
-	float x = saturate( flSrgbGammaValue );
-	return ( x <= 0.04045f ) ? ( x / 12.92f ) : ( pow( ( x + 0.055f ) / 1.055f, 2.4f ) );
+	// 15 asm instructions
+	float3 vLinearSegment = vLinearColor.rgb * 12.92f;
+	float3 vExpSegment = ( 1.055f * pow( vLinearColor.rgb, ( 1.0f / 2.4f ) ) ) - 0.055f;
+
+	float3 vGammaColor = {  ( vLinearColor.r <= 0.0031308f ) ? vLinearSegment.r : vExpSegment.r,
+							( vLinearColor.g <= 0.0031308f ) ? vLinearSegment.g : vExpSegment.g,
+							( vLinearColor.b <= 0.0031308f ) ? vLinearSegment.b : vExpSegment.b };
+
+	return vGammaColor.rgb;
 }
 
-float SrgbLinearToGamma( float flLinearValue )
+// These two functions use the XBox 360's exact piecewise linear algorithm
+float3 X360GammaToLinear( float3 v360GammaColor )
 {
-	float x = saturate( flLinearValue );
-	return ( x <= 0.0031308f ) ? ( x * 12.92f ) : ( 1.055f * pow( x, ( 1.0f / 2.4f ) ) ) - 0.055f;
-}
+	// This code reduces the asm down to 11 instructions from the 63 instructions in the 360 XDK
+	float4 vTmpMul1 = {	1.0f, 2.0f, 4.0f, 8.0f };
+	float4 vTmpAdd1 = {	0.0f, ( -64.0f / 255.0f ), ( -96.0f / 255.0f ), ( -192.0f / 255.0f ) };
+	float4 vTmpAdd2 = {	0.0f, ( 64.0f / 255.0f ), ( 128.0f / 255.0f ), ( 513.0f / 255.0f ) };
 
-// These twofunctions use the XBox 360's exact piecewise linear algorithm
-float X360GammaToLinear( float fl360GammaValue )
-{
-	float flLinearValue;
+	float4 vRed   = ( v360GammaColor.r * vTmpMul1.xyzw * 0.25f ) + ( ( ( vTmpAdd1.xyzw * vTmpMul1.xyzw ) + vTmpAdd2.xyzw ) * 0.25f );
+	float4 vGreen = ( v360GammaColor.g * vTmpMul1.xyzw * 0.25f ) + ( ( ( vTmpAdd1.xyzw * vTmpMul1.xyzw ) + vTmpAdd2.xyzw ) * 0.25f );
+	float4 vBlue  = ( v360GammaColor.b * vTmpMul1.xyzw * 0.25f ) + ( ( ( vTmpAdd1.xyzw * vTmpMul1.xyzw ) + vTmpAdd2.xyzw ) * 0.25f );
 
-	fl360GammaValue = saturate( fl360GammaValue );
-	if ( fl360GammaValue < ( 96.0f / 255.0f ) )
-	{
-		if ( fl360GammaValue < ( 64.0f / 255.0f ) )
-		{
-			flLinearValue = fl360GammaValue * 255.0f;
-		}
-		else
-		{
-			flLinearValue = fl360GammaValue * ( 255.0f * 2.0f ) - 64.0f;
-			flLinearValue += floor( flLinearValue * ( 1.0f / 512.0f ) );
-		}
-	}
-	else
-	{
-		if( fl360GammaValue < ( 192.0f / 255.0f ) )
-		{
-			flLinearValue = fl360GammaValue * ( 255.0f * 4.0f ) - 256.0f;
-			flLinearValue += floor( flLinearValue * ( 1.0f / 256.0f ) );
-		}
-		else
-		{
-			flLinearValue = fl360GammaValue * ( 255.0f * 8.0f ) - 1024.0f;
-			flLinearValue += floor( flLinearValue * ( 1.0f / 128.0f ) );
-		}
-	}
+	float3 vMax1 = { max( vRed.x, vRed.y ), max( vGreen.x, vGreen.y ), max( vBlue.x, vBlue.y ) };
+	float3 vMax2 = { max( vRed.z, vRed.w ), max( vGreen.z, vGreen.w ), max( vBlue.z, vBlue.w ) };
+	float3 vLinearColor = max( vMax1.rgb, vMax2.rgb );
 
-	flLinearValue *= 1.0f / 1023.0f;
-
-	flLinearValue = saturate( flLinearValue );
-	return flLinearValue;
+	return vLinearColor.rgb;
 }
 
 float X360LinearToGamma( float flLinearValue )
 {
+	// This needs to be optimized
 	float fl360GammaValue;
 
 	flLinearValue = saturate( flLinearValue );
@@ -277,10 +284,7 @@ float X360LinearToGamma( float flLinearValue )
 		else
 		{
 			fl360GammaValue = flLinearValue * ( ( 1023.0f /8.0f ) * ( 1.0f / 255.0f ) ) + ( 128.0f /255.0f ); // 1.0 -> 1.0034313725490196078431372549016
-			if ( fl360GammaValue > 1.0f )
-			{
-				fl360GammaValue = 1.0f;
-			}
+			fl360GammaValue = saturate( fl360GammaValue );
 		}
 	}
 
@@ -288,13 +292,44 @@ float X360LinearToGamma( float flLinearValue )
 	return fl360GammaValue;
 }
 
-float SrgbGammaTo360Gamma( float flSrgbGammaValue )
+float3 SrgbGammaTo360Gamma( float3 vSrgbGammaColor )
 {
-	float flLinearValue = SrgbGammaToLinear( flSrgbGammaValue );
-	float fl360GammaValue = X360LinearToGamma( flLinearValue );
-	return fl360GammaValue;
+	return X360LinearToGamma( SrgbGammaToLinear( vSrgbGammaColor.rgb ) );
 }
 
+// Function to do srgb read in shader code
+#ifndef SHADER_SRGB_READ
+	#define SHADER_SRGB_READ 0
+#endif
+
+float4 tex2Dsrgb( sampler iSampler, float2 iUv )
+{
+	// This function is named as a hint that the texture is meant to be read with
+	// an sRGB->linear conversion. We have to do this in shader code on the 360 sometimes.
+	#if ( SHADER_SRGB_READ == 0 )
+	{
+		// Don't fake the srgb read in shader code
+		return tex2D( iSampler, iUv.xy );
+	}
+	#else
+	{
+		if ( IsX360() )
+		{
+			float4 vTextureValue = tex2D( iSampler, iUv.xy );
+			vTextureValue.rgb = X360GammaToLinear( vTextureValue.rgb );
+			return vTextureValue.rgba;
+		}
+		else
+		{
+			float4 vTextureValue = tex2D( iSampler, iUv.xy );
+			vTextureValue.rgb = SrgbGammaToLinear( vTextureValue.rgb );
+			return vTextureValue.rgba;
+		}
+	}
+	#endif
+}
+
+// Tangent transform helper functions
 float3 Vec3WorldToTangent( float3 iWorldVector, float3 iWorldNormal, float3 iWorldTangent, float3 iWorldBinormal )
 {
 	float3 vTangentVector;
@@ -321,6 +356,20 @@ float3 Vec3TangentToWorld( float3 iTangentVector, float3 iWorldNormal, float3 iW
 float3 Vec3TangentToWorldNormalized( float3 iTangentVector, float3 iWorldNormal, float3 iWorldTangent, float3 iWorldBinormal )
 {
 	return normalize( Vec3TangentToWorld( iTangentVector, iWorldNormal, iWorldTangent, iWorldBinormal ) );
+}
+
+// returns 1.0f for no fog, 0.0f for fully fogged
+float CalcRangeFogFactorFixedFunction( float3 worldPos, float3 eyePos, float flFogMaxDensity, float flFogEndOverRange, float flFogOORange )
+{
+	float dist = distance( eyePos.xyz, worldPos.xyz );
+	return max( flFogMaxDensity, ( -dist * flFogOORange ) + flFogEndOverRange );
+}
+
+// returns 0.0f for no fog, 1.0f for fully fogged which is opposite of what fixed function fog expects so that we don't have to do a "1-x" in the pixel shader.
+float CalcRangeFogFactorNonFixedFunction( float3 worldPos, float3 eyePos, float flFogMaxDensity, float flFogEndOverRange, float flFogOORange )
+{
+	float dist = distance( eyePos.xyz, worldPos.xyz );
+	return min( flFogMaxDensity, saturate( flFogEndOverRange + ( dist * flFogOORange ) ) );
 }
 
 #endif //#ifndef COMMON_FXC_H_

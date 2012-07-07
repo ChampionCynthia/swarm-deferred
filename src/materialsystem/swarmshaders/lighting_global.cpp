@@ -37,13 +37,13 @@ BEGIN_VS_SHADER( LIGHTING_GLOBAL, "" )
 
 			pShaderShadow->VertexShaderVertexFormat( VERTEX_POSITION, 1, NULL, 0 );
 
-			DECLARE_STATIC_VERTEX_SHADER_OLD( defconstruct_vs30 );
-			SET_STATIC_VERTEX_SHADER_COMBO_OLD( USEWORLDTRANSFORM, 0 );
-			SET_STATIC_VERTEX_SHADER_COMBO_OLD( SENDWORLDPOS, 0 );
-			SET_STATIC_VERTEX_SHADER_OLD( defconstruct_vs30 );
+			DECLARE_STATIC_VERTEX_SHADER( defconstruct_vs30 );
+			SET_STATIC_VERTEX_SHADER_COMBO( USEWORLDTRANSFORM, 0 );
+			SET_STATIC_VERTEX_SHADER_COMBO( SENDWORLDPOS, 0 );
+			SET_STATIC_VERTEX_SHADER( defconstruct_vs30 );
 
-			DECLARE_STATIC_PIXEL_SHADER_OLD( lightingpass_global_ps30 );
-			SET_STATIC_PIXEL_SHADER_OLD( lightingpass_global_ps30 );
+			DECLARE_STATIC_PIXEL_SHADER( lightingpass_global_ps30 );
+			SET_STATIC_PIXEL_SHADER( lightingpass_global_ps30 );
 		}
 		DYNAMIC_STATE
 		{
@@ -53,12 +53,12 @@ BEGIN_VS_SHADER( LIGHTING_GLOBAL, "" )
 
 			AssertMsg( data.bEnabled, "I shouldn't be drawn at all." );
 
-			DECLARE_DYNAMIC_VERTEX_SHADER_OLD( defconstruct_vs30 );
-			SET_DYNAMIC_VERTEX_SHADER_OLD( defconstruct_vs30 );
+			DECLARE_DYNAMIC_VERTEX_SHADER( defconstruct_vs30 );
+			SET_DYNAMIC_VERTEX_SHADER( defconstruct_vs30 );
 
-			DECLARE_DYNAMIC_PIXEL_SHADER_OLD( lightingpass_global_ps30 );
-			SET_DYNAMIC_PIXEL_SHADER_COMBO_OLD( HAS_SHADOW, data.bShadow );
-			SET_DYNAMIC_PIXEL_SHADER_OLD( lightingpass_global_ps30 );
+			DECLARE_DYNAMIC_PIXEL_SHADER( lightingpass_global_ps30 );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( HAS_SHADOW, data.bShadow );
+			SET_DYNAMIC_PIXEL_SHADER( lightingpass_global_ps30 );
 
 			BindTexture( SHADER_SAMPLER0, GetDeferredExt()->GetTexture_Normals() );
 			BindTexture( SHADER_SAMPLER1, GetDeferredExt()->GetTexture_Depth() );

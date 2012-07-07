@@ -1,10 +1,10 @@
-//========= Copyright © 1996-2007, Valve Corporation, All rights reserved. ============//
+//========== Copyright (c) Valve Corporation, All rights reserved. ==========//
 //
 // Purpose: Common shader compiler pragmas
 //
 // $NoKeywords: $
 //
-//=============================================================================//
+//===========================================================================//
 #ifndef COMMON_PRAGMAS_H_
 #define COMMON_PRAGMAS_H_
 

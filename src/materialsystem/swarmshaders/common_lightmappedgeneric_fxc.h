@@ -1,9 +1,9 @@
-
-
 #if defined( _X360 )
 
-void GetBaseTextureAndNormal( sampler base, sampler base2, sampler bump, bool bBase2, bool bBump, float3 coords, float3 vWeights,
-								out float4 vResultBase, out float4 vResultBase2, out float4 vResultBump )
+void GetBaseTextureAndNormal( sampler base, sampler base2, sampler bump, bool bBase2, bool bBump, 
+							  float3 coords, float2 bumpcoords,
+							  float3 vWeights,
+							  out float4 vResultBase, out float4 vResultBase2, out float4 vResultBump )
 {
 	vResultBase = 0;
 	vResultBase2 = 0;
@@ -17,7 +17,6 @@ void GetBaseTextureAndNormal( sampler base, sampler base2, sampler bump, bool bB
 #if SEAMLESS
 
 	vWeights = max( vWeights - 0.3, 0 );
-
 	vWeights *= 1.0f / dot( vWeights, float3(1,1,1) );
 
 	[branch]
@@ -66,28 +65,33 @@ void GetBaseTextureAndNormal( sampler base, sampler base2, sampler bump, bool bB
 		}
 	}
 
+	#if ( SHADER_SRGB_READ == 1 )
+		// Do this after the blending to save shader ops
+		vResultBase.rgb = X360GammaToLinear( vResultBase.rgb );
+		vResultBase2.rgb = X360GammaToLinear( vResultBase2.rgb );
+	#endif
+
 #else  // not seamless
 
-	vResultBase = tex2D( base, coords.xy );
+	vResultBase = tex2Dsrgb( base, coords.xy );
 
 	if ( bBase2 )
 	{
-		vResultBase2 = tex2D( base2, coords.xy );
+		vResultBase2 = tex2Dsrgb( base2, coords.xy );
 	}
 
 	if ( bBump )
 	{
-		vResultBump  = tex2D( bump, coords.xy );
+		vResultBump  = tex2D( bump, bumpcoords.xy );
 	}
 
 #endif
-
-
 }
 
 #else // PC
 
-void GetBaseTextureAndNormal( sampler base, sampler base2, sampler bump, bool bBase2, bool bBump, float3 coords, float3 vWeights,
+void GetBaseTextureAndNormal( sampler base, sampler base2, sampler bump, bool bBase2, bool bBump,
+							  float3 coords, float2 bumpcoords, float3 vWeights,
 							 out float4 vResultBase, out float4 vResultBase2, out float4 vResultBump )
 {
 	vResultBase = 0;
@@ -140,7 +144,7 @@ void GetBaseTextureAndNormal( sampler base, sampler base2, sampler bump, bool bB
 	}
 	if ( bBump )
 	{
-		vResultBump  = tex2D( bump, coords.xy );
+		vResultBump  = tex2D( bump, bumpcoords.xy );
 	}
 #endif
 
@@ -149,25 +153,23 @@ void GetBaseTextureAndNormal( sampler base, sampler base2, sampler bump, bool bB
 #endif
 
 
-
-
 float3 LightMapSample( sampler LightmapSampler, float2 vTexCoord )
 {
-#	if ( !defined( _X360 ) || !defined( USE_32BIT_LIGHTMAPS_ON_360 ) )
+	#if ( !defined( _X360 ) || !defined( USE_32BIT_LIGHTMAPS_ON_360 ) )
 	{
 		float3 sample = tex2D( LightmapSampler, vTexCoord );
 
 		return sample;
 	}
-#	else
+	#else
 	{
-#		if 0 //1 for cheap sampling, 0 for accurate scaling from the individual samples
+		#if 0 //1 for cheap sampling, 0 for accurate scaling from the individual samples
 		{
 			float4 sample = tex2D( LightmapSampler, vTexCoord );
 
 			return sample.rgb * sample.a;
 		}
-#		else
+		#else
 		{
 			float4 Weights;
 			float4 samples_0; //no arrays allowed in inline assembly
@@ -194,8 +196,87 @@ float3 LightMapSample( sampler LightmapSampler, float2 vTexCoord )
 		
 			return result;
 		}
-#		endif
+		#endif
 	}
-#	endif
+	#endif
 }
 
+#ifdef PIXELSHADER
+#define VS_OUTPUT PS_INPUT
+#endif
+
+struct VS_OUTPUT
+{
+#ifndef PIXELSHADER
+	float4 projPos					: POSITION;	
+#	if !defined( _X360 ) && !defined( SHADER_MODEL_VS_3_0 )
+	float  fog						: FOG;
+#	endif
+#endif
+#if SEAMLESS
+	#if HARDWAREFOGBLEND || DOPIXELFOG
+		float3 SeamlessTexCoord_fogFactorW         : TEXCOORD0;            // zy xz
+	#else
+		float4 SeamlessTexCoord_fogFactorW         : TEXCOORD0;            // zy xz
+	#endif
+#else
+	#if HARDWAREFOGBLEND || DOPIXELFOG
+		float2 baseTexCoord_fogFactorZ				: TEXCOORD0;
+	#else
+		float3 baseTexCoord_fogFactorZ				: TEXCOORD0;
+	#endif
+
+	// detail textures and bumpmaps are mutually exclusive so that we have enough texcoords.
+#endif
+	float4 detailOrBumpAndEnvmapMaskTexCoord : TEXCOORD1;   // envmap mask
+
+	// CENTROID: TEXCOORD2
+#if defined( _X360 )
+	float4 lightmapTexCoord1And2		: TEXCOORD2_centroid;
+#else
+	float4 lightmapTexCoord1And2		: TEXCOORD2;
+#endif
+
+	// CENTROID: TEXCOORD3
+#if defined( _X360 )
+	float4 lightmapTexCoord3			: TEXCOORD3_centroid;
+#else
+	float4 lightmapTexCoord3			: TEXCOORD3;
+#endif
+
+	float4 worldPos_projPosZ		: TEXCOORD4;
+	float3x3 tangentSpaceTranspose	: TEXCOORD5;
+	// tangentSpaceTranspose		: TEXCOORD6
+	// tangentSpaceTranspose		: TEXCOORD7
+	float4 vertexColor				: COLOR0;
+	float  vertexBlendX				: COLOR1;
+
+	// Extra iterators on 360, used in flashlight combo
+#if defined( _X360 ) && FLASHLIGHT
+	float4 flashlightSpacePos		: TEXCOORD8;
+	float4 vProjPos					: TEXCOORD9;
+#endif
+};
+
+#define DETAILCOORDS detailOrBumpAndEnvmapMaskTexCoord.xy
+#define DETAILORBUMPCOORDS DETAILCOORDS
+#define ENVMAPMASKCOORDS detailOrBumpAndEnvmapMaskTexCoord.wz
+
+#if DETAILTEXTURE && BUMPMAP && !SELFILLUM && !FANCY_BLENDING
+	#define BUMPCOORDS lightmapTexCoord3.wz
+#elif DETAILTEXTURE
+	#define BUMPCOORDS baseTexCoord_fogFactorZ.xy
+#else
+	// This is the SEAMLESS case too since we skip SEAMLESS && DETAILTEXTURE
+	#define BUMPCOORDS detailOrBumpAndEnvmapMaskTexCoord.xy
+#endif
+
+#if FANCY_BLENDING
+	#define FANCYBLENDMASKCOORDS lightmapTexCoord3.wz
+#endif
+
+#if SEAMLESS
+	// don't use BASETEXCOORD in the SEAMLESS case
+#else
+	#define BASETEXCOORD baseTexCoord_fogFactorZ.xy
+#endif

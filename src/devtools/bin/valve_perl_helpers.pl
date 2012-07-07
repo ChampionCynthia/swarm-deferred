@@ -281,7 +281,7 @@ sub NormalizePerforceFilename
 	$line =~ s/^.*(vshtmp9.*)/$1/i;
 
 	# for vcs files. HACK!
-	$line =~ s,^.*game/hl2/shaders/,,i;
+	$line =~ s,^.*game/platform/shaders/,,i;
 
 	return $line;
 }
@@ -401,10 +401,6 @@ sub LoadShaderListFile
 				elsif( $shaderbase =~ m/_vsxx/i )
 				{
 					my $targetbase = $shaderbase;
-					$targetbase =~ s/_vsxx/_vs11/i;
-					push @srcfiles, ( $line . "-----" . $targetbase );
-					
-					$targetbase = $shaderbase;
 					$targetbase =~ s/_vsxx/_vs20/i;
 					push @srcfiles, ( $line . "-----" . $targetbase );
 				}

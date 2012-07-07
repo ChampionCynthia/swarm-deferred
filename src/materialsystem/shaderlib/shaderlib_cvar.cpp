@@ -37,6 +37,6 @@ void InitShaderLibCVars( CreateInterfaceFn cvarFactory )
 {
 	if ( g_pCVar )
 	{
-		ConVar_Register( 0, &g_ConVarAccessor );
+		ConVar_Register( FCVAR_MATERIAL_SYSTEM_THREAD, &g_ConVarAccessor );
 	}
 }
