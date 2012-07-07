@@ -1,7 +1,9 @@
 // ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
+// !$BUMPMAP2 && !$MULTIBLEND && $BLENDMODULATE
 // !$BUMPMAP && $BUMPMAP2
-// !$BUMPMAP2 && $BLENDMODULATE
 // $MODEL && $BUMPMAP2
+// $MODEL && $MULTIBLEND
+// $BUMPMAP2 && $MULTIBLEND
 // defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
 // defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
 // defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
@@ -140,6 +142,27 @@ public:
 		m_bBLENDMODULATE = true;
 #endif
 	}
+private:
+	int m_nMULTIBLEND;
+#ifdef _DEBUG
+	bool m_bMULTIBLEND;
+#endif
+public:
+	void SetMULTIBLEND( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nMULTIBLEND = i;
+#ifdef _DEBUG
+		m_bMULTIBLEND = true;
+#endif
+	}
+	void SetMULTIBLEND( bool i )
+	{
+		m_nMULTIBLEND = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bMULTIBLEND = true;
+#endif
+	}
 public:
 	// CONSTRUCTOR
 	gbuffer_ps30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
@@ -168,19 +191,23 @@ public:
 		m_bBLENDMODULATE = false;
 #endif // _DEBUG
 		m_nBLENDMODULATE = 0;
+#ifdef _DEBUG
+		m_bMULTIBLEND = false;
+#endif // _DEBUG
+		m_nMULTIBLEND = 0;
 	}
 	int GetIndex()
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bALPHATEST && m_bBUMPMAP && m_bNOCULL && m_bPHONGMAP && m_bBUMPMAP2 && m_bBLENDMODULATE;
+		bool bAllStaticVarsDefined = m_bALPHATEST && m_bBUMPMAP && m_bNOCULL && m_bPHONGMAP && m_bBUMPMAP2 && m_bBLENDMODULATE && m_bMULTIBLEND;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 1 * m_nALPHATEST ) + ( 2 * m_nBUMPMAP ) + ( 6 * m_nNOCULL ) + ( 12 * m_nPHONGMAP ) + ( 24 * m_nBUMPMAP2 ) + ( 48 * m_nBLENDMODULATE ) + 0;
+		return ( 1 * m_nALPHATEST ) + ( 2 * m_nBUMPMAP ) + ( 6 * m_nNOCULL ) + ( 12 * m_nPHONGMAP ) + ( 24 * m_nBUMPMAP2 ) + ( 48 * m_nBLENDMODULATE ) + ( 96 * m_nMULTIBLEND ) + 0;
 	}
 };
-#define shaderStaticTest_gbuffer_ps30 psh_forgot_to_set_static_ALPHATEST + psh_forgot_to_set_static_BUMPMAP + psh_forgot_to_set_static_NOCULL + psh_forgot_to_set_static_PHONGMAP + psh_forgot_to_set_static_BUMPMAP2 + psh_forgot_to_set_static_BLENDMODULATE + 0
+#define shaderStaticTest_gbuffer_ps30 psh_forgot_to_set_static_ALPHATEST + psh_forgot_to_set_static_BUMPMAP + psh_forgot_to_set_static_NOCULL + psh_forgot_to_set_static_PHONGMAP + psh_forgot_to_set_static_BUMPMAP2 + psh_forgot_to_set_static_BLENDMODULATE + psh_forgot_to_set_static_MULTIBLEND + 0
 class gbuffer_ps30_Dynamic_Index
 {
 public:

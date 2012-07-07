@@ -4,7 +4,7 @@
   <PropertyGroup Label="UserMacros">
     <appsDir>D:\Steam\Steamapps</appsDir>
     <modName>SwarmDeferred</modName>
-    <debugCommandLine>-sw -w 1600 -h 900 -allowdebug -console -shaderedit</debugCommandLine>
+    <debugCommandLine>-sw -w 1600 -h 900 -allowdebug -console</debugCommandLine>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />

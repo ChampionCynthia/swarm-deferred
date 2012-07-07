@@ -93,14 +93,37 @@ float2 GetTransformedUVs( in float2 uv, in float4 transform[2] )
 	return uvOut;
 }
 
-float GetModulatedBlend( in float flAlphaBlend, in sampler sBlendTexture, in float2 flTexCoord )
+float GetModulatedBlend( in float flBlendAmount, in float2 modt )
 {
-	float2 modt = tex2D( sBlendTexture, flTexCoord ).rg;
-
 	float minb = max( 0, modt.g - modt.r );
 	float maxb = min( 1, modt.g + modt.r );
 
-	return smoothstep( minb, maxb, flAlphaBlend );
+	return smoothstep( minb, maxb, flBlendAmount );
+}
+
+float GetMultiBlend( const float BlendAmount, inout float Remaining )
+{
+	float Result = smoothstep( 0.0, 1.0f, BlendAmount );
+	Result = min( Result, Remaining );
+	Remaining -= Result;
+
+	return Result;
+}
+
+float GetMultiBlendModulated( in float2 modt, const float flBlendAmount, const float AlphaBlend, inout float Remaining )
+{
+	//modt.r = lerp( modt.r, 1, AlphaBlend );
+
+	float Result = any( flBlendAmount )
+		* GetModulatedBlend( flBlendAmount, modt );
+
+	float alpha = 2.0 - AlphaBlend - modt.g;
+	Result *= lerp( saturate( alpha ), 1, step( AlphaBlend, modt.g ) );
+
+	Result = min( Result, Remaining );
+	Remaining -= Result;
+
+	return Result;
 }
 
 #endif

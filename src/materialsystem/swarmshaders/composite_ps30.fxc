@@ -32,11 +32,12 @@
 // SKIP:		$RIMLIGHT && !$READNORMAL
 // SKIP:		!$RIMLIGHT && $RIMLIGHTMODULATELIGHT
 
-// SKIP:		!$BASETEXTURE2 && $BLENDMODULATE
+// SKIP:		!$BASETEXTURE2 && !$MULTIBLEND && $BLENDMODULATE
 // SKIP:		$MODEL && $BASETEXTURE2
 // SKIP:		$MODEL && $MULTIBLEND
 // SKIP:		$BASETEXTURE2 && $MULTIBLEND
-// SKIP:		$BLENDMODULATE && $MULTIBLEND
+// SKIP:		$ENVMAPMASK && $MULTIBLEND
+// SKIP:		$SELFILLUM_MASK && $MULTIBLEND
 
 // SKIP:		!$SELFILLUM && $SELFILLUM_MASK
 // SKIP:		!$SELFILLUM && $SELFILLUM_ENVMAP_ALPHA
@@ -101,13 +102,12 @@ sampler sEnvmapMask2						: register( s7 );
 
 #if MULTIBLEND
 sampler sAlbedo2							: register( s5 );
-sampler sAlbedo3							: register( s6 );
-sampler sAlbedo4							: register( s7 );
+sampler sAlbedo3							: register( s7 );
+sampler sAlbedo4							: register( s8 );
 
-#if ENVMAP && ENVMAPMASK
-sampler sEnvmapMask2						: register( s8 );
-sampler sEnvmapMask3						: register( s9 );
-sampler sEnvmapMask4						: register( s10 );
+#if BLENDMODULATE
+sampler sBlendmodulate2						: register( s9 );
+sampler sBlendmodulate3						: register( s10 );
 #endif
 #endif
 
@@ -133,11 +133,19 @@ struct PS_INPUT
 	float3 worldToEye				: TEXCOORD3;
 #endif
 
-#if BASETEXTURE2 || MULTIBLEND
+#if BASETEXTURE2
 	float4 vColor_0					: COLOR0;
 #endif
+
 #if MULTIBLEND
-	float4 vColor_1					: COLOR1;
+#if BLENDMODULATE
+	float4 vTexCoordBlendmod23			: TEXCOORD4;
+#endif
+	float3 vAlphaBlend					: TEXCOORD5;
+	float4 vColorBlend1					: COLOR0;
+	float4 vColorBlend2					: COLOR1;
+	float4 vColorBlend3					: TEXCOORD6;
+	float3 vColorBlend4					: TEXCOORD7;
 #endif
 
 #if NOCULL
@@ -164,14 +172,35 @@ PS_OUTPUT main( const PS_INPUT In )
 	float4 flAlbedoSample2 = tex2D( sAlbedo2, In.vTexCoord.xy );
 	float flBlendfactor = In.vColor_0.w;
 #if BLENDMODULATE
-	flBlendfactor = GetModulatedBlend( flBlendfactor, sBlendmodulate, In.vTexCoord.zw );
+	flBlendfactor = GetModulatedBlend( flBlendfactor, tex2D( sBlendmodulate, In.vTexCoord.zw ).rg );
 #endif
 	flAlbedoSample = lerp( flAlbedoSample, flAlbedoSample2, flBlendfactor );
 #endif
 
 #if MULTIBLEND
-	//TODO: implement after weights have been found
-	flAlbedoSample = In.vColor_1;
+	float remaining = 1;
+	float4 flBlendFactors;
+
+#if BLENDMODULATE
+	flBlendFactors.x = GetMultiBlendModulated( tex2D( sBlendmodulate, In.vTexCoord.zw ).rg, In.vColorBlend1.a, In.vAlphaBlend.x, remaining );
+	flBlendFactors.y = GetMultiBlendModulated( tex2D( sBlendmodulate2, In.vTexCoordBlendmod23.xy ).rg, In.vColorBlend2.a, In.vAlphaBlend.y, remaining );
+	flBlendFactors.z = GetMultiBlendModulated( tex2D( sBlendmodulate3, In.vTexCoordBlendmod23.zw ).rg, In.vColorBlend3.a, In.vAlphaBlend.z, remaining );
+#else
+	flBlendFactors.x = GetMultiBlend( In.vColorBlend1.a, remaining );
+	flBlendFactors.y = GetMultiBlend( In.vColorBlend2.a, remaining );
+	flBlendFactors.z = GetMultiBlend( In.vColorBlend3.a, remaining );
+#endif
+	flBlendFactors.w = remaining;
+
+	flAlbedoSample = flAlbedoSample * flBlendFactors.x
+		+ tex2D( sAlbedo2, In.vTexCoord.xy ) * flBlendFactors.y
+		+ tex2D( sAlbedo3, In.vTexCoord.xy ) * flBlendFactors.z
+		+ tex2D( sAlbedo4, In.vTexCoord.xy ) * flBlendFactors.w;
+
+	flAlbedoSample.rgb *= In.vColorBlend1.rgb * flBlendFactors.x
+		+ In.vColorBlend2.rgb * flBlendFactors.y
+		+ In.vColorBlend3.rgb * flBlendFactors.z
+		+ In.vColorBlend4.rgb * flBlendFactors.w;
 #endif
 
 #if ALPHATEST

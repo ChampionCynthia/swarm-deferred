@@ -33,6 +33,8 @@ void DrawPassShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, IM
 	const bool bAlbedo = PARM_TEX( info.iAlbedo );
 	const bool bAlphatest = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST ) && bAlbedo;
 
+	const bool bMultiBlend = PARM_SET( info.iMultiblend );
+
 	SHADOW_STATE
 	{
 		pShaderShadow->SetDefaultState();
@@ -46,8 +48,11 @@ void DrawPassShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, IM
 
 		int iVFmtFlags = VERTEX_POSITION | VERTEX_NORMAL;
 		int iUserDataSize = 0;
-		int pTexCoordDim[3] = { 2, 0, 3 };
-		int iTexCoordNum = ( bModel && bIsDecal && bFastVTex ) ? 3 : 1;
+
+		int *pTexCoordDim;
+		int iTexCoordNum;
+		GetTexcoordSettings( ( bModel && bIsDecal && bFastVTex ), bMultiBlend,
+			iTexCoordNum, &pTexCoordDim );
 
 		if ( bModel )
 		{

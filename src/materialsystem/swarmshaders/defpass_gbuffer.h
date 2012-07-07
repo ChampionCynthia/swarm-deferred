@@ -16,8 +16,12 @@ struct defParms_gBuffer
 	int iAlbedo;
 	int iBumpmap;
 	int iBumpmap2;
+	int iBumpmap3;
+	int iBumpmap4;
 	int iPhongmap;
 	int iBlendmodulate;
+	int iBlendmodulate2;
+	int iBlendmodulate3;
 
 	// control
 	int iAlphatestRef;
@@ -25,7 +29,12 @@ struct defParms_gBuffer
 	int iPhongExp;
 	int iPhongExp2;
 	int iSSBump;
+
+	// blending
 	int iBlendmodulateTransform;
+	int iBlendmodulateTransform2;
+	int iBlendmodulateTransform3;
+	int iMultiblend;
 
 	// config
 	bool bModel;

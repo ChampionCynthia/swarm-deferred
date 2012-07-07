@@ -20,9 +20,9 @@ struct defParms_composite
 	int iEnvmap;
 	int iEnvmapMask;
 	int iEnvmapMask2;
-	int iEnvmapMask3;
-	int iEnvmapMask4;
 	int iBlendmodulate;
+	int iBlendmodulate2;
+	int iBlendmodulate3;
 
 	// envmapping
 	int iEnvmapTint;
@@ -52,6 +52,8 @@ struct defParms_composite
 
 	// blendmod
 	int iBlendmodulateTransform;
+	int iBlendmodulateTransform2;
+	int iBlendmodulateTransform3;
 	int iMultiblend;
 
 	int iFresnelRanges;

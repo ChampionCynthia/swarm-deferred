@@ -34,14 +34,14 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		SHADER_PARAM( BLENDMASKTRANSFORM, SHADER_PARAM_TYPE_MATRIX, "center .5 .5 scale 1 1 rotate 0 translate 0 0", "$blendmodulatetexture texcoord transform" )
 
 		SHADER_PARAM( MULTIBLEND, SHADER_PARAM_TYPE_BOOL, "", "" )
-
 		SHADER_PARAM( BASETEXTURE3, SHADER_PARAM_TYPE_TEXTURE, "", "" )
-		SHADER_PARAM( BUMPMAP3, SHADER_PARAM_TYPE_TEXTURE, "", "" )
-		SHADER_PARAM( ENVMAPMASK3, SHADER_PARAM_TYPE_TEXTURE, "shadertest/shadertest_envmask", "envmap mask" )
-
 		SHADER_PARAM( BASETEXTURE4, SHADER_PARAM_TYPE_TEXTURE, "", "" )
+		SHADER_PARAM( BUMPMAP3, SHADER_PARAM_TYPE_TEXTURE, "", "" )
 		SHADER_PARAM( BUMPMAP4, SHADER_PARAM_TYPE_TEXTURE, "", "" )
-		SHADER_PARAM( ENVMAPMASK4, SHADER_PARAM_TYPE_TEXTURE, "shadertest/shadertest_envmask", "envmap mask" )
+		SHADER_PARAM( BLENDMODULATETEXTURE2, SHADER_PARAM_TYPE_TEXTURE, "", "texture to use r/g channels for blend range for" )
+		SHADER_PARAM( BLENDMODULATETEXTURE3, SHADER_PARAM_TYPE_TEXTURE, "", "texture to use r/g channels for blend range for" )
+		SHADER_PARAM( BLENDMASKTRANSFORM2, SHADER_PARAM_TYPE_MATRIX, "center .5 .5 scale 1 1 rotate 0 translate 0 0", "$blendmodulatetexture texcoord transform" )
+		SHADER_PARAM( BLENDMASKTRANSFORM3, SHADER_PARAM_TYPE_MATRIX, "center .5 .5 scale 1 1 rotate 0 translate 0 0", "$blendmodulatetexture texcoord transform" )
 
 	END_SHADER_PARAMS
 
@@ -52,16 +52,24 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		p.iAlbedo = BASETEXTURE;
 		p.iBumpmap = BUMPMAP;
 		p.iBumpmap2 = BUMPMAP2;
+		p.iBumpmap3 = BUMPMAP3;
+		p.iBumpmap4 = BUMPMAP4;
 
 		p.iPhongmap = PHONG_MAP;
-		p.iBlendmodulate = BLENDMODULATETEXTURE;
 
 		p.iAlphatestRef = ALPHATESTREFERENCE;
 		p.iLitface = LITFACE;
 		p.iPhongExp = PHONG_EXP;
 		p.iPhongExp2 = PHONG_EXP2;
 		p.iSSBump = SSBUMP;
+
+		p.iMultiblend = MULTIBLEND;
+		p.iBlendmodulate = BLENDMODULATETEXTURE;
+		p.iBlendmodulate2 = BLENDMODULATETEXTURE2;
+		p.iBlendmodulate3 = BLENDMODULATETEXTURE3;
 		p.iBlendmodulateTransform = BLENDMASKTRANSFORM;
+		p.iBlendmodulateTransform2 = BLENDMASKTRANSFORM2;
+		p.iBlendmodulateTransform3 = BLENDMASKTRANSFORM3;
 	}
 
 	void SetupParmsShadow( defParms_shadow &p )
@@ -69,6 +77,7 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		p.bModel = false;
 		p.iAlbedo = BASETEXTURE;
 		p.iAlphatestRef = ALPHATESTREFERENCE;
+		p.iMultiblend = MULTIBLEND;
 	}
 
 	void SetupParmsComposite( defParms_composite &p )
@@ -82,8 +91,6 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		p.iEnvmap = ENVMAP;
 		p.iEnvmapMask = ENVMAPMASK;
 		p.iEnvmapMask2 = ENVMAPMASK2;
-		p.iEnvmapMask3 = ENVMAPMASK3;
-		p.iEnvmapMask4 = ENVMAPMASK4;
 		p.iEnvmapTint = ENVMAPTINT;
 		p.iEnvmapContrast = ENVMAPCONTRAST;
 		p.iEnvmapSaturation = ENVMAPSATURATION;
@@ -94,7 +101,11 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		p.iPhongFresnel = PHONG_FRESNEL;
 
 		p.iBlendmodulate = BLENDMODULATETEXTURE;
+		p.iBlendmodulate2 = BLENDMODULATETEXTURE2;
+		p.iBlendmodulate3 = BLENDMODULATETEXTURE3;
 		p.iBlendmodulateTransform = BLENDMASKTRANSFORM;
+		p.iBlendmodulateTransform2 = BLENDMASKTRANSFORM2;
+		p.iBlendmodulateTransform3 = BLENDMASKTRANSFORM3;
 		p.iMultiblend = MULTIBLEND;
 
 		p.iFresnelRanges = FRESNELRANGES;
@@ -157,7 +168,12 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 	SHADER_FALLBACK
 	{
 		if ( !GetDeferredExt()->IsDeferredLightingEnabled() )
+		{
+			if ( PARM_SET( MULTIBLEND ) )
+				return "MultiBlend";
+
 			return "LightmappedGeneric";
+		}
 
 		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
 		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );

@@ -5,10 +5,14 @@
 // STATIC:		"PHONGMAP"			"0..1"
 // STATIC:		"BUMPMAP2"			"0..1"
 // STATIC:		"BLENDMODULATE"		"0..1"
+// STATIC:		"MULTIBLEND"		"0..1"
 
+// SKIP:		!$BUMPMAP2 && !$MULTIBLEND && $BLENDMODULATE
 // SKIP:		!$BUMPMAP && $BUMPMAP2
-// SKIP:		!$BUMPMAP2 && $BLENDMODULATE
 // SKIP:		$MODEL && $BUMPMAP2
+
+// SKIP:		$MODEL && $MULTIBLEND
+// SKIP:		$BUMPMAP2 && $MULTIBLEND
 
 #include "common_ps_fxc.h"
 #include "common_deferred_fxc.h"
@@ -41,6 +45,16 @@ sampler sBumpmap2							: register( s3 );
 sampler sBlendmodulate						: register( s4 );
 #endif
 
+#if MULTIBLEND
+sampler sBumpmap2							: register( s3 );
+sampler sBumpmap3							: register( s5 );
+sampler sBumpmap4							: register( s6 );
+#if BLENDMODULATE
+sampler sBlendmodulate2						: register( s7 );
+sampler sBlendmodulate3						: register( s8 );
+#endif
+#endif
+
 struct PS_INPUT
 {
 #if BLENDMODULATE
@@ -48,14 +62,12 @@ struct PS_INPUT
 #else
 	float2 vTexCoord				: TEXCOORD0;
 #endif
-	float3 worldNormal				: TEXCOORD1;
+	float4 worldNormal_Depth		: TEXCOORD1;
 
 #if BUMPMAP
 	float3 worldTangentS			: TEXCOORD2;
 	float3 worldTangentT			: TEXCOORD3;
 #endif
-
-	float depth						: TEXCOORD4;
 
 #if NOCULL
 	float vDir						: VFACE;
@@ -63,6 +75,17 @@ struct PS_INPUT
 
 #if BUMPMAP2
 	float4 vColor_0					: COLOR0;
+#endif
+
+#if MULTIBLEND
+#if BLENDMODULATE
+	float4 vTexCoordBlendmod23			: TEXCOORD4;
+#endif
+	float3 vAlphaBlend					: TEXCOORD5;
+	float4 vColorBlend1					: COLOR0;
+	float4 vColorBlend2					: COLOR1;
+	float4 vColorBlend3					: TEXCOORD6;
+	float3 vColorBlend4					: TEXCOORD7;
 #endif
 };
 
@@ -94,9 +117,28 @@ PS_OUTPUT main( const PS_INPUT In )
 	float3 bumpNormal2 = tex2D( sBumpmap2, In.vTexCoord.xy ).rgb;
 	float flBlendfactor = In.vColor_0.w;
 #if BLENDMODULATE
-	flBlendfactor = GetModulatedBlend( flBlendfactor, sBlendmodulate, In.vTexCoord.zw );
+	flBlendfactor = GetModulatedBlend( flBlendfactor, tex2D( sBlendmodulate, In.vTexCoord.zw ).rg );
 #endif
 	bumpNormal = lerp( bumpNormal, bumpNormal2, flBlendfactor );
+#endif
+
+#if MULTIBLEND
+	float remaining = 1;
+	float4 flBlendFactors;
+#if BLENDMODULATE
+	flBlendFactors.x = GetMultiBlendModulated( tex2D( sBlendmodulate, In.vTexCoord.zw ).rg, In.vColorBlend1.a, In.vAlphaBlend.x, remaining );
+	flBlendFactors.y = GetMultiBlendModulated( tex2D( sBlendmodulate2, In.vTexCoordBlendmod23.xy ).rg, In.vColorBlend2.a, In.vAlphaBlend.y, remaining );
+	flBlendFactors.z = GetMultiBlendModulated( tex2D( sBlendmodulate3, In.vTexCoordBlendmod23.zw ).rg, In.vColorBlend3.a, In.vAlphaBlend.z, remaining );
+#else
+	flBlendFactors.x = GetMultiBlend( In.vColorBlend1.a, remaining );
+	flBlendFactors.y = GetMultiBlend( In.vColorBlend2.a, remaining );
+	flBlendFactors.z = GetMultiBlend( In.vColorBlend3.a, remaining );
+#endif
+	flBlendFactors.w = remaining;
+	bumpNormal = bumpNormal * flBlendFactors.x
+		+ tex2D( sBumpmap2, In.vTexCoord.xy ) * flBlendFactors.y
+		+ tex2D( sBumpmap3, In.vTexCoord.xy ) * flBlendFactors.z
+		+ tex2D( sBumpmap4, In.vTexCoord.xy ) * flBlendFactors.w;
 #endif
 
 	float3 tangentNormal;
@@ -105,9 +147,9 @@ PS_OUTPUT main( const PS_INPUT In )
 #else
 	tangentNormal = normalize( bumpBasis[0]*bumpNormal.x + bumpBasis[1]*bumpNormal.y + bumpBasis[2]*bumpNormal.z);
 #endif
-	float3 worldNormal = Vec3TangentToWorld( tangentNormal, In.worldNormal, In.worldTangentS, In.worldTangentT );
+	float3 worldNormal = Vec3TangentToWorld( tangentNormal, In.worldNormal_Depth.xyz, In.worldTangentS, In.worldTangentT );
 #else
-	float3 worldNormal = In.worldNormal;
+	float3 worldNormal = In.worldNormal_Depth.xyz;
 #endif
 
 #if NOCULL
@@ -136,7 +178,7 @@ PS_OUTPUT main( const PS_INPUT In )
 	Out.vColor_2 = float4( phong_exp / 63.0f, g_flHalflambert_Litface.xy, 0 );
 #endif
 
-	Out.vColor_1 = float4( In.depth, 0, 0, 1 );
+	Out.vColor_1 = float4( In.worldNormal_Depth.w, 0, 0, 1 );
 
 	return Out;
 }

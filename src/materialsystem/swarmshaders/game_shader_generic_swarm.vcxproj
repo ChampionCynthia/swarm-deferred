@@ -202,6 +202,7 @@ if exist "$(TargetDir)"$(ProjectName).map copy "$(TargetDir)"$(ProjectName).map 
     <ClCompile Include="debug_shadow.cpp" />
     <ClCompile Include="deferred_brush.cpp" />
     <ClCompile Include="deferred_model.cpp" />
+    <ClCompile Include="deferred_utility.cpp" />
     <ClCompile Include="defpass_composite.cpp" />
     <ClCompile Include="defpass_gbuffer.cpp" />
     <ClCompile Include="defpass_shadow.cpp" />

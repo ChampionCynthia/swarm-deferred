@@ -26,8 +26,20 @@ void InitPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 	if ( PARM_DEFINED( info.iBumpmap2 ) )
 		pShader->LoadBumpMap( info.iBumpmap2 );
 
+	if ( PARM_DEFINED( info.iBumpmap3 ) )
+		pShader->LoadBumpMap( info.iBumpmap3 );
+
+	if ( PARM_DEFINED( info.iBumpmap4 ) )
+		pShader->LoadBumpMap( info.iBumpmap4 );
+
 	if ( PARM_DEFINED( info.iBlendmodulate ) )
 		pShader->LoadTexture( info.iBlendmodulate );
+
+	if ( PARM_DEFINED( info.iBlendmodulate2 ) )
+		pShader->LoadTexture( info.iBlendmodulate2 );
+
+	if ( PARM_DEFINED( info.iBlendmodulate3 ) )
+		pShader->LoadTexture( info.iBlendmodulate3 );
 
 	if ( PARM_DEFINED( info.iAlbedo ) )
 		pShader->LoadTexture( info.iAlbedo );
@@ -48,8 +60,16 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 	const bool bAlbedo = PARM_TEX( info.iAlbedo );
 	const bool bBumpmap = PARM_TEX( info.iBumpmap );
 	const bool bBumpmap2 = bBumpmap && PARM_TEX( info.iBumpmap2 );
+	const bool bBumpmap3 = bBumpmap && PARM_TEX( info.iBumpmap3 );
+	const bool bBumpmap4 = bBumpmap && PARM_TEX( info.iBumpmap4 );
 	const bool bPhongmap = PARM_TEX( info.iPhongmap );
-	const bool bBlendmodulate = bBumpmap2 && PARM_TEX( info.iBlendmodulate );
+
+	const bool bMultiBlend = PARM_SET( info.iMultiblend );
+	const bool bMultiBlendBump = bMultiBlend && bBumpmap;
+
+	const bool bBlendmodulate = ( bBumpmap2 || bMultiBlendBump ) && PARM_TEX( info.iBlendmodulate );
+	const bool bBlendmodulate2 = bBlendmodulate && PARM_TEX( info.iBlendmodulate2 );
+	const bool bBlendmodulate3 = bBlendmodulate && PARM_TEX( info.iBlendmodulate3 );
 
 	const bool bAlphatest = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST ) && bAlbedo;
 	const bool bSSBump = bBumpmap && PARM_SET( info.iSSBump );
@@ -69,8 +89,11 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 
 		int iVFmtFlags = VERTEX_POSITION | VERTEX_NORMAL;
 		int iUserDataSize = 0;
-		int pTexCoordDim[3] = { 2, 0, 3 };
-		int iTexCoordNum = ( bModel && bIsDecal && bFastVTex ) ? 3 : 1;
+
+		int *pTexCoordDim;
+		int iTexCoordNum;
+		GetTexcoordSettings( ( bModel && bIsDecal && bFastVTex ), bMultiBlend,
+			iTexCoordNum, &pTexCoordDim );
 
 		if ( bModel )
 		{
@@ -107,12 +130,24 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 			pShaderShadow->EnableSRGBRead( SHADER_SAMPLER2, false );
 		}
 
-		if ( bBumpmap2 )
+		if ( bBumpmap2 || bMultiBlendBump )
 		{
 			pShaderShadow->EnableTexture( SHADER_SAMPLER3, true );
 
 			if ( bBlendmodulate )
 				pShaderShadow->EnableTexture( SHADER_SAMPLER4, true );
+		}
+
+		if ( bMultiBlendBump )
+		{
+			pShaderShadow->EnableTexture( SHADER_SAMPLER5, true );
+			pShaderShadow->EnableTexture( SHADER_SAMPLER6, true );
+
+			if ( bBlendmodulate )
+			{
+				pShaderShadow->EnableTexture( SHADER_SAMPLER7, true );
+				pShaderShadow->EnableTexture( SHADER_SAMPLER8, true );
+			}
 		}
 
 		pShaderShadow->EnableAlphaWrites( true );
@@ -123,8 +158,9 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 		SET_STATIC_VERTEX_SHADER_COMBO( MODEL, bModel );
 		SET_STATIC_VERTEX_SHADER_COMBO( MORPHING_VTEX, bModel && bFastVTex );
 		SET_STATIC_VERTEX_SHADER_COMBO( TANGENTSPACE, bBumpmap );
-		SET_STATIC_VERTEX_SHADER_COMBO( BUMPMAP2, bBumpmap2 );
+		SET_STATIC_VERTEX_SHADER_COMBO( BUMPMAP2, bBumpmap2 && !bMultiBlend );
 		SET_STATIC_VERTEX_SHADER_COMBO( BLENDMODULATE, bBlendmodulate );
+		SET_STATIC_VERTEX_SHADER_COMBO( MULTIBLEND, bMultiBlendBump );
 		SET_STATIC_VERTEX_SHADER( gbuffer_vs30 );
 
 		DECLARE_STATIC_PIXEL_SHADER( gbuffer_ps30 );
@@ -132,8 +168,9 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 		SET_STATIC_PIXEL_SHADER_COMBO( BUMPMAP, bBumpmap ? bSSBump ? 2 : 1 : 0 );
 		SET_STATIC_PIXEL_SHADER_COMBO( NOCULL, bNoCull );
 		SET_STATIC_PIXEL_SHADER_COMBO( PHONGMAP, bPhongmap );
-		SET_STATIC_PIXEL_SHADER_COMBO( BUMPMAP2, bBumpmap2 );
+		SET_STATIC_PIXEL_SHADER_COMBO( BUMPMAP2, bBumpmap2 && !bMultiBlend );
 		SET_STATIC_PIXEL_SHADER_COMBO( BLENDMODULATE, bBlendmodulate );
+		SET_STATIC_PIXEL_SHADER_COMBO( MULTIBLEND, bMultiBlendBump );
 		SET_STATIC_PIXEL_SHADER( gbuffer_ps30 );
 	}
 	DYNAMIC_STATE
@@ -174,14 +211,46 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 					tmpBuf.SetPixelShaderConstant1( 2, flPhongExp[0] );
 			}
 
-			if ( bBumpmap2 )
+			if ( bBumpmap2 || bMultiBlendBump )
 			{
-				tmpBuf.BindTexture( pShader, SHADER_SAMPLER3, info.iBumpmap2 );
+				if ( bBumpmap2 )
+					tmpBuf.BindTexture( pShader, SHADER_SAMPLER3, info.iBumpmap2 );
+				else
+					tmpBuf.BindStandardTexture( SHADER_SAMPLER3, TEXTURE_NORMALMAP_FLAT );
 
 				if ( bBlendmodulate )
 				{
 					tmpBuf.SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_3, info.iBlendmodulateTransform );
 					tmpBuf.BindTexture( pShader, SHADER_SAMPLER4, info.iBlendmodulate );
+				}
+			}
+
+			if ( bMultiBlendBump )
+			{
+				if ( bBumpmap3 )
+					tmpBuf.BindTexture( pShader, SHADER_SAMPLER5, info.iBumpmap3 );
+				else
+					tmpBuf.BindStandardTexture( SHADER_SAMPLER5, TEXTURE_NORMALMAP_FLAT );
+
+				if ( bBumpmap4 )
+					tmpBuf.BindTexture( pShader, SHADER_SAMPLER6, info.iBumpmap4 );
+				else
+					tmpBuf.BindStandardTexture( SHADER_SAMPLER6, TEXTURE_NORMALMAP_FLAT );
+
+				if ( bBlendmodulate )
+				{
+					tmpBuf.SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_5, info.iBlendmodulateTransform2 );
+					tmpBuf.SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, info.iBlendmodulateTransform3 );
+
+					if ( bBlendmodulate2 )
+						tmpBuf.BindTexture( pShader, SHADER_SAMPLER7, info.iBlendmodulate2 );
+					else
+						tmpBuf.BindStandardTexture( SHADER_SAMPLER7, TEXTURE_BLACK );
+
+					if ( bBlendmodulate3 )
+						tmpBuf.BindTexture( pShader, SHADER_SAMPLER8, info.iBlendmodulate3 );
+					else
+						tmpBuf.BindStandardTexture( SHADER_SAMPLER8, TEXTURE_BLACK );
 				}
 			}
 

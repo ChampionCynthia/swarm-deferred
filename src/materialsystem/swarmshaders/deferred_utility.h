@@ -39,6 +39,8 @@
 	if ( PARM_VALID( x ) && !params[ x ]->IsDefined() )\
 	params[ x ]->SetVecValue( val0, val1, val2 );
 
+void GetTexcoordSettings( const bool bDecal, const bool bMultiBlend,
+	int &iNumTexcoords, int **iTexcoordDim );
 
 #include "defpass_gbuffer.h"
 

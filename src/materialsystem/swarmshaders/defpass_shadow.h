@@ -18,6 +18,9 @@ struct defParms_shadow
 	// control
 	int iAlphatestRef;
 
+	// blending
+	int iMultiblend;
+
 	// config
 	bool bModel;
 };

@@ -281,7 +281,7 @@ void ShaderEditorHandler::PrepareCallbackData()
 	if ( abs( flSearchTimer - gpGlobals->curtime ) > 5.0f )
 	{
 		C_BaseEntity *pEnt = ClientEntityList().FirstBaseEntity();
-		while ( !handleSun.IsValid() && pEnt )
+		while ( ( !handleSun.IsValid() || handleSun.Get() == NULL ) && pEnt )
 		{
 			if ( !Q_stricmp( pEnt->GetClassname(), "class C_Sun" ) )
 			{
@@ -292,7 +292,7 @@ void ShaderEditorHandler::PrepareCallbackData()
 		}
 	}
 
-	if ( handleSun.IsValid() )
+	if ( handleSun.IsValid() && handleSun.Get() != NULL )
 	{
 		C_Sun *pSun = handleSun.Get();
 		Vector dir = pSun->m_vDirection;

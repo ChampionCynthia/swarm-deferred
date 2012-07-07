@@ -90,6 +90,9 @@
     <ClCompile Include="volume_blend.cpp">
       <Filter>Source Files\lighting</Filter>
     </ClCompile>
+    <ClCompile Include="deferred_utility.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseVSShader.h">
