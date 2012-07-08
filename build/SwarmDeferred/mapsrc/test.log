@@ -12868,3 +12868,963 @@ Level flags = 2
 Total triangle count: 2044
 Writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
 32 seconds elapsed
+
+
+
+materialPath: d:\steam\SteamApps\sourcemods\swarmdeferred\materials
+Loading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.vmf
+fixing up env_cubemap materials on brush sides...
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10Processing areas...done (0)
+Building Faces...done (0)
+Chop Details...done (0)
+Find Visible Detail Sides...
+Merged 32 detail faces...done (0)
+Merging details...done (0)
+FixTjuncs...
+PruneNodes...
+WriteBSP...
+done (0)
+writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.prt...Building visibility clusters...
+done (0)
+Finding displacement neighbors...
+Finding lightmap sample positions...
+Displacement Alpha : 0...1...2...3...4...5...6...7...8...9...10
+Building Physics collision data...
+done (0) (22614 bytes)
+Placing detail props : 0...1...2...3...4...5...6...7...8...9...10
+Compacting texture/material tables...
+Reduced 79 texinfos to 46
+Reduced 25 texdatas to 20 (738 bytes to 608)
+Writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+2 seconds elapsed
+
+
+
+8 threads
+reading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+reading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.prt
+ 147 portalclusters
+ 278 numportals
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10Optimized: 195 visible clusters (0.00%)
+Total clusters visible: 13342
+Average clusters visible: 90
+Building PAS...
+Average clusters audible: 145
+visdatasize:6734  compressed from 7056
+writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+0 seconds elapsed
+
+
+
+[Reading texlights from 'lights.rad']
+[45 texlights parsed from 'lights.rad']
+
+Loading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+Loaded alpha texture materials\models\props_foliage\Mall_trees_branches02.vtf
+Loaded alpha texture materials\models\props_foliage\Mall_trees_branches01.vtf
+Loaded alpha texture materials\models\props_foliage\Urban_Trees_branches03_mip0.vtf
+879 faces
+2924285 square feet [421097024.00 square inches]
+11 Displacements
+43331 Square Feet [6239711.50 Square Inches]
+879 patches before subdivision
+41495 patches after subdivision
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred_global"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+1 direct lights
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10transfers 985426, max 712
+transfer lists:   7.5 megs
+0...1...2...3...4...5...6...7...8...9...10	Bounce #1 added RGB(1603, 1314, 1214)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #2 added RGB(149, 61, 28)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #3 added RGB(14, 5, 2)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #4 added RGB(2, 0, 0)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #5 added RGB(0, 0, 0)
+Build Patch/Sample Hash Table(s).....Done<0.0290 sec>
+0...1...2...3...4...5...6...7...8...9...10FinalLightFace Done
+0 of 0 (0% of) surface lights went in leaf ambient cubes.
+0...1...2...3...4...5...6...7...8...9...10Writing leaf ambient...done
+Computing static prop lighting : 00...1...2...3...4...5...6...7...8...9...10
+Ready to Finish
+
+Object names       Objects/Maxobjs  Memory / Maxmem  Fullness 
+------------       ---------------  ---------------  -------- 
+models                   6/1024          288/49152    ( 0.6%) 
+brushes                 61/8192          732/98304    ( 0.7%) 
+brushsides             366/65536        2928/524288   ( 0.6%) 
+planes                 264/65536        5280/1310720  ( 0.4%) 
+vertexes              1187/65536       14244/786432   ( 1.8%) 
+nodes                  427/65536       13664/2097152  ( 0.7%) 
+texinfos                46/12288        3312/884736   ( 0.4%) 
+texdata                 20/2048          640/65536    ( 1.0%) 
+dispinfos               11/0            1936/0        ( 0.0%) 
+disp_verts            3179/0           63580/0        ( 0.0%) 
+disp_tris             5632/0           11264/0        ( 0.0%) 
+disp_multiblend        289/0           23120/0        ( 0.0%) 
+disp_lmsamples      151143/0          151143/0        ( 0.0%) 
+faces                  879/65536       49224/3670016  ( 1.3%) 
+hdr faces              879/65536       49224/3670016  ( 1.3%) 
+origfaces              141/65536        7896/3670016  ( 0.2%) 
+leaves                 434/65536       13888/2097152  ( 0.7%) 
+leaffaces              930/65536        1860/131072   ( 1.4%) 
+leafbrushes            322/65536         644/131072   ( 0.5%) 
+areas                    3/256            24/2048     ( 1.2%) 
+surfedges             4366/512000      17464/2048000  ( 0.9%) 
+edges                 2426/256000       9704/1024000  ( 0.9%) 
+LDR worldlights          0/8192            0/819200   ( 0.0%) 
+HDR worldlights          1/8192          100/819200   ( 0.0%) 
+leafwaterdata            0/32768           0/393216   ( 0.0%) 
+waterstrips             39/32768         390/327680   ( 0.1%) 
+waterverts               0/65536           0/786432   ( 0.0%) 
+waterindices           753/65536        1506/131072   ( 1.1%) 
+cubemapsamples           8/1024          128/16384    ( 0.8%) 
+overlays                 1/512           352/180224   ( 0.2%) 
+LDR lightdata         [variable]           0/0        ( 0.0%) 
+HDR lightdata         [variable]     1382108/0        ( 0.0%) 
+visdata               [variable]        6734/16777216 ( 0.0%) 
+entdata               [variable]       17337/393216   ( 4.4%) 
+LDR ambient table      434/65536        1736/262144   ( 0.7%) 
+HDR ambient table      434/65536        1736/262144   ( 0.7%) 
+LDR leaf ambient       434/65536       12152/1835008  ( 0.7%) 
+HDR leaf ambient      1196/65536       33488/1835008  ( 1.8%) 
+occluders                0/0               0/0        ( 0.0%) 
+occluder polygons        0/0               0/0        ( 0.0%) 
+occluder vert ind        0/0               0/0        ( 0.0%) 
+Prop Hull Verts          0/0               0/0        ( 0.0%) 
+Prop Hull Blob           0/0               0/0        ( 0.0%) 
+Prop Hull Lists          0/0               0/0        ( 0.0%) 
+Prop Hulls               0/0               0/0        ( 0.0%) 
+Prop Hull trilist        0/0               0/0        ( 0.0%) 
+detail props          [variable]           1/12       ( 8.3%) 
+static props          [variable]           1/4388     ( 0.0%) 
+pakfile               [variable]      960113/0        ( 0.0%) 
+physics               [variable]       22614/4194304  ( 0.5%) 
+physics terrain       [variable]        4070/1048576  ( 0.4%) 
+
+Level flags = 2
+
+Total triangle count: 2044
+Writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+32 seconds elapsed
+
+
+
+materialPath: d:\steam\SteamApps\sourcemods\swarmdeferred\materials
+Loading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.vmf
+fixing up env_cubemap materials on brush sides...
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10Processing areas...done (0)
+Building Faces...done (0)
+Chop Details...done (0)
+Find Visible Detail Sides...
+Merged 32 detail faces...done (0)
+Merging details...done (0)
+FixTjuncs...
+PruneNodes...
+WriteBSP...
+done (0)
+writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.prt...Building visibility clusters...
+done (0)
+Finding displacement neighbors...
+Finding lightmap sample positions...
+Displacement Alpha : 0...1...2...3...4...5...6...7...8...9...10
+Building Physics collision data...
+done (0) (22614 bytes)
+Placing detail props : 0...1...2...3...4...5...6...7...8...9...10
+Compacting texture/material tables...
+Reduced 79 texinfos to 46
+Reduced 25 texdatas to 20 (738 bytes to 608)
+Writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+1 second elapsed
+
+
+
+8 threads
+reading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+reading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.prt
+ 147 portalclusters
+ 278 numportals
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10Optimized: 195 visible clusters (0.00%)
+Total clusters visible: 13342
+Average clusters visible: 90
+Building PAS...
+Average clusters audible: 145
+visdatasize:6734  compressed from 7056
+writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+0 seconds elapsed
+
+
+
+[Reading texlights from 'lights.rad']
+[45 texlights parsed from 'lights.rad']
+
+Loading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+Loaded alpha texture materials\models\props_foliage\Mall_trees_branches02.vtf
+Loaded alpha texture materials\models\props_foliage\Mall_trees_branches01.vtf
+Loaded alpha texture materials\models\props_foliage\Urban_Trees_branches03_mip0.vtf
+879 faces
+2924285 square feet [421097024.00 square inches]
+11 Displacements
+43331 Square Feet [6239711.50 Square Inches]
+879 patches before subdivision
+41495 patches after subdivision
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred_global"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+1 direct lights
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10transfers 985426, max 712
+transfer lists:   7.5 megs
+0...1...2...3...4...5...6...7...8...9...10	Bounce #1 added RGB(1603, 1314, 1214)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #2 added RGB(149, 61, 28)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #3 added RGB(14, 5, 2)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #4 added RGB(2, 0, 0)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #5 added RGB(0, 0, 0)
+Build Patch/Sample Hash Table(s).....Done<0.0289 sec>
+0...1...2...3...4...5...6...7...8...9...10FinalLightFace Done
+0 of 0 (0% of) surface lights went in leaf ambient cubes.
+0...1...2...3...4...5...6...7...8...9...10Writing leaf ambient...done
+Computing static prop lighting : 00...1...2...3...4...5...6...7...8...9...10
+Ready to Finish
+
+Object names       Objects/Maxobjs  Memory / Maxmem  Fullness 
+------------       ---------------  ---------------  -------- 
+models                   6/1024          288/49152    ( 0.6%) 
+brushes                 61/8192          732/98304    ( 0.7%) 
+brushsides             366/65536        2928/524288   ( 0.6%) 
+planes                 264/65536        5280/1310720  ( 0.4%) 
+vertexes              1187/65536       14244/786432   ( 1.8%) 
+nodes                  427/65536       13664/2097152  ( 0.7%) 
+texinfos                46/12288        3312/884736   ( 0.4%) 
+texdata                 20/2048          640/65536    ( 1.0%) 
+dispinfos               11/0            1936/0        ( 0.0%) 
+disp_verts            3179/0           63580/0        ( 0.0%) 
+disp_tris             5632/0           11264/0        ( 0.0%) 
+disp_multiblend        289/0           23120/0        ( 0.0%) 
+disp_lmsamples      151143/0          151143/0        ( 0.0%) 
+faces                  879/65536       49224/3670016  ( 1.3%) 
+hdr faces              879/65536       49224/3670016  ( 1.3%) 
+origfaces              141/65536        7896/3670016  ( 0.2%) 
+leaves                 434/65536       13888/2097152  ( 0.7%) 
+leaffaces              930/65536        1860/131072   ( 1.4%) 
+leafbrushes            322/65536         644/131072   ( 0.5%) 
+areas                    3/256            24/2048     ( 1.2%) 
+surfedges             4366/512000      17464/2048000  ( 0.9%) 
+edges                 2426/256000       9704/1024000  ( 0.9%) 
+LDR worldlights          0/8192            0/819200   ( 0.0%) 
+HDR worldlights          1/8192          100/819200   ( 0.0%) 
+leafwaterdata            0/32768           0/393216   ( 0.0%) 
+waterstrips             39/32768         390/327680   ( 0.1%) 
+waterverts               0/65536           0/786432   ( 0.0%) 
+waterindices           753/65536        1506/131072   ( 1.1%) 
+cubemapsamples           8/1024          128/16384    ( 0.8%) 
+overlays                 1/512           352/180224   ( 0.2%) 
+LDR lightdata         [variable]           0/0        ( 0.0%) 
+HDR lightdata         [variable]     1382108/0        ( 0.0%) 
+visdata               [variable]        6734/16777216 ( 0.0%) 
+entdata               [variable]       17337/393216   ( 4.4%) 
+LDR ambient table      434/65536        1736/262144   ( 0.7%) 
+HDR ambient table      434/65536        1736/262144   ( 0.7%) 
+LDR leaf ambient       434/65536       12152/1835008  ( 0.7%) 
+HDR leaf ambient      1196/65536       33488/1835008  ( 1.8%) 
+occluders                0/0               0/0        ( 0.0%) 
+occluder polygons        0/0               0/0        ( 0.0%) 
+occluder vert ind        0/0               0/0        ( 0.0%) 
+Prop Hull Verts          0/0               0/0        ( 0.0%) 
+Prop Hull Blob           0/0               0/0        ( 0.0%) 
+Prop Hull Lists          0/0               0/0        ( 0.0%) 
+Prop Hulls               0/0               0/0        ( 0.0%) 
+Prop Hull trilist        0/0               0/0        ( 0.0%) 
+detail props          [variable]           1/12       ( 8.3%) 
+static props          [variable]           1/4388     ( 0.0%) 
+pakfile               [variable]      960113/0        ( 0.0%) 
+physics               [variable]       22614/4194304  ( 0.5%) 
+physics terrain       [variable]        4070/1048576  ( 0.4%) 
+
+Level flags = 2
+
+Total triangle count: 2044
+Writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+32 seconds elapsed
+
+
+
+materialPath: d:\steam\SteamApps\sourcemods\swarmdeferred\materials
+Loading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.vmf
+fixing up env_cubemap materials on brush sides...
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10Processing areas...done (0)
+Building Faces...done (0)
+Chop Details...done (0)
+Find Visible Detail Sides...
+Merged 32 detail faces...done (0)
+Merging details...done (0)
+FixTjuncs...
+PruneNodes...
+WriteBSP...
+done (0)
+writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.prt...Building visibility clusters...
+done (0)
+Finding displacement neighbors...
+Finding lightmap sample positions...
+Displacement Alpha : 0...1...2...3...4...5...6...7...8...9...10
+Building Physics collision data...
+done (0) (22614 bytes)
+Placing detail props : 0...1...2...3...4...5...6...7...8...9...10
+Compacting texture/material tables...
+Reduced 79 texinfos to 46
+Reduced 25 texdatas to 20 (738 bytes to 608)
+Writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+1 second elapsed
+
+
+
+8 threads
+reading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+reading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.prt
+ 147 portalclusters
+ 278 numportals
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10Optimized: 195 visible clusters (0.00%)
+Total clusters visible: 13342
+Average clusters visible: 90
+Building PAS...
+Average clusters audible: 145
+visdatasize:6734  compressed from 7056
+writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+0 seconds elapsed
+
+
+
+[Reading texlights from 'lights.rad']
+[45 texlights parsed from 'lights.rad']
+
+Loading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+Loaded alpha texture materials\models\props_foliage\Mall_trees_branches02.vtf
+Loaded alpha texture materials\models\props_foliage\Mall_trees_branches01.vtf
+Loaded alpha texture materials\models\props_foliage\Urban_Trees_branches03_mip0.vtf
+879 faces
+2924285 square feet [421097024.00 square inches]
+11 Displacements
+43331 Square Feet [6239711.50 Square Inches]
+879 patches before subdivision
+41495 patches after subdivision
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred_global"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+1 direct lights
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10transfers 985426, max 712
+transfer lists:   7.5 megs
+0...1...2...3...4...5...6...7...8...9...10	Bounce #1 added RGB(1577, 1318, 1217)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #2 added RGB(148, 61, 28)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #3 added RGB(14, 5, 2)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #4 added RGB(2, 0, 0)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #5 added RGB(0, 0, 0)
+Build Patch/Sample Hash Table(s).....Done<0.0291 sec>
+0...1...2...3...4...5...6...7...8...9...10FinalLightFace Done
+0 of 0 (0% of) surface lights went in leaf ambient cubes.
+0...1...2...3...4...5...6...7...8...9...10Writing leaf ambient...done
+Computing static prop lighting : 00...1...2...3...4...5...6...7...8...9...10
+Ready to Finish
+
+Object names       Objects/Maxobjs  Memory / Maxmem  Fullness 
+------------       ---------------  ---------------  -------- 
+models                   6/1024          288/49152    ( 0.6%) 
+brushes                 61/8192          732/98304    ( 0.7%) 
+brushsides             366/65536        2928/524288   ( 0.6%) 
+planes                 264/65536        5280/1310720  ( 0.4%) 
+vertexes              1187/65536       14244/786432   ( 1.8%) 
+nodes                  427/65536       13664/2097152  ( 0.7%) 
+texinfos                46/12288        3312/884736   ( 0.4%) 
+texdata                 20/2048          640/65536    ( 1.0%) 
+dispinfos               11/0            1936/0        ( 0.0%) 
+disp_verts            3179/0           63580/0        ( 0.0%) 
+disp_tris             5632/0           11264/0        ( 0.0%) 
+disp_multiblend        289/0           23120/0        ( 0.0%) 
+disp_lmsamples      151143/0          151143/0        ( 0.0%) 
+faces                  879/65536       49224/3670016  ( 1.3%) 
+hdr faces              879/65536       49224/3670016  ( 1.3%) 
+origfaces              141/65536        7896/3670016  ( 0.2%) 
+leaves                 434/65536       13888/2097152  ( 0.7%) 
+leaffaces              930/65536        1860/131072   ( 1.4%) 
+leafbrushes            322/65536         644/131072   ( 0.5%) 
+areas                    3/256            24/2048     ( 1.2%) 
+surfedges             4366/512000      17464/2048000  ( 0.9%) 
+edges                 2426/256000       9704/1024000  ( 0.9%) 
+LDR worldlights          0/8192            0/819200   ( 0.0%) 
+HDR worldlights          1/8192          100/819200   ( 0.0%) 
+leafwaterdata            0/32768           0/393216   ( 0.0%) 
+waterstrips             39/32768         390/327680   ( 0.1%) 
+waterverts               0/65536           0/786432   ( 0.0%) 
+waterindices           753/65536        1506/131072   ( 1.1%) 
+cubemapsamples           8/1024          128/16384    ( 0.8%) 
+overlays                 1/512           352/180224   ( 0.2%) 
+LDR lightdata         [variable]           0/0        ( 0.0%) 
+HDR lightdata         [variable]     1382108/0        ( 0.0%) 
+visdata               [variable]        6734/16777216 ( 0.0%) 
+entdata               [variable]       17337/393216   ( 4.4%) 
+LDR ambient table      434/65536        1736/262144   ( 0.7%) 
+HDR ambient table      434/65536        1736/262144   ( 0.7%) 
+LDR leaf ambient       434/65536       12152/1835008  ( 0.7%) 
+HDR leaf ambient      1130/65536       31640/1835008  ( 1.7%) 
+occluders                0/0               0/0        ( 0.0%) 
+occluder polygons        0/0               0/0        ( 0.0%) 
+occluder vert ind        0/0               0/0        ( 0.0%) 
+Prop Hull Verts          0/0               0/0        ( 0.0%) 
+Prop Hull Blob           0/0               0/0        ( 0.0%) 
+Prop Hull Lists          0/0               0/0        ( 0.0%) 
+Prop Hulls               0/0               0/0        ( 0.0%) 
+Prop Hull trilist        0/0               0/0        ( 0.0%) 
+detail props          [variable]           1/12       ( 8.3%) 
+static props          [variable]           1/4388     ( 0.0%) 
+pakfile               [variable]      960113/0        ( 0.0%) 
+physics               [variable]       22614/4194304  ( 0.5%) 
+physics terrain       [variable]        4070/1048576  ( 0.4%) 
+
+Level flags = 2
+
+Total triangle count: 2044
+Writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+32 seconds elapsed
+
+
+
+materialPath: d:\steam\SteamApps\sourcemods\swarmdeferred\materials
+Loading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.vmf
+fixing up env_cubemap materials on brush sides...
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10Processing areas...done (0)
+Building Faces...done (0)
+Chop Details...done (0)
+Find Visible Detail Sides...
+Merged 32 detail faces...done (0)
+Merging details...done (0)
+FixTjuncs...
+PruneNodes...
+WriteBSP...
+done (0)
+writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.prt...Building visibility clusters...
+done (0)
+Finding displacement neighbors...
+Finding lightmap sample positions...
+Displacement Alpha : 0...1...2...3...4...5...6...7...8...9...10
+Building Physics collision data...
+done (0) (22614 bytes)
+Placing detail props : 0...1...2...3...4...5...6...7...8...9...10
+Compacting texture/material tables...
+Reduced 79 texinfos to 46
+Reduced 25 texdatas to 20 (738 bytes to 608)
+Writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+1 second elapsed
+
+
+
+8 threads
+reading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+reading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.prt
+ 147 portalclusters
+ 278 numportals
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10Optimized: 195 visible clusters (0.00%)
+Total clusters visible: 13342
+Average clusters visible: 90
+Building PAS...
+Average clusters audible: 145
+visdatasize:6734  compressed from 7056
+writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+0 seconds elapsed
+
+
+
+[Reading texlights from 'lights.rad']
+[45 texlights parsed from 'lights.rad']
+
+Loading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+Loaded alpha texture materials\models\props_foliage\Mall_trees_branches02.vtf
+Loaded alpha texture materials\models\props_foliage\Mall_trees_branches01.vtf
+Loaded alpha texture materials\models\props_foliage\Urban_Trees_branches03_mip0.vtf
+879 faces
+2924285 square feet [421097024.00 square inches]
+11 Displacements
+43331 Square Feet [6239711.50 Square Inches]
+879 patches before subdivision
+41495 patches after subdivision
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred_global"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+1 direct lights
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10transfers 978310, max 708
+transfer lists:   7.5 megs
+0...1...2...3...4...5...6...7...8...9...10	Bounce #1 added RGB(1574, 1316, 1215)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #2 added RGB(148, 61, 28)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #3 added RGB(14, 5, 2)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #4 added RGB(2, 0, 0)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #5 added RGB(0, 0, 0)
+Build Patch/Sample Hash Table(s).....Done<0.0295 sec>
+0...1...2...3...4...5...6...7...8...9...10FinalLightFace Done
+0 of 0 (0% of) surface lights went in leaf ambient cubes.
+0...1...2...3...4...5...6...7...8...9...10Writing leaf ambient...done
+Computing static prop lighting : 00...1...2...3...4...5...6...7...8...9...10
+Ready to Finish
+
+Object names       Objects/Maxobjs  Memory / Maxmem  Fullness 
+------------       ---------------  ---------------  -------- 
+models                   6/1024          288/49152    ( 0.6%) 
+brushes                 61/8192          732/98304    ( 0.7%) 
+brushsides             366/65536        2928/524288   ( 0.6%) 
+planes                 264/65536        5280/1310720  ( 0.4%) 
+vertexes              1187/65536       14244/786432   ( 1.8%) 
+nodes                  427/65536       13664/2097152  ( 0.7%) 
+texinfos                46/12288        3312/884736   ( 0.4%) 
+texdata                 20/2048          640/65536    ( 1.0%) 
+dispinfos               11/0            1936/0        ( 0.0%) 
+disp_verts            3179/0           63580/0        ( 0.0%) 
+disp_tris             5632/0           11264/0        ( 0.0%) 
+disp_multiblend        289/0           23120/0        ( 0.0%) 
+disp_lmsamples      151143/0          151143/0        ( 0.0%) 
+faces                  879/65536       49224/3670016  ( 1.3%) 
+hdr faces              879/65536       49224/3670016  ( 1.3%) 
+origfaces              141/65536        7896/3670016  ( 0.2%) 
+leaves                 434/65536       13888/2097152  ( 0.7%) 
+leaffaces              930/65536        1860/131072   ( 1.4%) 
+leafbrushes            322/65536         644/131072   ( 0.5%) 
+areas                    3/256            24/2048     ( 1.2%) 
+surfedges             4366/512000      17464/2048000  ( 0.9%) 
+edges                 2426/256000       9704/1024000  ( 0.9%) 
+LDR worldlights          0/8192            0/819200   ( 0.0%) 
+HDR worldlights          1/8192          100/819200   ( 0.0%) 
+leafwaterdata            0/32768           0/393216   ( 0.0%) 
+waterstrips             39/32768         390/327680   ( 0.1%) 
+waterverts               0/65536           0/786432   ( 0.0%) 
+waterindices           753/65536        1506/131072   ( 1.1%) 
+cubemapsamples           9/1024          144/16384    ( 0.9%) 
+overlays                 1/512           352/180224   ( 0.2%) 
+LDR lightdata         [variable]           0/0        ( 0.0%) 
+HDR lightdata         [variable]     1382108/0        ( 0.0%) 
+visdata               [variable]        6734/16777216 ( 0.0%) 
+entdata               [variable]       17337/393216   ( 4.4%) 
+LDR ambient table      434/65536        1736/262144   ( 0.7%) 
+HDR ambient table      434/65536        1736/262144   ( 0.7%) 
+LDR leaf ambient       434/65536       12152/1835008  ( 0.7%) 
+HDR leaf ambient      1134/65536       31752/1835008  ( 1.7%) 
+occluders                0/0               0/0        ( 0.0%) 
+occluder polygons        0/0               0/0        ( 0.0%) 
+occluder vert ind        0/0               0/0        ( 0.0%) 
+Prop Hull Verts          0/0               0/0        ( 0.0%) 
+Prop Hull Blob           0/0               0/0        ( 0.0%) 
+Prop Hull Lists          0/0               0/0        ( 0.0%) 
+Prop Hulls               0/0               0/0        ( 0.0%) 
+Prop Hull trilist        0/0               0/0        ( 0.0%) 
+detail props          [variable]           1/12       ( 8.3%) 
+static props          [variable]           1/4388     ( 0.0%) 
+pakfile               [variable]     1034477/0        ( 0.0%) 
+physics               [variable]       22614/4194304  ( 0.5%) 
+physics terrain       [variable]        4406/1048576  ( 0.4%) 
+
+Level flags = 2
+
+Total triangle count: 2044
+Writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+32 seconds elapsed
+
+
+
+materialPath: d:\steam\SteamApps\sourcemods\swarmdeferred\materials
+Loading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.vmf
+fixing up env_cubemap materials on brush sides...
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10Processing areas...done (0)
+Building Faces...done (0)
+Chop Details...done (0)
+Find Visible Detail Sides...
+Merged 32 detail faces...done (0)
+Merging details...done (0)
+FixTjuncs...
+PruneNodes...
+WriteBSP...
+done (0)
+writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.prt...Building visibility clusters...
+done (0)
+Finding displacement neighbors...
+Finding lightmap sample positions...
+Displacement Alpha : 0...1...2...3...4...5...6...7...8...9...10
+Building Physics collision data...
+done (0) (22614 bytes)
+Placing detail props : 0...1...2...3...4...5...6...7...8...9...10
+Compacting texture/material tables...
+Reduced 79 texinfos to 46
+Reduced 25 texdatas to 20 (738 bytes to 608)
+Writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+1 second elapsed
+
+
+
+8 threads
+reading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+reading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.prt
+ 147 portalclusters
+ 278 numportals
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10Optimized: 195 visible clusters (0.00%)
+Total clusters visible: 13342
+Average clusters visible: 90
+Building PAS...
+Average clusters audible: 145
+visdatasize:6734  compressed from 7056
+writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+0 seconds elapsed
+
+
+
+[Reading texlights from 'lights.rad']
+[45 texlights parsed from 'lights.rad']
+
+Loading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+Loaded alpha texture materials\models\props_foliage\Mall_trees_branches02.vtf
+Loaded alpha texture materials\models\props_foliage\Mall_trees_branches01.vtf
+Loaded alpha texture materials\models\props_foliage\Urban_Trees_branches03_mip0.vtf
+879 faces
+2924285 square feet [421097024.00 square inches]
+11 Displacements
+43331 Square Feet [6239711.50 Square Inches]
+879 patches before subdivision
+41495 patches after subdivision
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred_global"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+1 direct lights
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10transfers 978310, max 708
+transfer lists:   7.5 megs
+0...1...2...3...4...5...6...7...8...9...10	Bounce #1 added RGB(1574, 1316, 1215)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #2 added RGB(148, 61, 28)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #3 added RGB(14, 5, 2)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #4 added RGB(2, 0, 0)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #5 added RGB(0, 0, 0)
+Build Patch/Sample Hash Table(s).....Done<0.0291 sec>
+0...1...2...3...4...5...6...7...8...9...10FinalLightFace Done
+0 of 0 (0% of) surface lights went in leaf ambient cubes.
+0...1...2...3...4...5...6...7...8...9...10Writing leaf ambient...done
+Computing static prop lighting : 00...1...2...3...4...5...6...7...8...9...10
+Ready to Finish
+
+Object names       Objects/Maxobjs  Memory / Maxmem  Fullness 
+------------       ---------------  ---------------  -------- 
+models                   6/1024          288/49152    ( 0.6%) 
+brushes                 61/8192          732/98304    ( 0.7%) 
+brushsides             366/65536        2928/524288   ( 0.6%) 
+planes                 264/65536        5280/1310720  ( 0.4%) 
+vertexes              1187/65536       14244/786432   ( 1.8%) 
+nodes                  427/65536       13664/2097152  ( 0.7%) 
+texinfos                46/12288        3312/884736   ( 0.4%) 
+texdata                 20/2048          640/65536    ( 1.0%) 
+dispinfos               11/0            1936/0        ( 0.0%) 
+disp_verts            3179/0           63580/0        ( 0.0%) 
+disp_tris             5632/0           11264/0        ( 0.0%) 
+disp_multiblend        289/0           23120/0        ( 0.0%) 
+disp_lmsamples      151143/0          151143/0        ( 0.0%) 
+faces                  879/65536       49224/3670016  ( 1.3%) 
+hdr faces              879/65536       49224/3670016  ( 1.3%) 
+origfaces              141/65536        7896/3670016  ( 0.2%) 
+leaves                 434/65536       13888/2097152  ( 0.7%) 
+leaffaces              930/65536        1860/131072   ( 1.4%) 
+leafbrushes            322/65536         644/131072   ( 0.5%) 
+areas                    3/256            24/2048     ( 1.2%) 
+surfedges             4366/512000      17464/2048000  ( 0.9%) 
+edges                 2426/256000       9704/1024000  ( 0.9%) 
+LDR worldlights          0/8192            0/819200   ( 0.0%) 
+HDR worldlights          1/8192          100/819200   ( 0.0%) 
+leafwaterdata            0/32768           0/393216   ( 0.0%) 
+waterstrips             39/32768         390/327680   ( 0.1%) 
+waterverts               0/65536           0/786432   ( 0.0%) 
+waterindices           753/65536        1506/131072   ( 1.1%) 
+cubemapsamples           9/1024          144/16384    ( 0.9%) 
+overlays                 1/512           352/180224   ( 0.2%) 
+LDR lightdata         [variable]           0/0        ( 0.0%) 
+HDR lightdata         [variable]     1382108/0        ( 0.0%) 
+visdata               [variable]        6734/16777216 ( 0.0%) 
+entdata               [variable]       17337/393216   ( 4.4%) 
+LDR ambient table      434/65536        1736/262144   ( 0.7%) 
+HDR ambient table      434/65536        1736/262144   ( 0.7%) 
+LDR leaf ambient       434/65536       12152/1835008  ( 0.7%) 
+HDR leaf ambient      1134/65536       31752/1835008  ( 1.7%) 
+occluders                0/0               0/0        ( 0.0%) 
+occluder polygons        0/0               0/0        ( 0.0%) 
+occluder vert ind        0/0               0/0        ( 0.0%) 
+Prop Hull Verts          0/0               0/0        ( 0.0%) 
+Prop Hull Blob           0/0               0/0        ( 0.0%) 
+Prop Hull Lists          0/0               0/0        ( 0.0%) 
+Prop Hulls               0/0               0/0        ( 0.0%) 
+Prop Hull trilist        0/0               0/0        ( 0.0%) 
+detail props          [variable]           1/12       ( 8.3%) 
+static props          [variable]           1/4388     ( 0.0%) 
+pakfile               [variable]     1034477/0        ( 0.0%) 
+physics               [variable]       22614/4194304  ( 0.5%) 
+physics terrain       [variable]        4406/1048576  ( 0.4%) 
+
+Level flags = 2
+
+Total triangle count: 2044
+Writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+32 seconds elapsed
+
+
+
+materialPath: d:\steam\SteamApps\sourcemods\swarmdeferred\materials
+Loading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.vmf
+fixing up env_cubemap materials on brush sides...
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10Processing areas...done (0)
+Building Faces...done (0)
+Chop Details...done (0)
+Find Visible Detail Sides...
+Merged 32 detail faces...done (0)
+Merging details...done (0)
+FixTjuncs...
+PruneNodes...
+WriteBSP...
+done (0)
+writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.prt...Building visibility clusters...
+done (0)
+Finding displacement neighbors...
+Finding lightmap sample positions...
+Displacement Alpha : 0...1...2...3...4...5...6...7...8...9...10
+Building Physics collision data...
+done (0) (22614 bytes)
+Placing detail props : 0...1...2...3...4...5...6...7...8...9...10
+Compacting texture/material tables...
+Reduced 80 texinfos to 46
+Reduced 26 texdatas to 20 (783 bytes to 633)
+Writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+1 second elapsed
+
+
+
+8 threads
+reading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+reading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.prt
+ 147 portalclusters
+ 278 numportals
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10Optimized: 193 visible clusters (0.00%)
+Total clusters visible: 13340
+Average clusters visible: 90
+Building PAS...
+Average clusters audible: 145
+visdatasize:6734  compressed from 7056
+writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+0 seconds elapsed
+
+
+
+[Reading texlights from 'lights.rad']
+[45 texlights parsed from 'lights.rad']
+
+Loading d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+Loaded alpha texture materials\models\props_foliage\Mall_trees_branches02.vtf
+Loaded alpha texture materials\models\props_foliage\Mall_trees_branches01.vtf
+Loaded alpha texture materials\models\props_foliage\Urban_Trees_branches03_mip0.vtf
+879 faces
+2924285 square feet [421097024.00 square inches]
+11 Displacements
+43331 Square Feet [6239711.50 Square Inches]
+879 patches before subdivision
+41241 patches after subdivision
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred_global"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+unsupported light entity: "light_deferred"
+1 direct lights
+0...1...2...3...4...5...6...7...8...9...100...1...2...3...4...5...6...7...8...9...10transfers 966099, max 707
+transfer lists:   7.4 megs
+0...1...2...3...4...5...6...7...8...9...10	Bounce #1 added RGB(1504, 1281, 1150)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #2 added RGB(139, 59, 26)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #3 added RGB(13, 5, 2)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #4 added RGB(2, 0, 0)
+0...1...2...3...4...5...6...7...8...9...10	Bounce #5 added RGB(0, 0, 0)
+Build Patch/Sample Hash Table(s).....Done<0.0286 sec>
+0...1...2...3...4...5...6...7...8...9...10FinalLightFace Done
+0 of 0 (0% of) surface lights went in leaf ambient cubes.
+0...1...2...3...4...5...6...7...8...9...10Writing leaf ambient...done
+Computing static prop lighting : 00...1...2...3...4...5...6...7...8...9...10
+Ready to Finish
+
+Object names       Objects/Maxobjs  Memory / Maxmem  Fullness 
+------------       ---------------  ---------------  -------- 
+models                   6/1024          288/49152    ( 0.6%) 
+brushes                 61/8192          732/98304    ( 0.7%) 
+brushsides             366/65536        2928/524288   ( 0.6%) 
+planes                 264/65536        5280/1310720  ( 0.4%) 
+vertexes              1187/65536       14244/786432   ( 1.8%) 
+nodes                  427/65536       13664/2097152  ( 0.7%) 
+texinfos                46/12288        3312/884736   ( 0.4%) 
+texdata                 20/2048          640/65536    ( 1.0%) 
+dispinfos               11/0            1936/0        ( 0.0%) 
+disp_verts            3179/0           63580/0        ( 0.0%) 
+disp_tris             5632/0           11264/0        ( 0.0%) 
+disp_multiblend        289/0           23120/0        ( 0.0%) 
+disp_lmsamples      151143/0          151143/0        ( 0.0%) 
+faces                  879/65536       49224/3670016  ( 1.3%) 
+hdr faces              879/65536       49224/3670016  ( 1.3%) 
+origfaces              141/65536        7896/3670016  ( 0.2%) 
+leaves                 434/65536       13888/2097152  ( 0.7%) 
+leaffaces              930/65536        1860/131072   ( 1.4%) 
+leafbrushes            322/65536         644/131072   ( 0.5%) 
+areas                    3/256            24/2048     ( 1.2%) 
+surfedges             4366/512000      17464/2048000  ( 0.9%) 
+edges                 2426/256000       9704/1024000  ( 0.9%) 
+LDR worldlights          0/8192            0/819200   ( 0.0%) 
+HDR worldlights          1/8192          100/819200   ( 0.0%) 
+leafwaterdata            0/32768           0/393216   ( 0.0%) 
+waterstrips             39/32768         390/327680   ( 0.1%) 
+waterverts               0/65536           0/786432   ( 0.0%) 
+waterindices           753/65536        1506/131072   ( 1.1%) 
+cubemapsamples           9/1024          144/16384    ( 0.9%) 
+overlays                 1/512           352/180224   ( 0.2%) 
+LDR lightdata         [variable]           0/0        ( 0.0%) 
+HDR lightdata         [variable]     1372104/0        ( 0.0%) 
+visdata               [variable]        6734/16777216 ( 0.0%) 
+entdata               [variable]       17337/393216   ( 4.4%) 
+LDR ambient table      434/65536        1736/262144   ( 0.7%) 
+HDR ambient table      434/65536        1736/262144   ( 0.7%) 
+LDR leaf ambient       434/65536       12152/1835008  ( 0.7%) 
+HDR leaf ambient      1099/65536       30772/1835008  ( 1.7%) 
+occluders                0/0               0/0        ( 0.0%) 
+occluder polygons        0/0               0/0        ( 0.0%) 
+occluder vert ind        0/0               0/0        ( 0.0%) 
+Prop Hull Verts          0/0               0/0        ( 0.0%) 
+Prop Hull Blob           0/0               0/0        ( 0.0%) 
+Prop Hull Lists          0/0               0/0        ( 0.0%) 
+Prop Hulls               0/0               0/0        ( 0.0%) 
+Prop Hull trilist        0/0               0/0        ( 0.0%) 
+detail props          [variable]           1/12       ( 8.3%) 
+static props          [variable]           1/4388     ( 0.0%) 
+pakfile               [variable]     1034795/0        ( 0.0%) 
+physics               [variable]       22614/4194304  ( 0.5%) 
+physics terrain       [variable]        4406/1048576  ( 0.4%) 
+
+Level flags = 2
+
+Total triangle count: 2044
+Writing d:\steam\steamapps\sourcemods\swarmdeferred\mapsrc\test.bsp
+32 seconds elapsed
