@@ -250,8 +250,8 @@ void CDeferredViewRender::CreateRadiosityScreenGrid()
 		for ( int y = 0; y < RADIOSITY_BUFFER_GRIDS_PER_AXIS; y++ )
 		{
 			const int iIndexLocal = x + y * RADIOSITY_BUFFER_GRIDS_PER_AXIS;
-			const int iIndicesOne[2] = { MAX( 0, iIndexLocal - 1 ), MIN( RADIOSITY_BUFFER_SAMPLES - 1, iIndexLocal + 1 ) };
-			const int iIndicesTwo[2] = { MAX( 0, iIndexLocal - 2 ), MIN( RADIOSITY_BUFFER_SAMPLES - 1, iIndexLocal + 2 ) };
+			const int iIndicesOne[2] = { MIN( RADIOSITY_BUFFER_SAMPLES - 1, iIndexLocal + 1 ), MAX( 0, iIndexLocal - 1 ) };
+			const int iIndicesTwo[2] = { MIN( RADIOSITY_BUFFER_SAMPLES - 1, iIndexLocal + 2 ), MAX( 0, iIndexLocal - 2 ) };
 
 			for ( int q = 0; q < 4; q++ )
 			{
@@ -940,6 +940,12 @@ void CDeferredViewRender::PerformLighting( const CViewSetup &view )
 	pRenderContext->PopRenderTargetAndViewport();
 }
 
+static int GetSourceRadBufferIndex()
+{
+	const int iNumSteps = deferred_radiosity_propagate_count.GetInt() + deferred_radiosity_blur_count.GetInt();
+	return ( iNumSteps % 2 == 0 ) ? 0 : 1;
+}
+
 void CDeferredViewRender::BeginRadiosity( const CViewSetup &view )
 {
 	const int gridSize = RADIOSITY_BUFFER_SAMPLES;
@@ -958,12 +964,19 @@ void CDeferredViewRender::BeginRadiosity( const CViewSetup &view )
 	m_vecRadiosityOrigin -= gridSizeHalf * gridStepSize;
 	UpdateRadiosityPosition();
 
-	const int iSourceBuffer = ( deferred_radiosity_propagate_count.GetInt() % 2 == 0 ) ? 0 : 1;
+	const int iSourceBuffer = GetSourceRadBufferIndex();
 
 	CMatRenderContextPtr pRenderContext( materials );
+
 	pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( iSourceBuffer ), NULL,
 		0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
 	pRenderContext->ClearColor3ub( 0, 0, 0 );
+	pRenderContext->ClearBuffers( true, false );
+	pRenderContext->PopRenderTargetAndViewport();
+
+	pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityNormal(), NULL,
+		0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
+	pRenderContext->ClearColor3ub( 127, 127, 127 );
 	pRenderContext->ClearBuffers( true, false );
 	pRenderContext->PopRenderTargetAndViewport();
 }
@@ -991,7 +1004,7 @@ void CDeferredViewRender::UpdateRadiosityPosition( Vector *offset )
 
 void CDeferredViewRender::PerformRadiosityGlobal( const CViewSetup &view )
 {
-	const int iSourceBuffer = ( deferred_radiosity_propagate_count.GetInt() % 2 == 0 ) ? 0 : 1;
+	const int iSourceBuffer = GetSourceRadBufferIndex();
 
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( iSourceBuffer ), NULL,
@@ -1007,11 +1020,17 @@ void CDeferredViewRender::PerformRadiosityGlobal( const CViewSetup &view )
 void CDeferredViewRender::EndRadiosity( const CViewSetup &view )
 {
 	const int iNumPropagateSteps = deferred_radiosity_propagate_count.GetInt();
-	bool bSecondDestBuffer = ( iNumPropagateSteps % 2 == 0 );
+	const int iNumBlurSteps = deferred_radiosity_blur_count.GetInt();
+	bool bSecondDestBuffer = GetSourceRadBufferIndex() == 0;
 
 	IMaterial *pPropagateMat[2] = {
 		GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_0 ),
 		GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_1 ),
+	};
+
+	IMaterial *pBlurMat[2] = {
+		GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_BLUR_0 ),
+		GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_BLUR_1 ),
 	};
 
 	for ( int i = 0; i < iNumPropagateSteps; i++ )
@@ -1019,12 +1038,24 @@ void CDeferredViewRender::EndRadiosity( const CViewSetup &view )
 		CMatRenderContextPtr pRenderContext( materials );
 		pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( bSecondDestBuffer ? 1 : 0 ), NULL,
 			0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
-
 		pRenderContext->Bind( pPropagateMat[ bSecondDestBuffer ? 0 : 1 ] );
+
 		GetRadiosityScreenGrid()->Draw();
 
 		pRenderContext->PopRenderTargetAndViewport();
+		bSecondDestBuffer = !bSecondDestBuffer;
+	}
 
+	for ( int i = 0; i < iNumBlurSteps; i++ )
+	{
+		CMatRenderContextPtr pRenderContext( materials );
+		pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( bSecondDestBuffer ? 1 : 0 ), NULL,
+			0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
+		pRenderContext->Bind( pBlurMat[ bSecondDestBuffer ? 0 : 1 ] );
+
+		GetRadiosityScreenGrid()->Draw();
+
+		pRenderContext->PopRenderTargetAndViewport();
 		bSecondDestBuffer = !bSecondDestBuffer;
 	}
 

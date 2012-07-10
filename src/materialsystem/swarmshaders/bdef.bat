@@ -50,7 +50,7 @@ set tt_all_chkpt=%tt_start%
 set BUILD_SHADER=call buildshaders.bat
 set ARG_EXTRA=
 
-%BUILD_SHADER% deferred_shaders_short		-game %GAMEDIR% -source %SOURCEDIR%
+%BUILD_SHADER% deferred_shaders		-game %GAMEDIR% -source %SOURCEDIR%
 
 
 rem echo.
