@@ -190,6 +190,98 @@ void DrawCube( CMeshBuilder &meshBuilder, Vector vecPos, float flRadius, float *
 	}
 }
 
+IMesh *CDeferredViewRender::GetRadiosityScreenGrid()
+{
+	if ( m_pMesh_RadiosityScreenGrid == NULL )
+		CreateRadiosityScreenGrid();
+
+	Assert( m_pMesh_RadiosityScreenGrid != NULL );
+
+	return m_pMesh_RadiosityScreenGrid;
+}
+
+void CDeferredViewRender::CreateRadiosityScreenGrid()
+{
+	Assert( m_pMesh_RadiosityScreenGrid == NULL );
+
+	VertexFormat_t format = VERTEX_POSITION
+		| VERTEX_TEXCOORD_SIZE( 0, 2 )
+		| VERTEX_TEXCOORD_SIZE( 1, 4 )
+		| VERTEX_TEXCOORD_SIZE( 2, 4 )
+		| VERTEX_TANGENT_S;
+
+	const float flLocalCoordSingle = 1.0f / RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+	const float flTexelHalf = 0.5f / RADIOSITY_BUFFER_RES;
+	const float flLocalCoords[4][2] = {
+		0, 0,
+		flLocalCoordSingle, 0,
+		flLocalCoordSingle, flLocalCoordSingle,
+		0, flLocalCoordSingle,
+	};
+
+	CMatRenderContextPtr pRenderContext( materials );
+	m_pMesh_RadiosityScreenGrid = pRenderContext->CreateStaticMesh(
+		format, TEXTURE_GROUP_OTHER );
+	
+	CMeshBuilder meshBuilder;
+	meshBuilder.Begin( m_pMesh_RadiosityScreenGrid, MATERIAL_QUADS,
+		RADIOSITY_BUFFER_GRIDS_PER_AXIS * RADIOSITY_BUFFER_GRIDS_PER_AXIS );
+
+	float flGridOrigins[RADIOSITY_BUFFER_SAMPLES][2];
+	for ( int i = 0; i < RADIOSITY_BUFFER_SAMPLES; i++ )
+	{
+		int x = i % RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+		int y = i / RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+
+		flGridOrigins[i][0] = x * flLocalCoordSingle + flTexelHalf;
+		flGridOrigins[i][1] = y * flLocalCoordSingle + flTexelHalf;
+	}
+
+	const float flGridSize = RADIOSITY_BUFFER_GRID_STEP_SIZE * RADIOSITY_BUFFER_SAMPLES;
+	const float flLocalGridSize[4][2] = {
+		0, 0,
+		flGridSize, 0,
+		flGridSize, flGridSize,
+		0, flGridSize,
+	};
+
+	for ( int x = 0; x < RADIOSITY_BUFFER_GRIDS_PER_AXIS; x++ )
+	{
+		for ( int y = 0; y < RADIOSITY_BUFFER_GRIDS_PER_AXIS; y++ )
+		{
+			const int iIndexLocal = x + y * RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+			const int iIndicesOne[2] = { MAX( 0, iIndexLocal - 1 ), MIN( RADIOSITY_BUFFER_SAMPLES - 1, iIndexLocal + 1 ) };
+			const int iIndicesTwo[2] = { MAX( 0, iIndexLocal - 2 ), MIN( RADIOSITY_BUFFER_SAMPLES - 1, iIndexLocal + 2 ) };
+
+			for ( int q = 0; q < 4; q++ )
+			{
+				meshBuilder.Position3f(
+					(x * flLocalCoordSingle + flLocalCoords[q][0]) * 2 - flLocalCoordSingle * RADIOSITY_BUFFER_GRIDS_PER_AXIS,
+					flLocalCoordSingle * RADIOSITY_BUFFER_GRIDS_PER_AXIS - (y * flLocalCoordSingle + flLocalCoords[q][1]) * 2,
+					0 );
+
+				meshBuilder.TexCoord2f( 0,
+					flGridOrigins[iIndexLocal][0] + flLocalCoords[q][0], flGridOrigins[iIndexLocal][1] + flLocalCoords[q][1] );
+
+				meshBuilder.TexCoord4f( 1,
+					flGridOrigins[iIndicesOne[0]][0] + flLocalCoords[q][0], flGridOrigins[iIndicesOne[0]][1] + flLocalCoords[q][1],
+					flGridOrigins[iIndicesOne[1]][0] + flLocalCoords[q][0], flGridOrigins[iIndicesOne[1]][1] + flLocalCoords[q][1] );
+
+				meshBuilder.TexCoord4f( 2,
+					flGridOrigins[iIndicesTwo[0]][0] + flLocalCoords[q][0], flGridOrigins[iIndicesTwo[0]][1] + flLocalCoords[q][1],
+					flGridOrigins[iIndicesTwo[1]][0] + flLocalCoords[q][0], flGridOrigins[iIndicesTwo[1]][1] + flLocalCoords[q][1] );
+
+				meshBuilder.TangentS3f( flLocalGridSize[q][0],
+					flLocalGridSize[q][1],
+					iIndexLocal * RADIOSITY_BUFFER_GRID_STEP_SIZE );
+
+				meshBuilder.AdvanceVertex();
+			}
+		}
+	}
+
+	meshBuilder.End();
+}
 
 //-----------------------------------------------------------------------------
 // 
@@ -523,6 +615,7 @@ extern void FinishCurrentView();
 //-----------------------------------------------------------------------------
 CDeferredViewRender::CDeferredViewRender()
 {
+	m_pMesh_RadiosityScreenGrid = NULL;
 }
 
 void CDeferredViewRender::Init()
@@ -900,28 +993,13 @@ void CDeferredViewRender::PerformRadiosityGlobal( const CViewSetup &view )
 {
 	const int iSourceBuffer = ( deferred_radiosity_propagate_count.GetInt() % 2 == 0 ) ? 0 : 1;
 
-	lightData_Global_t state = GetActiveGlobalLightState();
-	QAngle lightAng;
-	VectorAngles( -state.vecLight.AsVector3D(), lightAng );
-
-	Vector fwd, right, up;
-	AngleVectors( lightAng, &fwd, &right, &up );
-
-	Vector offset = Vector(
-		( DotProduct( fwd, Vector( 1, 0, 0 ) ) > 0.0f ) ? -1 : 0,
-		( DotProduct( fwd, Vector( 0, 1, 0 ) ) > 0.0f ) ? -1 : 0,
-		0 );
-	offset *= RADIOSITY_BUFFER_GRID_STEP_SIZE;
-
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( iSourceBuffer ), NULL,
 		0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
 	pRenderContext->SetRenderTargetEx( 1, GetDefRT_RadiosityNormal() );
 
-	UpdateRadiosityPosition( &offset );
-	DrawLightPassFullscreen( GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_GLOBAL ),
-		RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
-	UpdateRadiosityPosition();
+	pRenderContext->Bind( GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_GLOBAL ) );
+	GetRadiosityScreenGrid()->Draw();
 
 	pRenderContext->PopRenderTargetAndViewport();
 }
@@ -942,8 +1020,8 @@ void CDeferredViewRender::EndRadiosity( const CViewSetup &view )
 		pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( bSecondDestBuffer ? 1 : 0 ), NULL,
 			0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
 
-		DrawLightPassFullscreen( pPropagateMat[ bSecondDestBuffer ? 0 : 1 ],
-			RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
+		pRenderContext->Bind( pPropagateMat[ bSecondDestBuffer ? 0 : 1 ] );
+		GetRadiosityScreenGrid()->Draw();
 
 		pRenderContext->PopRenderTargetAndViewport();
 
@@ -1050,8 +1128,8 @@ void CDeferredViewRender::DebugRadiosity( const CViewSetup &view )
 				meshBuilder.Begin( pMesh, MATERIAL_QUADS, nMaxCubes * 6 );
 			}
 
-			int grid_x = z % 8;
-			int grid_y = z / 8;
+			int grid_x = z % RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+			int grid_y = z / RADIOSITY_BUFFER_GRIDS_PER_AXIS;
 
 			float flUV[2] = {
 				grid_x * flUVGridSize + x * flUVTexelSize + flUVTexelSizeHalf,

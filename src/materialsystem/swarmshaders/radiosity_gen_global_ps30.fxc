@@ -18,7 +18,7 @@ sampler sShadowDepth						: register( s2 );
 
 struct PS_INPUT
 {
-	float2 vTexCoord				: TEXCOORD0;
+	float3 vWorldPos				: TEXCOORD0;
 };
 
 
@@ -33,14 +33,7 @@ PS_OUTPUT main( const PS_INPUT In )
 {
 	PS_OUTPUT Out;
 
-	float2 gridIndex;
-	float2 gridFrac = modf( In.vTexCoord.xy, gridIndex );
-
-	float3 worldPos = g_vecGridOrigin;
-	worldPos.xy += gridFrac * RADIOSITY_BUFFER_SAMPLES * RADIOSITY_BUFFER_GRID_STEP_SIZE;
-
-	gridIndex *= float2( RADIOSITY_BUFFER_GRID_STEP_SIZE, RADIOSITY_BUFFER_GRID_STEP_SIZE * RADIOSITY_BUFFER_GRIDS_PER_AXIS );
-	worldPos.z += gridIndex.x + gridIndex.y;
+	float3 worldPos = g_vecGridOrigin + In.vWorldPos;
 
 	float3 shadowPos = mul( float4( worldPos, 1 ), g_matOrtho );
 	float flMask = 1.0f - any( floor( shadowPos.xy ) );

@@ -24,7 +24,7 @@ PS_OUTPUT main( const PS_INPUT In )
 
 	float4 sample = tex2D( sRadiosityBuffer, In.vTexCoord_0 );
 
-	clip( sample.rgb - 0.01f );
+	clip( ( sample.r + sample.g + sample.b ) - 0.01f );
 
 	Out.vColor_0 = sample;
 

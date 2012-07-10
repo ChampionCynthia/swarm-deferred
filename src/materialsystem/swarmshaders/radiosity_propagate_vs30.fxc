@@ -6,14 +6,20 @@
 struct VS_INPUT
 {
 	float3 vPos						: POSITION;
+
 	float2 vTexCoord_0				: TEXCOORD0;
+	float4 vTexCoord_1				: TEXCOORD1;
+	float4 vTexCoord_2				: TEXCOORD2;
 };
 
 
 struct VS_OUTPUT
 {
 	float4 vProjPos					: POSITION;
-	float4 vTexCoord				: TEXCOORD0;
+
+	float2 vGOrig_Cur				: TEXCOORD0;
+	float4 vGOrig_One				: TEXCOORD1;
+	float4 vGOrig_Two				: TEXCOORD2;
 };
 
 
@@ -22,8 +28,10 @@ VS_OUTPUT main( const VS_INPUT In )
 	VS_OUTPUT Out;
 
 	Out.vProjPos = float4( In.vPos.xyz, 1 );
-	Out.vTexCoord.xy = In.vTexCoord_0;
-	Out.vTexCoord.zw = In.vTexCoord_0 * RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+
+	Out.vGOrig_Cur = In.vTexCoord_0;
+	Out.vGOrig_One = In.vTexCoord_1;
+	Out.vGOrig_Two = In.vTexCoord_2;
 
 	return Out;
 }

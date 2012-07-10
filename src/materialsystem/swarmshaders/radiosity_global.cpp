@@ -36,7 +36,7 @@ BEGIN_VS_SHADER( RADIOSITY_GLOBAL, "" )
 			pShaderShadow->EnableTexture( SHADER_SAMPLER1, true );
 			pShaderShadow->EnableTexture( SHADER_SAMPLER2, true );
 
-			pShaderShadow->VertexShaderVertexFormat( VERTEX_POSITION, 1, NULL, 0 );
+			pShaderShadow->VertexShaderVertexFormat( VERTEX_POSITION | VERTEX_TANGENT_S, 1, NULL, 0 );
 
 			DECLARE_STATIC_VERTEX_SHADER( radiosity_gen_vs30 );
 			SET_STATIC_VERTEX_SHADER( radiosity_gen_vs30 );

@@ -49,6 +49,7 @@ private:
 	void ProcessDeferredGlobals( const CViewSetup &view );
 
 	void PerformLighting( const CViewSetup &view );
+
 	void BeginRadiosity( const CViewSetup &view );
 	void UpdateRadiosityPosition( Vector *offset = NULL );
 	void PerformRadiosityGlobal( const CViewSetup &view );
@@ -59,7 +60,11 @@ private:
 
 	float m_flRenderDelay[SHADOW_NUM_CASCADES];
 
+	IMesh *GetRadiosityScreenGrid();
+	void CreateRadiosityScreenGrid();
+
 	Vector m_vecRadiosityOrigin;
+	IMesh *m_pMesh_RadiosityScreenGrid;
 };
 
 

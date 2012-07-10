@@ -39,7 +39,8 @@ BEGIN_VS_SHADER( RADIOSITY_PROPAGATE, "" )
 			pShaderShadow->EnableTexture( SHADER_SAMPLER0, true );
 			pShaderShadow->EnableTexture( SHADER_SAMPLER1, true );
 
-			pShaderShadow->VertexShaderVertexFormat( VERTEX_POSITION, 1, NULL, 0 );
+			int iTexDim[] = { 2, 4, 4 };
+			pShaderShadow->VertexShaderVertexFormat( VERTEX_POSITION, 3, iTexDim, 0 );
 
 			DECLARE_STATIC_VERTEX_SHADER( radiosity_propagate_vs30 );
 			SET_STATIC_VERTEX_SHADER( radiosity_propagate_vs30 );
