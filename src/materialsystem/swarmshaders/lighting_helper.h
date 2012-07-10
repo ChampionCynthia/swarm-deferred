@@ -56,6 +56,19 @@ FORCEINLINE void MakeShadowProjectionConstants( float *pFl0, float *pFl1, int re
 	pFl1[1] = resy;
 }
 
+FORCEINLINE void CommitShadowProjectionConstants_Ortho_Single( IShaderDynamicAPI *pShaderAPI,
+	const int index, int iFirstRegister )
+{
+	const shadowData_ortho_t &data = GetDeferredExt()->GetShadowData_Ortho( index );
+	Vector4D fwd = GetDeferredExt()->GetLightData_Global().vecLight * -1.0f;
+
+	pShaderAPI->SetPixelShaderConstant( iFirstRegister, data.matWorldToTexture.Base(), 3 );
+	iFirstRegister += 3;
+	pShaderAPI->SetPixelShaderConstant( iFirstRegister++, data.vecUVTransform.Base() );
+	pShaderAPI->SetPixelShaderConstant( iFirstRegister++, data.vecSlopeSettings.Base() );
+	pShaderAPI->SetPixelShaderConstant( iFirstRegister++, data.vecOrigin.Base() );
+	pShaderAPI->SetPixelShaderConstant( iFirstRegister, fwd.Base() );
+}
 
 FORCEINLINE void CommitShadowProjectionConstants_Ortho_Composite( IShaderDynamicAPI *pShaderAPI,
 	const int numCascades, int iFirstRegister )

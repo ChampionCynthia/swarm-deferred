@@ -2,6 +2,8 @@
 #ifndef COMMON_LIGHTING_H
 #define COMMON_LIGHTING_H
 
+static const float flWorldGridSize = RADIOSITY_BUFFER_GRID_STEP_SIZE * RADIOSITY_BUFFER_SAMPLES;
+static const float flRadiosityTexelSizeHalf = 0.5f / RADIOSITY_BUFFER_RES;
 
 float3 DoStandardCookie( sampler sCookie, float2 uvs )
 {
@@ -38,5 +40,34 @@ float4 DoLightFinalCookied( float3 diffuse, float3 ambient, float4 litdot_lamoun
 #endif
 }
 
+float3 DoRadiosity( float3 worldPos,
+	sampler RadiositySampler, float3 vecRadiosityOrigin, float flRadiositySettings )
+{
+	float3 vecDelta = ( worldPos - vecRadiosityOrigin ) / flWorldGridSize;
+
+	clip( 0.5f - any( floor( vecDelta ) ) );
+
+	float2 flGridUVLocal = vecDelta.xy / RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+
+	float2 flGridIndexSplit;
+	flGridIndexSplit.x = modf( vecDelta.z * RADIOSITY_BUFFER_GRIDS_PER_AXIS, flGridIndexSplit.y );
+
+	flGridIndexSplit.x *= RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+	float flSampleFrac = modf( flGridIndexSplit.x, flGridIndexSplit.x );
+
+	flGridIndexSplit /= RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+
+	float2 flGridUVLow = flGridUVLocal + flGridIndexSplit + flRadiosityTexelSizeHalf;
+
+	flGridIndexSplit.x = modf(
+		( floor( vecDelta.z * RADIOSITY_BUFFER_SAMPLES ) + 1 ) / RADIOSITY_BUFFER_GRIDS_PER_AXIS,
+		flGridIndexSplit.y );
+	flGridIndexSplit.y /= RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+
+	float2 flGridUVHigh = flGridUVLocal + flGridIndexSplit + flRadiosityTexelSizeHalf;
+
+	return lerp( tex2D( RadiositySampler, flGridUVLow ).rgb,
+		tex2D( RadiositySampler, flGridUVHigh ).rgb, flSampleFrac ) * flRadiositySettings.x;
+}
 
 #endif

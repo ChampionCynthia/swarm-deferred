@@ -146,6 +146,50 @@ extern FrustumCache_t *FrustumCache( void );
 
 extern void FlushWorldLists();
 
+void DrawCube( CMeshBuilder &meshBuilder, Vector vecPos, float flRadius, float *pfl2Texcoords )
+{
+	const float flOffsets[24][3] = {
+		-flRadius, -flRadius, -flRadius,
+		flRadius, -flRadius, -flRadius,
+		flRadius, flRadius, -flRadius,
+		-flRadius, flRadius, -flRadius,
+
+		flRadius, flRadius, flRadius,
+		flRadius, flRadius, -flRadius,
+		flRadius, -flRadius, -flRadius,
+		flRadius, -flRadius, flRadius,
+
+		-flRadius, flRadius, flRadius,
+		-flRadius, -flRadius, flRadius,
+		-flRadius, -flRadius, -flRadius,
+		-flRadius, flRadius, -flRadius,
+
+		flRadius, flRadius, flRadius,
+		-flRadius, flRadius, flRadius,
+		-flRadius, flRadius, -flRadius,
+		flRadius, flRadius, -flRadius,
+
+		flRadius, -flRadius, flRadius,
+		flRadius, -flRadius, -flRadius,
+		-flRadius, -flRadius, -flRadius,
+		-flRadius, -flRadius, flRadius,
+
+		flRadius, flRadius, flRadius,
+		flRadius, -flRadius, flRadius,
+		-flRadius, -flRadius, flRadius,
+		-flRadius, flRadius, flRadius,
+	};
+
+	for ( int i = 0; i < 24; i++ )
+	{
+		meshBuilder.Position3f( vecPos.x + flOffsets[i][0],
+			vecPos.y + flOffsets[i][1],
+			vecPos.z + flOffsets[i][2] );
+		meshBuilder.TexCoord2fv( 0, pfl2Texcoords );
+		meshBuilder.AdvanceVertex();
+	}
+}
+
 
 //-----------------------------------------------------------------------------
 // 
@@ -248,13 +292,21 @@ abstract_class CBaseShadowView : public CBaseWorldViewDeferred
 {
 	DECLARE_CLASS( CBaseShadowView, CBaseWorldViewDeferred );
 public:
-	CBaseShadowView(CViewRender *pMainView) : CBaseWorldViewDeferred( pMainView ) {}
+	CBaseShadowView(CViewRender *pMainView) : CBaseWorldViewDeferred( pMainView )
+	{
+		m_bOutputRadiosity = false;
+	};
 
 	void			Setup( const CViewSetup &view,
 						ITexture *pDepthTexture,
 						ITexture *pDummyTexture );
-	void			Draw();
+	void			SetupRadiosityTargets(
+						ITexture *pAlbedoTexture,
+						ITexture *pNormalTexture );
 
+	void SetRadiosityOutputEnabled( bool bEnabled );
+
+	void			Draw();
 	virtual bool	AdjustView( float waterHeight );
 	virtual void	PushView( float waterHeight );
 	virtual void	PopView();
@@ -268,7 +320,11 @@ private:
 
 	ITexture *m_pDepthTexture;
 	ITexture *m_pDummyTexture;
+	ITexture *m_pRadAlbedoTexture;
+	ITexture *m_pRadNormalTexture;
 	ViewCustomVisibility_t shadowVis;
+
+	bool m_bOutputRadiosity;
 };
 
 class COrthoShadowView : public CBaseShadowView
@@ -513,6 +569,11 @@ void CDeferredViewRender::ViewDrawSceneDeferred( const CViewSetup &view, int nCl
 
 	ViewDrawComposite( view, bDrew3dSkybox, nSkyboxVisible, nClearFlags, viewID, bDrawViewModel );
 
+#if DEFCFG_ENABLE_RADIOSITY
+	if ( deferred_radiosity_debug.GetBool() )
+		DebugRadiosity( view );
+#endif
+
 	g_ShaderEditorSystem->UpdateSkymask( bDrew3dSkybox );
 
 	GetLightingManager()->RenderVolumetrics( view );
@@ -705,6 +766,10 @@ static lightData_Global_t GetActiveGlobalLightState()
 void CDeferredViewRender::PerformLighting( const CViewSetup &view )
 {
 	bool bResetLightAccum = false;
+	const bool bRadiosityEnabled = DEFCFG_ENABLE_RADIOSITY != 0 && deferred_radiosity_enable.GetBool();
+
+	if ( bRadiosityEnabled )
+		BeginRadiosity( view );
 
 	if ( GetGlobalLight() != NULL )
 	{
@@ -746,7 +811,7 @@ void CDeferredViewRender::PerformLighting( const CViewSetup &view )
 				Vector origins[2] = { view.origin, view.origin + lightDataState.state.vecLight.AsVector3D() * 1024 };
 				render->ViewSetupVis( false, 2, origins );
 
-				RenderCascadedShadows( view );
+				RenderCascadedShadows( view, bRadiosityEnabled );
 			}
 		}
 		else
@@ -775,12 +840,255 @@ void CDeferredViewRender::PerformLighting( const CViewSetup &view )
 
 	GetLightingManager()->RenderLights( lightingView, this );
 
+	if ( bRadiosityEnabled )
+		EndRadiosity( view );
+
 	pRenderContext.GetFrom( materials );
+	pRenderContext->PopRenderTargetAndViewport();
+}
+
+void CDeferredViewRender::BeginRadiosity( const CViewSetup &view )
+{
+	const int gridSize = RADIOSITY_BUFFER_SAMPLES;
+	const int gridSizeHalf = gridSize / 2;
+	const float gridStepSize = RADIOSITY_BUFFER_GRID_STEP_SIZE;
+
+	Vector vecFwd;
+	AngleVectors( view.angles, &vecFwd );
+
+	m_vecRadiosityOrigin = view.origin
+		+ vecFwd * RADIOSITY_BUFFER_GRID_STEP_SIZE * RADIOSITY_BUFFER_SAMPLES * 0.3f;
+
+	for ( int i = 0; i < 3; i++ )
+		m_vecRadiosityOrigin[i] -= fmod( m_vecRadiosityOrigin[i], gridStepSize );
+
+	m_vecRadiosityOrigin -= gridSizeHalf * gridStepSize;
+	UpdateRadiosityPosition();
+
+	const int iSourceBuffer = ( deferred_radiosity_propagate_count.GetInt() % 2 == 0 ) ? 0 : 1;
+
+	CMatRenderContextPtr pRenderContext( materials );
+	pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( iSourceBuffer ), NULL,
+		0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
+	pRenderContext->ClearColor3ub( 0, 0, 0 );
+	pRenderContext->ClearBuffers( true, false );
+	pRenderContext->PopRenderTargetAndViewport();
+}
+
+void CDeferredViewRender::UpdateRadiosityPosition( Vector *offset )
+{
+	struct defData_setupRadiosity
+	{
+	public:
+		radiosityData_t data;
+
+		static void Fire( defData_setupRadiosity d )
+		{
+			GetDeferredExt()->CommitRadiosityData( d.data );
+		};
+	};
+
+	defData_setupRadiosity radSetup;
+	radSetup.data.vecOrigin = m_vecRadiosityOrigin;
+	if ( offset != NULL )
+		radSetup.data.vecOrigin += *offset;
+
+	QUEUE_FIRE( defData_setupRadiosity, Fire, radSetup );
+}
+
+void CDeferredViewRender::PerformRadiosityGlobal( const CViewSetup &view )
+{
+	const int iSourceBuffer = ( deferred_radiosity_propagate_count.GetInt() % 2 == 0 ) ? 0 : 1;
+
+	lightData_Global_t state = GetActiveGlobalLightState();
+	QAngle lightAng;
+	VectorAngles( -state.vecLight.AsVector3D(), lightAng );
+
+	Vector fwd, right, up;
+	AngleVectors( lightAng, &fwd, &right, &up );
+
+	Vector offset = Vector(
+		( DotProduct( fwd, Vector( 1, 0, 0 ) ) > 0.0f ) ? -1 : 0,
+		( DotProduct( fwd, Vector( 0, 1, 0 ) ) > 0.0f ) ? -1 : 0,
+		0 );
+	offset *= RADIOSITY_BUFFER_GRID_STEP_SIZE;
+
+	CMatRenderContextPtr pRenderContext( materials );
+	pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( iSourceBuffer ), NULL,
+		0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
+	pRenderContext->SetRenderTargetEx( 1, GetDefRT_RadiosityNormal() );
+
+	UpdateRadiosityPosition( &offset );
+	DrawLightPassFullscreen( GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_GLOBAL ),
+		RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
+	UpdateRadiosityPosition();
 
 	pRenderContext->PopRenderTargetAndViewport();
 }
 
-void CDeferredViewRender::RenderCascadedShadows( const CViewSetup &view )
+void CDeferredViewRender::EndRadiosity( const CViewSetup &view )
+{
+	const int iNumPropagateSteps = deferred_radiosity_propagate_count.GetInt();
+	bool bSecondDestBuffer = ( iNumPropagateSteps % 2 == 0 );
+
+	IMaterial *pPropagateMat[2] = {
+		GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_0 ),
+		GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_1 ),
+	};
+
+	for ( int i = 0; i < iNumPropagateSteps; i++ )
+	{
+		CMatRenderContextPtr pRenderContext( materials );
+		pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( bSecondDestBuffer ? 1 : 0 ), NULL,
+			0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
+
+		DrawLightPassFullscreen( pPropagateMat[ bSecondDestBuffer ? 0 : 1 ],
+			RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
+
+		pRenderContext->PopRenderTargetAndViewport();
+
+		bSecondDestBuffer = !bSecondDestBuffer;
+	}
+
+	DrawLightPassFullscreen( GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_BLEND ),
+		view.width, view.height );
+}
+
+void CDeferredViewRender::DebugRadiosity( const CViewSetup &view )
+{
+#if 0
+	Vector tmp[3] = { vecRadiosityOrigin,
+		vecRadiosityOrigin,
+		vecRadiosityOrigin };
+
+	const int directions[3][2] = {
+		1, 2,
+		0, 2,
+		0, 1,
+	};
+
+	const Vector vecCross[3] = {
+		Vector( 1, 0, 0 ),
+		Vector( 0, 1, 0 ),
+		Vector( 0, 0, 1 ),
+	};
+
+	const int iColors[3][3] = {
+		255, 0, 0,
+		0, 255, 0,
+		0, 0, 255,
+	};
+
+	for ( int i = 0; i < 3; i++ )
+	{
+		for ( int x = 0; x < gridSize; x++ )
+		{
+			Vector tmp2 = tmp[i];
+
+			for ( int y = 0; y < gridSize; y++ )
+			{
+				debugoverlay->AddLineOverlayAlpha( tmp2, tmp2 + vecCross[i] * gridStepSize * gridSize,
+					iColors[i][0], iColors[i][1], iColors[i][2], 32,
+					true, -1 );
+
+				tmp2[ directions[i][1] ] += gridStepSize;
+			}
+
+			tmp[i][ directions[i][0] ] += gridStepSize;
+		}
+	}
+#endif
+
+	static CUtlVector< IMesh* > hMeshList;
+	IMaterial *pMatDbgRadGrid = GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_DEBUG );
+
+	if ( hMeshList.Count() == 0 )
+	{
+		const float flCubesize = RADIOSITY_BUFFER_GRID_STEP_SIZE * 0.15f;
+		const Vector directions[3] = {
+			Vector( RADIOSITY_BUFFER_GRID_STEP_SIZE, 0, 0 ),
+			Vector( 0, RADIOSITY_BUFFER_GRID_STEP_SIZE, 0 ),
+			Vector( 0, 0, RADIOSITY_BUFFER_GRID_STEP_SIZE ),
+		};
+
+		int nMaxVerts, nMaxIndices;
+		CMatRenderContextPtr pRenderContext( materials );
+		CMeshBuilder meshBuilder;
+
+		IMesh *pMesh = pRenderContext->CreateStaticMesh( VERTEX_POSITION | VERTEX_TEXCOORD_SIZE( 0, 2 ),
+			TEXTURE_GROUP_OTHER,
+			pMatDbgRadGrid );
+		hMeshList.AddToTail( pMesh );
+
+		IMesh *pMeshDummy = pRenderContext->GetDynamicMesh( true, NULL, NULL, pMatDbgRadGrid );
+		pRenderContext->GetMaxToRender( pMeshDummy, false, &nMaxVerts, &nMaxIndices );
+		pMeshDummy->Draw();
+
+		int nMaxCubes = nMaxIndices / 36;
+		if ( nMaxCubes > nMaxVerts / 24 )
+			nMaxCubes = nMaxVerts / 24;
+
+		int nRenderRemaining = nMaxCubes;
+		meshBuilder.Begin( pMesh, MATERIAL_QUADS, nMaxCubes * 6 );
+
+		const float flUVTexelSize = 1.0f / RADIOSITY_BUFFER_RES;
+		const float flUVTexelSizeHalf = flUVTexelSize * 0.5f;
+		const float flUVGridSize = 1.0f / RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+
+		for ( int x = 0; x < RADIOSITY_BUFFER_SAMPLES; x++ )
+		for ( int y = 0; y < RADIOSITY_BUFFER_SAMPLES; y++ )
+		for ( int z = 0; z < RADIOSITY_BUFFER_SAMPLES; z++ )
+		{
+			if ( nRenderRemaining <= 0 )
+			{
+				nRenderRemaining = nMaxCubes;
+				meshBuilder.End();
+				pMesh = pRenderContext->CreateStaticMesh( VERTEX_POSITION | VERTEX_TEXCOORD_SIZE( 0, 2 ),
+							TEXTURE_GROUP_OTHER,
+							GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_DEBUG ) );
+				hMeshList.AddToTail( pMesh );
+				meshBuilder.Begin( pMesh, MATERIAL_QUADS, nMaxCubes * 6 );
+			}
+
+			int grid_x = z % 8;
+			int grid_y = z / 8;
+
+			float flUV[2] = {
+				grid_x * flUVGridSize + x * flUVTexelSize + flUVTexelSizeHalf,
+				grid_y * flUVGridSize + y * flUVTexelSize + flUVTexelSizeHalf,
+			};
+
+			DrawCube( meshBuilder, directions[ 0 ] * x
+				+ directions[ 1 ] * y
+				+ directions[ 2 ] * z,
+				flCubesize,
+				flUV );
+
+			nRenderRemaining--;
+		}
+
+		if ( nRenderRemaining != nMaxCubes )
+			meshBuilder.End();
+	}
+
+	CMatRenderContextPtr pRenderContext( materials );
+	pRenderContext->Bind( pMatDbgRadGrid );
+
+	VMatrix pos;
+	pos.SetupMatrixOrgAngles( m_vecRadiosityOrigin, vec3_angle );
+
+	pRenderContext->MatrixMode( MATERIAL_MODEL );
+	pRenderContext->PushMatrix();
+	pRenderContext->LoadMatrix( pos );
+
+	for ( int i = 0; i < hMeshList.Count(); i++ )
+		hMeshList[ i ]->Draw();
+
+	pRenderContext->MatrixMode( MATERIAL_MODEL );
+	pRenderContext->PopMatrix();
+}
+
+void CDeferredViewRender::RenderCascadedShadows( const CViewSetup &view, const bool bEnableRadiosity )
 {
 	for ( int i = 0; i < SHADOW_NUM_CASCADES; i++ )
 	{
@@ -788,7 +1096,10 @@ void CDeferredViewRender::RenderCascadedShadows( const CViewSetup &view )
 		if ( delta > 0.0f && delta < 1.0f )
 			continue;
 
-		m_flRenderDelay[i] = gpGlobals->curtime + GetCascadeInfo(i).flUpdateDelay;
+		const cascade_t &cascade = GetCascadeInfo(i);
+		const bool bDoRadiosity = bEnableRadiosity && cascade.bOutputRadiosityData;
+
+		m_flRenderDelay[i] = gpGlobals->curtime + cascade.flUpdateDelay;
 
 #if CSM_USE_COMPOSITED_TARGET == 0
 		int textureIndex = i;
@@ -798,7 +1109,16 @@ void CDeferredViewRender::RenderCascadedShadows( const CViewSetup &view )
 
 		CRefPtr<COrthoShadowView> pOrthoDepth = new COrthoShadowView( this, i );
 		pOrthoDepth->Setup( view, GetShadowDepthRT_Ortho( textureIndex ), GetShadowColorRT_Ortho( textureIndex ) );
+		if ( bDoRadiosity )
+		{
+			pOrthoDepth->SetRadiosityOutputEnabled( true );
+			pOrthoDepth->SetupRadiosityTargets( GetRadiosityAlbedoRT_Ortho( textureIndex ),
+				GetRadiosityNormalRT_Ortho( textureIndex ) );
+		}
 		AddViewToScene( pOrthoDepth );
+
+		if ( bDoRadiosity )
+			PerformRadiosityGlobal( view );
 	}
 }
 
@@ -2765,6 +3085,12 @@ void CBaseShadowView::Setup( const CViewSetup &view, ITexture *pDepthTexture, IT
 	shadowVis.AddVisOrigin( origin );
 }
 
+void CBaseShadowView::SetupRadiosityTargets( ITexture *pAlbedoTexture, ITexture *pNormalTexture )
+{
+	m_pRadAlbedoTexture = pAlbedoTexture;
+	m_pRadNormalTexture = pNormalTexture;
+}
+
 void CBaseShadowView::Draw()
 {
 	int oldViewID = g_CurrentViewID;
@@ -2775,13 +3101,17 @@ void CBaseShadowView::Draw()
 		DEFERRED_RENDER_STAGE_SHADOWPASS );
 	pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_SHADOW_MODE,
 		GetShadowMode() );
+	pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_SHADOW_RADIOSITY,
+		m_bOutputRadiosity ? 1 : 0 );
 	pRenderContext.SafeRelease();
-
+	
 	DrawSetup( 0, m_DrawFlags, 0, -1, true );
 
 	DrawExecute( 0, CurrentViewID(), 0, true );
 
 	pRenderContext.GetFrom( materials );
+		pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_SHADOW_RADIOSITY,
+		0 );
 	pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE,
 		DEFERRED_RENDER_STAGE_INVALID );
 
@@ -2808,6 +3138,15 @@ void CBaseShadowView::PushView( float waterHeight )
 #else
 	pRenderContext->ClearBuffers( false, true );
 #endif
+
+	if ( m_bOutputRadiosity )
+	{
+		Assert( !IsErrorTexture( m_pRadAlbedoTexture ) );
+		Assert( !IsErrorTexture( m_pRadNormalTexture ) );
+
+		pRenderContext->SetRenderTargetEx( 1, m_pRadAlbedoTexture );
+		pRenderContext->SetRenderTargetEx( 2, m_pRadNormalTexture );
+	}
 }
 
 void CBaseShadowView::PopView()
@@ -2818,6 +3157,10 @@ void CBaseShadowView::PopView()
 	render->PopView( GetFrustum() );
 }
 
+void CBaseShadowView::SetRadiosityOutputEnabled( bool bEnabled )
+{
+	m_bOutputRadiosity = bEnabled;
+}
 
 void COrthoShadowView::CalcShadowView()
 {
@@ -2901,7 +3244,7 @@ void COrthoShadowView::CommitData()
 #endif
 
 	shadowData.data.vecSlopeSettings.Init(
-		data.flSlopeScaleMin, data.flSlopeScaleMax, data.flNormalScaleMax, zFar
+		data.flSlopeScaleMin, data.flSlopeScaleMax, data.flNormalScaleMax, 1.0f / zFar
 		);
 	shadowData.data.vecOrigin.Init( origin );
 
@@ -3015,7 +3358,7 @@ void CSpotLightShadowView::CommitData()
 	data.data.vecOrigin.Init( origin );
 	// slope min, slope max, normal max, depth
 	//data.data.vecSlopeSettings.Init( 0.005f, 0.02f, 3, zFar );
-	data.data.vecSlopeSettings.Init( 0.001f, 0.005f, 3, zFar );
+	data.data.vecSlopeSettings.Init( 0.001f, 0.005f, 3, 0 );
 
 	QUEUE_FIRE( sendShadowDataProj, Fire, data );
 

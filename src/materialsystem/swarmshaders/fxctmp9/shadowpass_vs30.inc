@@ -49,6 +49,27 @@ public:
 		m_bMORPHING_VTEX = true;
 #endif
 	}
+private:
+	int m_nMULTITEXTURE;
+#ifdef _DEBUG
+	bool m_bMULTITEXTURE;
+#endif
+public:
+	void SetMULTITEXTURE( int i )
+	{
+		Assert( i >= 0 && i <= 2 );
+		m_nMULTITEXTURE = i;
+#ifdef _DEBUG
+		m_bMULTITEXTURE = true;
+#endif
+	}
+	void SetMULTITEXTURE( bool i )
+	{
+		m_nMULTITEXTURE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bMULTITEXTURE = true;
+#endif
+	}
 public:
 	// CONSTRUCTOR
 	shadowpass_vs30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
@@ -61,19 +82,23 @@ public:
 		m_bMORPHING_VTEX = false;
 #endif // _DEBUG
 		m_nMORPHING_VTEX = 0;
+#ifdef _DEBUG
+		m_bMULTITEXTURE = false;
+#endif // _DEBUG
+		m_nMULTITEXTURE = 0;
 	}
 	int GetIndex()
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bMODEL && m_bMORPHING_VTEX;
+		bool bAllStaticVarsDefined = m_bMODEL && m_bMORPHING_VTEX && m_bMULTITEXTURE;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 24 * m_nMODEL ) + ( 48 * m_nMORPHING_VTEX ) + 0;
+		return ( 48 * m_nMODEL ) + ( 96 * m_nMORPHING_VTEX ) + ( 192 * m_nMULTITEXTURE ) + 0;
 	}
 };
-#define shaderStaticTest_shadowpass_vs30 vsh_forgot_to_set_static_MODEL + vsh_forgot_to_set_static_MORPHING_VTEX + 0
+#define shaderStaticTest_shadowpass_vs30 vsh_forgot_to_set_static_MODEL + vsh_forgot_to_set_static_MORPHING_VTEX + vsh_forgot_to_set_static_MULTITEXTURE + 0
 class shadowpass_vs30_Dynamic_Index
 {
 private:
@@ -160,6 +185,27 @@ public:
 		m_bSHADOW_MODE = true;
 #endif
 	}
+private:
+	int m_nRADIOSITY;
+#ifdef _DEBUG
+	bool m_bRADIOSITY;
+#endif
+public:
+	void SetRADIOSITY( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nRADIOSITY = i;
+#ifdef _DEBUG
+		m_bRADIOSITY = true;
+#endif
+	}
+	void SetRADIOSITY( bool i )
+	{
+		m_nRADIOSITY = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bRADIOSITY = true;
+#endif
+	}
 public:
 	// CONSTRUCTOR
 	shadowpass_vs30_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
@@ -180,16 +226,20 @@ public:
 		m_bSHADOW_MODE = false;
 #endif // _DEBUG
 		m_nSHADOW_MODE = 0;
+#ifdef _DEBUG
+		m_bRADIOSITY = false;
+#endif // _DEBUG
+		m_nRADIOSITY = 0;
 	}
 	int GetIndex()
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllDynamicVarsDefined = m_bCOMPRESSED_VERTS && m_bSKINNING && m_bMORPHING && m_bSHADOW_MODE;
+		bool bAllDynamicVarsDefined = m_bCOMPRESSED_VERTS && m_bSKINNING && m_bMORPHING && m_bSHADOW_MODE && m_bRADIOSITY;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG
-		return ( 1 * m_nCOMPRESSED_VERTS ) + ( 2 * m_nSKINNING ) + ( 4 * m_nMORPHING ) + ( 8 * m_nSHADOW_MODE ) + 0;
+		return ( 1 * m_nCOMPRESSED_VERTS ) + ( 2 * m_nSKINNING ) + ( 4 * m_nMORPHING ) + ( 8 * m_nSHADOW_MODE ) + ( 24 * m_nRADIOSITY ) + 0;
 	}
 };
-#define shaderDynamicTest_shadowpass_vs30 vsh_forgot_to_set_dynamic_COMPRESSED_VERTS + vsh_forgot_to_set_dynamic_SKINNING + vsh_forgot_to_set_dynamic_MORPHING + vsh_forgot_to_set_dynamic_SHADOW_MODE + 0
+#define shaderDynamicTest_shadowpass_vs30 vsh_forgot_to_set_dynamic_COMPRESSED_VERTS + vsh_forgot_to_set_dynamic_SKINNING + vsh_forgot_to_set_dynamic_MORPHING + vsh_forgot_to_set_dynamic_SHADOW_MODE + vsh_forgot_to_set_dynamic_RADIOSITY + 0

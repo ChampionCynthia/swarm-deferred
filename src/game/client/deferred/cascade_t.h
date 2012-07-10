@@ -16,6 +16,7 @@ struct cascade_t
 	float flNormalScaleMax;
 
 	float flUpdateDelay;
+	bool bOutputRadiosityData;
 
 #if CSM_USE_COMPOSITED_TARGET
 	int iViewport_x;

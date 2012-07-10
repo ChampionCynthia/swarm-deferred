@@ -76,6 +76,10 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 	{
 		p.bModel = false;
 		p.iAlbedo = BASETEXTURE;
+		p.iAlbedo2 = BASETEXTURE2;
+		p.iAlbedo3 = BASETEXTURE3;
+		p.iAlbedo4 = BASETEXTURE4;
+
 		p.iAlphatestRef = ALPHATESTREFERENCE;
 		p.iMultiblend = MULTIBLEND;
 	}

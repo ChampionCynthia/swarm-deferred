@@ -14,6 +14,9 @@ struct defParms_shadow
 
 	// textures
 	int iAlbedo;
+	int iAlbedo2;
+	int iAlbedo3;
+	int iAlbedo4;
 
 	// control
 	int iAlphatestRef;

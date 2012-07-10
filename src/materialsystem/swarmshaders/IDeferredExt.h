@@ -76,6 +76,11 @@ struct volumeData_t
 	bool bHasCookie;
 };
 
+struct radiosityData_t
+{
+	Vector vecOrigin;
+};
+
 class IDeferredExtension : public IBaseInterface
 {
 public:
@@ -93,6 +98,8 @@ public:
 
 	virtual void CommitVolumeData( const volumeData_t &data ) = 0;
 
+	virtual void CommitRadiosityData( const radiosityData_t &data ) = 0;
+
 	virtual void CommitLightData_Global( const lightData_Global_t &data ) = 0;
 	virtual float *CommitLightData_Common( float *pFlData, int numRows,
 		int numShadowedCookied, int numShadowed,
@@ -108,6 +115,8 @@ public:
 	virtual void CommitTexture_ProjectedDepth( const int &index, ITexture *pTexShadowDepth ) = 0;
 	virtual void CommitTexture_Cookie( const int &index, ITexture *pTexCookie ) = 0;
 	virtual void CommitTexture_VolumePrePass( ITexture *pTexVolumePrePass ) = 0;
+	virtual void CommitTexture_ShadowRadOutput_Ortho( ITexture *pAlbedo, ITexture *pNormal ) = 0;
+	virtual void CommitTexture_Radiosity( ITexture *pTexRadBuffer0, ITexture *pTexRadBuffer1, ITexture *pTexRadNormal ) = 0;
 };
 
 #define DEFERRED_EXTENSION_VERSION "DeferredExtensionVersion001"
@@ -134,6 +143,7 @@ public:
 	virtual void CommitShadowData_General( const shadowData_general_t &data );
 
 	virtual void CommitVolumeData( const volumeData_t &data );
+	virtual void CommitRadiosityData( const radiosityData_t &data );
 
 	virtual void CommitLightData_Global( const lightData_Global_t &data );
 	virtual float *CommitLightData_Common( float *pFlData, int numRows,
@@ -150,6 +160,8 @@ public:
 	virtual void CommitTexture_ProjectedDepth( const int &index, ITexture *pTexShadowDepth );
 	virtual void CommitTexture_Cookie( const int &index, ITexture *pTexCookie );
 	virtual void CommitTexture_VolumePrePass( ITexture *pTexVolumePrePass );
+	virtual void CommitTexture_ShadowRadOutput_Ortho( ITexture *pAlbedo, ITexture *pNormal );
+	virtual void CommitTexture_Radiosity( ITexture *pTexRadBuffer0, ITexture *pTexRadBuffer1, ITexture *pTexRadNormal );
 
 	inline float *GetOriginBase();
 	inline float *GetForwardBase();
@@ -170,6 +182,7 @@ public:
 	inline const shadowData_general_t &GetShadowData_General();
 
 	inline const volumeData_t &GetVolumeData();
+	inline const radiosityData_t &GetRadiosityData();
 
 	inline const lightData_Global_t &GetLightData_Global();
 
@@ -184,6 +197,10 @@ public:
 	inline ITexture *GetTexture_ShadowDepth_Proj( const int &index );
 	inline ITexture *GetTexture_Cookie( const int &index );
 	inline ITexture *GetTexture_VolumePrePass();
+	inline ITexture *GetTexture_ShadowRad_Ortho_Albedo();
+	inline ITexture *GetTexture_ShadowRad_Ortho_Normal();
+	inline ITexture *GetTexture_RadBuffer( const int &index );
+	inline ITexture *GetTexture_RadNormal();
 
 private:
 	bool m_bDefLightingEnabled;
@@ -198,6 +215,7 @@ private:
 	shadowData_general_t m_dataGeneral;
 
 	volumeData_t m_dataVolume;
+	radiosityData_t m_dataRadiosity;
 
 	lightData_Global_t m_globalLight;
 	float *m_pflCommonLightData;
@@ -218,6 +236,9 @@ private:
 	ITexture *m_pTexShadowDepth_Proj[ MAX_SHADOW_PROJ ];
 	ITexture *m_pTexCookie[ NUM_COOKIE_SLOTS ];
 	ITexture *m_pTexVolumePrePass;
+	ITexture *m_pTexShadowRad_Ortho[ 2 ];
+	ITexture *m_pTexRadBuffer[ 2 ];
+	ITexture *m_pTexRadNormal;
 };
 
 float *CDeferredExtension::GetOriginBase()
@@ -268,6 +289,11 @@ const lightData_Global_t &CDeferredExtension::GetLightData_Global()
 const volumeData_t &CDeferredExtension::GetVolumeData()
 {
 	return m_dataVolume;
+}
+
+const radiosityData_t &CDeferredExtension::GetRadiosityData()
+{
+	return m_dataRadiosity;
 }
 
 int CDeferredExtension::GetNumActiveLights_ShadowedCookied()
@@ -335,6 +361,23 @@ ITexture *CDeferredExtension::GetTexture_Cookie( const int &index )
 ITexture *CDeferredExtension::GetTexture_VolumePrePass()
 {
 	return m_pTexVolumePrePass;
+}
+ITexture *CDeferredExtension::GetTexture_ShadowRad_Ortho_Albedo()
+{
+	return m_pTexShadowRad_Ortho[0];
+}
+ITexture *CDeferredExtension::GetTexture_ShadowRad_Ortho_Normal()
+{
+	return m_pTexShadowRad_Ortho[1];
+}
+ITexture *CDeferredExtension::GetTexture_RadBuffer( const int &index )
+{
+	Assert( index >= 0 && index < 2 );
+	return m_pTexRadBuffer[index];
+}
+ITexture *CDeferredExtension::GetTexture_RadNormal()
+{
+	return m_pTexRadNormal;
 }
 #endif
 

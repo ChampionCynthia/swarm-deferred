@@ -20,6 +20,10 @@ extern ConVar deferred_override_globalLight_diffuse;
 extern ConVar deferred_override_globalLight_ambient_high;
 extern ConVar deferred_override_globalLight_ambient_low;
 
+extern ConVar deferred_radiosity_enable;
+extern ConVar deferred_radiosity_propagate_count;
+extern ConVar deferred_radiosity_debug;
+
 
 #define PROFILER_DECLARE CFastTimer __pft; __pft.Start()
 #define PROFILER_RESTART __pft.Start();

@@ -19,8 +19,16 @@ volume_prepass_ps30.fxc
 volumpass_point_ps30.fxc
 volumpass_spot_ps30.fxc
 
+radiosity_gen_global_ps30.fxc
+radiosity_gen_vs30.fxc
+radiosity_propagate_ps30.fxc
+radiosity_propagate_vs30.fxc
+radiosity_blend_ps30.fxc
+
 screenspace_vs30.fxc
 gaussianblur_6_ps30.fxc
 
 debug_shadow_ortho_ps30.fxc
 debug_lighting_ctrl_ps30.fxc
+debug_radiosity_grid_ps30.fxc
+debug_radiosity_grid_vs30.fxc

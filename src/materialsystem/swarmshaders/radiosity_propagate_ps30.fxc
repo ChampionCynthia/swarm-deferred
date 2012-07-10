@@ -1,0 +1,60 @@
+
+
+#include "common_ps_fxc.h"
+#include "common_deferred_fxc.h"
+
+
+sampler sRadiosity						: register( s0 );
+sampler sNormals						: register( s1 );
+
+static const float flTexelSize = 1.0f / RADIOSITY_BUFFER_RES;
+
+struct PS_INPUT
+{
+	float4 vTexCoord				: TEXCOORD0;
+};
+
+
+struct PS_OUTPUT
+{
+	float4 vColor_0				:	COLOR0;
+};
+
+
+PS_OUTPUT main( const PS_INPUT In )
+{
+	PS_OUTPUT Out;
+
+	float3 color = tex2D( sRadiosity, In.vTexCoord.xy ).rgb;
+
+	color += tex2D( sRadiosity, In.vTexCoord.xy + float2( flTexelSize, 0 ) ).rgb;
+	color += tex2D( sRadiosity, In.vTexCoord.xy + float2( -flTexelSize, 0 ) ).rgb;
+	color += tex2D( sRadiosity, In.vTexCoord.xy + float2( 0, flTexelSize ) ).rgb;
+	color += tex2D( sRadiosity, In.vTexCoord.xy + float2( 0, -flTexelSize ) ).rgb;
+
+	float2 flGridIndexSplit;
+	float2 flGridFrac = modf( In.vTexCoord.zw, flGridIndexSplit ) / RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+
+	float flGridIndexTarget = max( 0,
+		flGridIndexSplit.x
+		+ flGridIndexSplit.y * RADIOSITY_BUFFER_GRIDS_PER_AXIS
+		- 1 ) / RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+
+	float2 flGridIndexTargetSplit;
+	flGridIndexTargetSplit.x = modf( flGridIndexTarget, flGridIndexTargetSplit.y );
+	flGridIndexTargetSplit.y /= RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+
+	color += tex2D( sRadiosity, flGridIndexTargetSplit + flGridFrac ).rgb;
+
+	flGridIndexTarget = min( RADIOSITY_BUFFER_SAMPLES-1 / RADIOSITY_BUFFER_GRIDS_PER_AXIS,
+		flGridIndexTarget + 2.0f / RADIOSITY_BUFFER_GRIDS_PER_AXIS );
+
+	flGridIndexTargetSplit.x = modf( flGridIndexTarget, flGridIndexTargetSplit.y );
+	flGridIndexTargetSplit.y /= RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+
+	color += tex2D( sRadiosity, flGridIndexTargetSplit + flGridFrac ).rgb;
+
+	Out.vColor_0 = float4( color * ( 1.0f / 7.0f ), 1 );
+
+	return Out;
+}

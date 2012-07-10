@@ -58,8 +58,13 @@
 #define DEFRTNAME_SHADOWCOLOR_ORTHO "_rt_ShadowColor_ortho_"	// + %02i
 #define DEFRTNAME_SHADOWCOLOR_PROJ "_rt_ShadowColor_proj_"		// + %02i
 #define DEFRTNAME_SHADOWCOLOR_DP "_rt_ShadowColor_dp_"			// + %02i
+#define DEFRTNAME_SHADOWRAD_ALBEDO_ORTHO "_rt_ShadowRad_Albedo_ortho_"	// + %02i
+#define DEFRTNAME_SHADOWRAD_NORMAL_ORTHO "_rt_ShadowRad_Normal_ortho_"	// + %02i
 
 #define DEFRTNAME_PROJECTABLE_VGUI "_rt_projvgui_"				// + %02i
+
+#define DEFRTNAME_RADIOSITY_BUFFER "_rt_radBuffer_"				// + %02i
+#define DEFRTNAME_RADIOSITY_NORMAL "_rt_radNormal"
 
 
 /* One physical shadowmap for multiple cascades
@@ -72,6 +77,18 @@
  */
 #	define CSM_COMP_RES_X 4096
 #	define CSM_COMP_RES_Y 2048
+#endif
+
+
+/* Radiosity stuff
+ */
+#define DEFCFG_ENABLE_RADIOSITY 1
+
+#ifdef DEFCFG_ENABLE_RADIOSITY
+#	define RADIOSITY_BUFFER_SAMPLES 64
+#	define RADIOSITY_BUFFER_RES 512 // sqrt( samples ^ 3 )
+#	define RADIOSITY_BUFFER_GRID_STEP_SIZE 24.0f
+#	define RADIOSITY_BUFFER_GRIDS_PER_AXIS 8 // sqrt( samples )
 #endif
 
 

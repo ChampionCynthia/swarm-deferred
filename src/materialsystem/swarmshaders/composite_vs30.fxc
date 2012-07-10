@@ -69,9 +69,6 @@ struct VS_INPUT
 
 #else
 
-	float3 vTangentS				: TANGENT;
-	float3 vTangentT				: BINORMAL;
-
 #if BASETEXTURE2
 	float4 vColor_0					: COLOR0;
 #endif

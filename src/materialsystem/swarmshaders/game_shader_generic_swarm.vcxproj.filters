@@ -93,6 +93,18 @@
     <ClCompile Include="deferred_utility.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
+    <ClCompile Include="radiosity_global.cpp">
+      <Filter>Source Files\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="debug_radiosity_grid.cpp">
+      <Filter>Source Files\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="radiosity_propagate.cpp">
+      <Filter>Source Files\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="radiosity_blend.cpp">
+      <Filter>Source Files\lighting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseVSShader.h">
@@ -263,6 +275,27 @@
       <Filter>Shader Source\fxc</Filter>
     </None>
     <None Include="volume_blend_ps30.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </None>
+    <None Include="radiosity_gen_global_ps30.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </None>
+    <None Include="radiosity_gen_vs30.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </None>
+    <None Include="debug_radiosity_grid_ps30.fxc">
+      <Filter>Shader Source\fxc\debug</Filter>
+    </None>
+    <None Include="debug_radiosity_grid_vs30.fxc">
+      <Filter>Shader Source\fxc\debug</Filter>
+    </None>
+    <None Include="radiosity_propagate_ps30.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </None>
+    <None Include="radiosity_propagate_vs30.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </None>
+    <None Include="radiosity_blend_ps30.fxc">
       <Filter>Shader Source\fxc</Filter>
     </None>
   </ItemGroup>

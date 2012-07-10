@@ -15,6 +15,9 @@ ITexture *GetDefRT_Lightaccum();
 ITexture *GetDefRT_VolumePrepass();
 ITexture *GetDefRT_VolumetricsBuffer( int index );
 
+ITexture *GetDefRT_RadiosityBuffer( int index );
+ITexture *GetDefRT_RadiosityNormal();
+
 int GetShadowResolution_Spot();
 int GetShadowResolution_Point();
 
@@ -28,5 +31,8 @@ ITexture *GetShadowColorRT_DP( int index );
 ITexture *GetShadowDepthRT_DP( int index );
 
 ITexture *GetProjectableVguiRT( int index );
+
+ITexture *GetRadiosityAlbedoRT_Ortho( int index );
+ITexture *GetRadiosityNormalRT_Ortho( int index );
 
 #endif

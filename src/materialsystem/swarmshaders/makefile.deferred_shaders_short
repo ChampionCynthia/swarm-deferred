@@ -1,0 +1,122 @@
+default:  fxctmp9_tmp\radiosity_gen_global_ps30.inc shaders\fxc\radiosity_gen_global_ps30.vcs fxctmp9_tmp\radiosity_gen_vs30.inc shaders\fxc\radiosity_gen_vs30.vcs fxctmp9_tmp\radiosity_propagate_ps30.inc shaders\fxc\radiosity_propagate_ps30.vcs fxctmp9_tmp\radiosity_propagate_vs30.inc shaders\fxc\radiosity_propagate_vs30.vcs fxctmp9_tmp\radiosity_blend_ps30.inc shaders\fxc\radiosity_blend_ps30.vcs fxctmp9_tmp\debug_radiosity_grid_ps30.inc shaders\fxc\debug_radiosity_grid_ps30.vcs fxctmp9_tmp\debug_radiosity_grid_vs30.inc shaders\fxc\debug_radiosity_grid_vs30.vcs fxctmp9_tmp\shadowpass_vs30.inc shaders\fxc\shadowpass_vs30.vcs fxctmp9_tmp\shadowpass_ps30.inc shaders\fxc\shadowpass_ps30.vcs fxctmp9_tmp\lightingpass_global_ps30.inc shaders\fxc\lightingpass_global_ps30.vcs
+
+fxctmp9_tmp\radiosity_gen_global_ps30.inc shaders\fxc\radiosity_gen_global_ps30.vcs: radiosity_gen_global_ps30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_shadowmapping_fxc.h common_fxc.h deferred_global_common.h common_ps_fxc.h common_pragmas.h common_hlsl_cpp_consts.h common_lighting_fxc.h common_deferred_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." radiosity_gen_global_ps30.fxc-----radiosity_gen_global_ps30
+	echo radiosity_gen_global_ps30.fxc>> filestocopy.txt
+	echo common_shadowmapping_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo deferred_global_common.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_lighting_fxc.h>> filestocopy.txt
+	echo common_deferred_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\radiosity_gen_vs30.inc shaders\fxc\radiosity_gen_vs30.vcs: radiosity_gen_vs30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_shadowmapping_fxc.h common_fxc.h common_vs_fxc.h deferred_global_common.h common_pragmas.h common_hlsl_cpp_consts.h common_lighting_fxc.h common_deferred_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." radiosity_gen_vs30.fxc-----radiosity_gen_vs30
+	echo radiosity_gen_vs30.fxc>> filestocopy.txt
+	echo common_shadowmapping_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo deferred_global_common.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_lighting_fxc.h>> filestocopy.txt
+	echo common_deferred_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\radiosity_propagate_ps30.inc shaders\fxc\radiosity_propagate_ps30.vcs: radiosity_propagate_ps30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_shadowmapping_fxc.h common_fxc.h deferred_global_common.h common_ps_fxc.h common_pragmas.h common_hlsl_cpp_consts.h common_lighting_fxc.h common_deferred_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." radiosity_propagate_ps30.fxc-----radiosity_propagate_ps30
+	echo radiosity_propagate_ps30.fxc>> filestocopy.txt
+	echo common_shadowmapping_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo deferred_global_common.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_lighting_fxc.h>> filestocopy.txt
+	echo common_deferred_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\radiosity_propagate_vs30.inc shaders\fxc\radiosity_propagate_vs30.vcs: radiosity_propagate_vs30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_shadowmapping_fxc.h common_fxc.h common_vs_fxc.h deferred_global_common.h common_pragmas.h common_hlsl_cpp_consts.h common_lighting_fxc.h common_deferred_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." radiosity_propagate_vs30.fxc-----radiosity_propagate_vs30
+	echo radiosity_propagate_vs30.fxc>> filestocopy.txt
+	echo common_shadowmapping_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo deferred_global_common.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_lighting_fxc.h>> filestocopy.txt
+	echo common_deferred_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\radiosity_blend_ps30.inc shaders\fxc\radiosity_blend_ps30.vcs: radiosity_blend_ps30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_shadowmapping_fxc.h common_fxc.h deferred_global_common.h common_ps_fxc.h common_pragmas.h common_hlsl_cpp_consts.h common_lighting_fxc.h common_deferred_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." radiosity_blend_ps30.fxc-----radiosity_blend_ps30
+	echo radiosity_blend_ps30.fxc>> filestocopy.txt
+	echo common_shadowmapping_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo deferred_global_common.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_lighting_fxc.h>> filestocopy.txt
+	echo common_deferred_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\debug_radiosity_grid_ps30.inc shaders\fxc\debug_radiosity_grid_ps30.vcs: debug_radiosity_grid_ps30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_shadowmapping_fxc.h common_fxc.h deferred_global_common.h common_ps_fxc.h common_pragmas.h common_hlsl_cpp_consts.h common_lighting_fxc.h common_deferred_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." debug_radiosity_grid_ps30.fxc-----debug_radiosity_grid_ps30
+	echo debug_radiosity_grid_ps30.fxc>> filestocopy.txt
+	echo common_shadowmapping_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo deferred_global_common.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_lighting_fxc.h>> filestocopy.txt
+	echo common_deferred_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\debug_radiosity_grid_vs30.inc shaders\fxc\debug_radiosity_grid_vs30.vcs: debug_radiosity_grid_vs30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_shadowmapping_fxc.h common_fxc.h common_vs_fxc.h deferred_global_common.h common_pragmas.h common_hlsl_cpp_consts.h common_lighting_fxc.h common_deferred_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." debug_radiosity_grid_vs30.fxc-----debug_radiosity_grid_vs30
+	echo debug_radiosity_grid_vs30.fxc>> filestocopy.txt
+	echo common_shadowmapping_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo deferred_global_common.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_lighting_fxc.h>> filestocopy.txt
+	echo common_deferred_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\shadowpass_vs30.inc shaders\fxc\shadowpass_vs30.vcs: shadowpass_vs30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_shadowmapping_fxc.h common_fxc.h common_vs_fxc.h deferred_global_common.h common_pragmas.h common_hlsl_cpp_consts.h common_lighting_fxc.h common_deferred_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." shadowpass_vs30.fxc-----shadowpass_vs30
+	echo shadowpass_vs30.fxc>> filestocopy.txt
+	echo common_shadowmapping_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
+	echo deferred_global_common.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_lighting_fxc.h>> filestocopy.txt
+	echo common_deferred_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\shadowpass_ps30.inc shaders\fxc\shadowpass_ps30.vcs: shadowpass_ps30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_shadowmapping_fxc.h common_fxc.h deferred_global_common.h common_ps_fxc.h common_pragmas.h common_hlsl_cpp_consts.h common_lighting_fxc.h common_deferred_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." shadowpass_ps30.fxc-----shadowpass_ps30
+	echo shadowpass_ps30.fxc>> filestocopy.txt
+	echo common_shadowmapping_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo deferred_global_common.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_lighting_fxc.h>> filestocopy.txt
+	echo common_deferred_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\lightingpass_global_ps30.inc shaders\fxc\lightingpass_global_ps30.vcs: lightingpass_global_ps30.fxc ..\..\devtools\bin\updateshaders.pl ..\..\devtools\bin\fxc_prep.pl common_shadowmapping_fxc.h common_fxc.h deferred_global_common.h common_ps_fxc.h common_pragmas.h common_hlsl_cpp_consts.h common_lighting_fxc.h common_deferred_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." lightingpass_global_ps30.fxc-----lightingpass_global_ps30
+	echo lightingpass_global_ps30.fxc>> filestocopy.txt
+	echo common_shadowmapping_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo deferred_global_common.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_lighting_fxc.h>> filestocopy.txt
+	echo common_deferred_fxc.h>> filestocopy.txt
+

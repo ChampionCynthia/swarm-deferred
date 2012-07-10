@@ -49,10 +49,17 @@ private:
 	void ProcessDeferredGlobals( const CViewSetup &view );
 
 	void PerformLighting( const CViewSetup &view );
+	void BeginRadiosity( const CViewSetup &view );
+	void UpdateRadiosityPosition( Vector *offset = NULL );
+	void PerformRadiosityGlobal( const CViewSetup &view );
+	void EndRadiosity( const CViewSetup &view );
+	void DebugRadiosity( const CViewSetup &view );
 
-	void RenderCascadedShadows( const CViewSetup &view );
+	void RenderCascadedShadows( const CViewSetup &view, const bool bEnableRadiosity );
 
 	float m_flRenderDelay[SHADOW_NUM_CASCADES];
+
+	Vector m_vecRadiosityOrigin;
 };
 
 

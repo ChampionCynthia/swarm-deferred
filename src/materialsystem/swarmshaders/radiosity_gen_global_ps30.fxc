@@ -1,0 +1,66 @@
+
+
+#include "common_ps_fxc.h"
+#include "common_deferred_fxc.h"
+
+
+const float3 g_vecGridOrigin				: register( c0 );
+
+const float4x3 g_matOrtho					: register( c1 ); // up to 3
+const float4 g_vecUVTransform				: register( c4 );
+const float4 g_vecSlopeSettings				: register( c5 );
+const float3 g_vecShadowOrigin				: register( c6 );
+const float3 g_vecShadowForward				: register( c7 );
+
+sampler sShadowAlbedo						: register( s0 );
+sampler sShadowNormal						: register( s1 );
+sampler sShadowDepth						: register( s2 );
+
+struct PS_INPUT
+{
+	float2 vTexCoord				: TEXCOORD0;
+};
+
+
+struct PS_OUTPUT
+{
+	float4 vColor_0				:	COLOR0;
+	float4 vColor_1				:	COLOR1;
+};
+
+
+PS_OUTPUT main( const PS_INPUT In )
+{
+	PS_OUTPUT Out;
+
+	float2 gridIndex;
+	float2 gridFrac = modf( In.vTexCoord.xy, gridIndex );
+
+	float3 worldPos = g_vecGridOrigin;
+	worldPos.xy += gridFrac * RADIOSITY_BUFFER_SAMPLES * RADIOSITY_BUFFER_GRID_STEP_SIZE;
+
+	gridIndex *= float2( RADIOSITY_BUFFER_GRID_STEP_SIZE, RADIOSITY_BUFFER_GRID_STEP_SIZE * RADIOSITY_BUFFER_GRIDS_PER_AXIS );
+	worldPos.z += gridIndex.x + gridIndex.y;
+
+	float3 shadowPos = mul( float4( worldPos, 1 ), g_matOrtho );
+	float flMask = 1.0f - any( floor( shadowPos.xy ) );
+
+	shadowPos.xy = shadowPos.xy * g_vecUVTransform.zw + g_vecUVTransform.xy;
+	float flShadowDepth = dot( worldPos - g_vecShadowOrigin, g_vecShadowForward ) * g_vecSlopeSettings.w;
+
+	float3 flNormalSample = tex2D( sShadowNormal, shadowPos.xy ).xyz;
+	float flDepthSample = tex2D( sShadowDepth, shadowPos.xy ).r;
+	float flDepthDelta = flDepthSample - flShadowDepth;
+
+	clip( step( 0, flDepthDelta )
+		* step( flDepthDelta,
+		RADIOSITY_BUFFER_GRID_STEP_SIZE * ( 3.0f + dot( flNormalSample * 2 - 1, g_vecShadowForward ) * 1.5f ) * g_vecSlopeSettings.w
+		) - 0.5f );
+
+	float3 flRadiositySample = tex2D( sShadowAlbedo, shadowPos.xy ).rgb;
+
+	Out.vColor_0 = float4( flRadiositySample * flMask, 1 );
+	Out.vColor_1 = float4( flNormalSample, 1 );
+
+	return Out;
+}

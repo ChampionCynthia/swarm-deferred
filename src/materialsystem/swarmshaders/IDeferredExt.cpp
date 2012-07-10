@@ -19,11 +19,15 @@ CDeferredExtension::CDeferredExtension()
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 	m_pTexLightCtrl = NULL;
 #endif
+
 	Q_memset( m_pTexShadowDepth_Ortho, 0, sizeof( ITexture* ) * MAX_SHADOW_ORTHO );
 	Q_memset( m_pTexShadowDepth_DP, 0, sizeof( ITexture* ) * MAX_SHADOW_DP );
 	Q_memset( m_pTexShadowDepth_Proj, 0, sizeof( ITexture* ) * MAX_SHADOW_PROJ );
 	Q_memset( m_pTexCookie, 0, sizeof( ITexture* ) * NUM_COOKIE_SLOTS );
 	m_pTexVolumePrePass = NULL;
+	Q_memset( m_pTexShadowRad_Ortho, 0, sizeof( ITexture* ) * 2 );
+	Q_memset( m_pTexRadBuffer, 0, sizeof( ITexture* ) * 2 );
+	m_pTexRadNormal = NULL;
 
 	m_pflCommonLightData = NULL;
 	m_iCommon_NumRows = 0;
@@ -91,6 +95,11 @@ void CDeferredExtension::CommitVolumeData( const volumeData_t &data )
 	m_dataVolume = data;
 }
 
+void CDeferredExtension::CommitRadiosityData( const radiosityData_t &data )
+{
+	m_dataRadiosity = data;
+}
+
 void CDeferredExtension::CommitLightData_Global( const lightData_Global_t &data )
 {
 	m_globalLight = data;
@@ -148,4 +157,15 @@ void CDeferredExtension::CommitTexture_Cookie( const int &index, ITexture *pTexC
 void CDeferredExtension::CommitTexture_VolumePrePass( ITexture *pTexVolumePrePass )
 {
 	m_pTexVolumePrePass = pTexVolumePrePass;
+}
+void CDeferredExtension::CommitTexture_ShadowRadOutput_Ortho( ITexture *pAlbedo, ITexture *pNormal )
+{
+	m_pTexShadowRad_Ortho[0] = pAlbedo;
+	m_pTexShadowRad_Ortho[1] = pNormal;
+}
+void CDeferredExtension::CommitTexture_Radiosity( ITexture *pTexRadBuffer0, ITexture *pTexRadBuffer1, ITexture *pTexRadNormal )
+{
+	m_pTexRadBuffer[0] = pTexRadBuffer0;
+	m_pTexRadBuffer[1] = pTexRadBuffer1;
+	m_pTexRadNormal = pTexRadNormal;
 }

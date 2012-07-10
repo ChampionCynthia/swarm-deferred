@@ -3,6 +3,9 @@
 
 #include "tier0/memdbgon.h"
 
+ConVar deferred_radiosity_enable( "deferred_radiosity_enable", "1" ); // from client.dll
+ConVar deferred_radiosity_multiplier( "deferred_radiosity_multiplier", "0.4" );
+ConVar deferred_radiosity_clipToShadow( "deferred_radiosity_clipToShadow", "0" );
 
 void GetTexcoordSettings( const bool bDecal, const bool bMultiBlend,
 	int &iNumTexcoords, int **iTexcoordDim )

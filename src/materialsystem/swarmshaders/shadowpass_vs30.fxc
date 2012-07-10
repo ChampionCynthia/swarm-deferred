@@ -1,12 +1,14 @@
 
 // STATIC:		"MODEL"					"0..1"
 // STATIC:		"MORPHING_VTEX"			"0..1"
+// STATIC:		"MULTITEXTURE"			"0..2"
 
 // DYNAMIC:		"COMPRESSED_VERTS"		"0..1"
 // DYNAMIC:		"SKINNING"				"0..1"
 // DYNAMIC:		"MORPHING"				"0..1"
 
 // DYNAMIC:		"SHADOW_MODE"			"0..2"
+// DYNAMIC:		"RADIOSITY"				"0..1"
 
 #include "common_vs_fxc.h"
 #include "common_deferred_fxc.h"
@@ -65,6 +67,16 @@ struct VS_INPUT
 	float vVertexID					: POSITION2;
 
 #endif
+
+#if MULTITEXTURE == 1
+	float4 vColor_0					: COLOR0;
+#elif MULTITEXTURE == 2
+	float4 vAlphaBlend					: TEXCOORD3;
+	float4 vColorBlend1					: TEXCOORD4;
+	float4 vColorBlend2					: TEXCOORD5;
+	float4 vColorBlend3					: TEXCOORD6;
+	float4 vColorBlend4					: TEXCOORD7;
+#endif
 };
 
 
@@ -83,6 +95,20 @@ struct VS_OUTPUT
 
 #if SHADOW_MODE == DEFERRED_SHADOW_MODE_DPSM
 	float flBack					: TEXCOORD2;
+#endif
+
+#if RADIOSITY
+	float3 vecNormal				: TEXCOORD3;
+#endif
+
+#if MULTITEXTURE == 1
+	float4 vColor_0					: COLOR0;
+#elif MULTITEXTURE == 2
+	float3 vAlphaBlend					: TEXCOORD5;
+	float4 vColorBlend1					: COLOR0;
+	float4 vColorBlend2					: COLOR1;
+	float4 vColorBlend3					: TEXCOORD6;
+	float3 vColorBlend4					: TEXCOORD7;
 #endif
 };
 
@@ -158,6 +184,19 @@ VS_OUTPUT main( const VS_INPUT In )
 
 	Out.vTexCoord = In.vTexCoord_0;
 
+#if RADIOSITY
+	Out.vecNormal = worldNormal;
+#endif
+
+#if MULTITEXTURE == 1
+	Out.vColor_0 = In.vColor_0;
+#elif MULTITEXTURE == 2
+	Out.vColorBlend1 = In.vColorBlend1;
+	Out.vColorBlend2 = In.vColorBlend2;
+	Out.vColorBlend3 = In.vColorBlend3;
+	Out.vColorBlend4.xyz = In.vColorBlend4.xyz;
+	Out.vAlphaBlend.xyz = In.vAlphaBlend.xyz;
+#endif
 
 #if SHADOWMAPPING_USE_COLOR
 
@@ -168,7 +207,7 @@ VS_OUTPUT main( const VS_INPUT In )
 
 	float3 worldDelta = worldPos - g_vecOrigin;
 	float dotFwd = dot( g_vecShadowForward, worldDelta );
-	Out.flDepth = dotFwd / PROJECTION_DEPTH;
+	Out.flDepth = dotFwd * PROJECTION_DEPTH;
 
 #elif SHADOW_MODE == DEFERRED_SHADOW_MODE_DPSM
 

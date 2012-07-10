@@ -16,10 +16,15 @@ static CTextureReference g_tex_VolumetricsBuffer[ 2 ];
 
 static CTextureReference g_tex_ShadowColor_Ortho[ MAX_SHADOW_ORTHO ];
 static CTextureReference g_tex_ShadowDepth_Ortho[ MAX_SHADOW_ORTHO ];
+static CTextureReference g_tex_ShadowRad_Albedo_Ortho[ MAX_SHADOW_ORTHO ];
+static CTextureReference g_tex_ShadowRad_Normal_Ortho[ MAX_SHADOW_ORTHO ];
 static CTextureReference g_tex_ShadowColor_Proj[ MAX_SHADOW_PROJ ];
 static CTextureReference g_tex_ShadowDepth_Proj[ MAX_SHADOW_PROJ ];
 static CTextureReference g_tex_ShadowColor_DP[ MAX_SHADOW_DP ];
 static CTextureReference g_tex_ShadowDepth_DP[ MAX_SHADOW_DP ];
+
+static CTextureReference g_tex_RadiosityBuffer[ 2 ];
+static CTextureReference g_tex_RadiosityNormal;
 
 static CTextureReference g_tex_ProjectableVGUI[ NUM_PROJECTABLE_VGUI ];
 
@@ -73,6 +78,9 @@ void InitDeferredRTs( bool bInitial )
 	const ImageFormat fmt_depth = GetDeferredManager()->GetShadowDepthFormat();
 	const ImageFormat fmt_depthColor = bShadowUseColor ? IMAGE_FORMAT_R32F
 		: g_pMaterialSystemHardwareConfig->GetNullTextureFormat();
+	const ImageFormat fmt_radAlbedo = IMAGE_FORMAT_RGB888;
+	const ImageFormat fmt_radNormal = IMAGE_FORMAT_RGB888;
+	const ImageFormat fmt_radBuffer = IMAGE_FORMAT_RGB888;
 
 	if ( fmt_depth == IMAGE_FORMAT_D16_SHADOW )
 		g_flDepthScalar = pow( 2.0, 16 );
@@ -87,6 +95,9 @@ void InitDeferredRTs( bool bInitial )
 	unsigned int depthFlags =			TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET;
 	unsigned int shadowColorFlags =		TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET | TEXTUREFLAGS_POINTSAMPLE;
 	unsigned int projVGUIFlags =		TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET;
+	unsigned int radAlbedoNormalFlags =	TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET | TEXTUREFLAGS_POINTSAMPLE;
+	unsigned int radBufferFlags =		TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET;
+	unsigned int radNormalFlags =		TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET | TEXTUREFLAGS_POINTSAMPLE;
 
 	materials->BeginRenderTargetAllocation();
 
@@ -168,6 +179,24 @@ void InitDeferredRTs( bool bInitial )
 				MATERIAL_RT_DEPTH_NONE,
 				shadowColorFlags, 0 ) );
 
+#if DEFCFG_ENABLE_RADIOSITY
+			g_tex_ShadowRad_Albedo_Ortho[i].Init( materials->CreateNamedRenderTargetTextureEx2(
+				VarArgs( "%s%02i", DEFRTNAME_SHADOWRAD_ALBEDO_ORTHO, i ),
+				iResolution_x, iResolution_y,
+				RT_SIZE_NO_CHANGE,
+				fmt_radAlbedo,
+				MATERIAL_RT_DEPTH_NONE,
+				radAlbedoNormalFlags, 0 ) );
+
+			g_tex_ShadowRad_Normal_Ortho[i].Init( materials->CreateNamedRenderTargetTextureEx2(
+				VarArgs( "%s%02i", DEFRTNAME_SHADOWRAD_NORMAL_ORTHO, i ),
+				iResolution_x, iResolution_y,
+				RT_SIZE_NO_CHANGE,
+				fmt_radNormal,
+				MATERIAL_RT_DEPTH_NONE,
+				radAlbedoNormalFlags, 0 ) );
+#endif
+
 			Assert( iResolution_y == g_tex_ShadowDepth_Ortho[i]->GetActualHeight() );
 			Assert( iResolution_y == g_tex_ShadowColor_Ortho[i]->GetActualHeight() );
 			Assert( iResolution_x == g_tex_ShadowDepth_Ortho[i]->GetActualWidth() );
@@ -184,6 +213,32 @@ void InitDeferredRTs( bool bInitial )
 				MATERIAL_RT_DEPTH_NONE,
 				projVGUIFlags, 0 ) );
 		}
+
+#if DEFCFG_ENABLE_RADIOSITY
+		AssertMsg( sqrt( (double)(RADIOSITY_BUFFER_SAMPLES * RADIOSITY_BUFFER_SAMPLES * RADIOSITY_BUFFER_SAMPLES) ) == RADIOSITY_BUFFER_RES,
+			"Sample algorithm relies on count and size to be correct..." );
+		AssertMsg( sqrt( (double)RADIOSITY_BUFFER_SAMPLES ) == RADIOSITY_BUFFER_GRIDS_PER_AXIS,
+			"Sample algorithm relies on grid layout to be defined based on sample count..." );
+
+		for ( int i = 0; i < 2; i++ )
+		{
+			g_tex_RadiosityBuffer[i].Init( materials->CreateNamedRenderTargetTextureEx2(
+				VarArgs( "%s%02i", DEFRTNAME_RADIOSITY_BUFFER, i ),
+				RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES,
+				RT_SIZE_NO_CHANGE,
+				fmt_radBuffer,
+				MATERIAL_RT_DEPTH_NONE,
+				radBufferFlags, 0 ) );
+		}
+
+		g_tex_RadiosityNormal.Init( materials->CreateNamedRenderTargetTextureEx2(
+			DEFRTNAME_RADIOSITY_NORMAL,
+			RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES,
+			RT_SIZE_NO_CHANGE,
+			fmt_radNormal,
+			MATERIAL_RT_DEPTH_NONE,
+			radNormalFlags, 0 ) );
+#endif
 	}
 
 	for ( int i = 0; i < MAX_SHADOW_PROJ; i++ )
@@ -284,6 +339,14 @@ void InitDeferredRTs( bool bInitial )
 	GetDeferredExt()->CommitTexture_VolumePrePass( g_tex_VolumePrepass );
 
 	GetDeferredExt()->CommitShadowData_General( generalShadowData );
+
+#if DEFCFG_ENABLE_RADIOSITY
+	AssertMsg( MAX_SHADOW_ORTHO == 1, "You gotta fix the commit func now.." );
+	GetDeferredExt()->CommitTexture_ShadowRadOutput_Ortho( g_tex_ShadowRad_Albedo_Ortho[0],
+		g_tex_ShadowRad_Normal_Ortho[0] );
+	GetDeferredExt()->CommitTexture_Radiosity( g_tex_RadiosityBuffer[0], g_tex_RadiosityBuffer[1],
+		g_tex_RadiosityNormal );
+#endif
 }
 
 int GetShadowResolution_Spot()
@@ -328,6 +391,17 @@ ITexture *GetDefRT_VolumetricsBuffer( int index )
 	return g_tex_VolumetricsBuffer[ index ];
 }
 
+ITexture *GetDefRT_RadiosityBuffer( int index )
+{
+	Assert( index >= 0 && index < 2 );
+	return g_tex_RadiosityBuffer[ index ];
+}
+
+ITexture *GetDefRT_RadiosityNormal()
+{
+	return g_tex_RadiosityNormal;
+}
+
 ITexture *GetShadowColorRT_Ortho( int index )
 {
 	Assert( index >= 0 && index < MAX_SHADOW_ORTHO );
@@ -364,4 +438,15 @@ ITexture *GetProjectableVguiRT( int index )
 {
 	Assert( index >= 0 && index < NUM_PROJECTABLE_VGUI );
 	return g_tex_ProjectableVGUI[ index ];
+}
+
+ITexture *GetRadiosityAlbedoRT_Ortho( int index )
+{
+	Assert( index >= 0 && index < MAX_SHADOW_DP );
+	return g_tex_ShadowRad_Albedo_Ortho[ index ];
+}
+ITexture *GetRadiosityNormalRT_Ortho( int index )
+{
+	Assert( index >= 0 && index < MAX_SHADOW_DP );
+	return g_tex_ShadowRad_Normal_Ortho[ index ];
 }

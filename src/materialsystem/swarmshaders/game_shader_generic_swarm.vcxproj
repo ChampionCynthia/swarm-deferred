@@ -199,6 +199,7 @@ if exist "$(TargetDir)"$(ProjectName).map copy "$(TargetDir)"$(ProjectName).map 
     <ClCompile Include="BaseVSShader.cpp" />
     <ClCompile Include="blur.cpp" />
     <ClCompile Include="debug_lightingctrl.cpp" />
+    <ClCompile Include="debug_radiosity_grid.cpp" />
     <ClCompile Include="debug_shadow.cpp" />
     <ClCompile Include="deferred_brush.cpp" />
     <ClCompile Include="deferred_model.cpp" />
@@ -212,6 +213,9 @@ if exist "$(TargetDir)"$(ProjectName).map copy "$(TargetDir)"$(ProjectName).map 
     <ClCompile Include="lighting_pass_volum.cpp" />
     <ClCompile Include="lighting_world.cpp" />
     <ClCompile Include="lighting_volume.cpp" />
+    <ClCompile Include="radiosity_blend.cpp" />
+    <ClCompile Include="radiosity_global.cpp" />
+    <ClCompile Include="radiosity_propagate.cpp" />
     <ClCompile Include="volume_blend.cpp" />
     <ClCompile Include="volume_prepass.cpp" />
   </ItemGroup>
@@ -271,6 +275,8 @@ if exist "$(TargetDir)"$(ProjectName).map copy "$(TargetDir)"$(ProjectName).map 
     <None Include="composite_ps30.fxc" />
     <None Include="composite_vs30.fxc" />
     <None Include="debug_lighting_ctrl_ps30.fxc" />
+    <None Include="debug_radiosity_grid_ps30.fxc" />
+    <None Include="debug_radiosity_grid_vs30.fxc" />
     <None Include="debug_shadow_ortho_ps30.fxc" />
     <None Include="defconstruct_vs30.fxc" />
     <None Include="deferred_shaders.txt" />
@@ -280,6 +286,11 @@ if exist "$(TargetDir)"$(ProjectName).map copy "$(TargetDir)"$(ProjectName).map 
     <None Include="lightingpass_global_ps30.fxc" />
     <None Include="lightingpass_point_ps30.fxc" />
     <None Include="lightingpass_spot_ps30.fxc" />
+    <None Include="radiosity_blend_ps30.fxc" />
+    <None Include="radiosity_gen_global_ps30.fxc" />
+    <None Include="radiosity_gen_vs30.fxc" />
+    <None Include="radiosity_propagate_ps30.fxc" />
+    <None Include="radiosity_propagate_vs30.fxc" />
     <None Include="screenspace_vs30.fxc" />
     <None Include="shadowpass_ps30.fxc" />
     <None Include="shadowpass_vs30.fxc" />
