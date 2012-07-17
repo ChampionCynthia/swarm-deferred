@@ -45,7 +45,11 @@ float3 DoRadiosity( float3 worldPos,
 {
 	float3 vecDelta = ( worldPos - vecRadiosityOrigin ) / flWorldGridSize;
 
+#if VENDOR == VENDOR_FXC_AMD
+	AMD_PRE_5K_NON_COMPLIANT
+#else
 	clip( 0.5f - any( floor( vecDelta ) ) );
+#endif
 
 	float2 flGridUVLocal = vecDelta.xy / RADIOSITY_BUFFER_GRIDS_PER_AXIS;
 

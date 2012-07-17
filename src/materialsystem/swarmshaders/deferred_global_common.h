@@ -64,7 +64,7 @@
 #define DEFRTNAME_PROJECTABLE_VGUI "_rt_projvgui_"				// + %02i
 
 #define DEFRTNAME_RADIOSITY_BUFFER "_rt_radBuffer_"				// + %02i
-#define DEFRTNAME_RADIOSITY_NORMAL "_rt_radNormal"
+#define DEFRTNAME_RADIOSITY_NORMAL "_rt_radNormal_"				// + %02i
 
 
 /* One physical shadowmap for multiple cascades

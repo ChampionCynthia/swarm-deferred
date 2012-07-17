@@ -24,7 +24,7 @@ static CTextureReference g_tex_ShadowColor_DP[ MAX_SHADOW_DP ];
 static CTextureReference g_tex_ShadowDepth_DP[ MAX_SHADOW_DP ];
 
 static CTextureReference g_tex_RadiosityBuffer[ 2 ];
-static CTextureReference g_tex_RadiosityNormal;
+static CTextureReference g_tex_RadiosityNormal[ 2 ];
 
 static CTextureReference g_tex_ProjectableVGUI[ NUM_PROJECTABLE_VGUI ];
 
@@ -229,15 +229,15 @@ void InitDeferredRTs( bool bInitial )
 				fmt_radBuffer,
 				MATERIAL_RT_DEPTH_NONE,
 				radBufferFlags, 0 ) );
-		}
 
-		g_tex_RadiosityNormal.Init( materials->CreateNamedRenderTargetTextureEx2(
-			DEFRTNAME_RADIOSITY_NORMAL,
-			RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES,
-			RT_SIZE_NO_CHANGE,
-			fmt_radNormal,
-			MATERIAL_RT_DEPTH_NONE,
-			radNormalFlags, 0 ) );
+			g_tex_RadiosityNormal[i].Init( materials->CreateNamedRenderTargetTextureEx2(
+				VarArgs( "%s%02i", DEFRTNAME_RADIOSITY_NORMAL, i ),
+				RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES,
+				RT_SIZE_NO_CHANGE,
+				fmt_radNormal,
+				MATERIAL_RT_DEPTH_NONE,
+				radNormalFlags, 0 ) );
+		}
 #endif
 	}
 
@@ -345,7 +345,7 @@ void InitDeferredRTs( bool bInitial )
 	GetDeferredExt()->CommitTexture_ShadowRadOutput_Ortho( g_tex_ShadowRad_Albedo_Ortho[0],
 		g_tex_ShadowRad_Normal_Ortho[0] );
 	GetDeferredExt()->CommitTexture_Radiosity( g_tex_RadiosityBuffer[0], g_tex_RadiosityBuffer[1],
-		g_tex_RadiosityNormal );
+		g_tex_RadiosityNormal[0], g_tex_RadiosityNormal[1] );
 #endif
 }
 
@@ -397,9 +397,10 @@ ITexture *GetDefRT_RadiosityBuffer( int index )
 	return g_tex_RadiosityBuffer[ index ];
 }
 
-ITexture *GetDefRT_RadiosityNormal()
+ITexture *GetDefRT_RadiosityNormal( int index )
 {
-	return g_tex_RadiosityNormal;
+	Assert( index >= 0 && index < 2 );
+	return g_tex_RadiosityNormal[ index ];
 }
 
 ITexture *GetShadowColorRT_Ortho( int index )

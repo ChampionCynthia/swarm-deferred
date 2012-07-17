@@ -116,7 +116,8 @@ public:
 	virtual void CommitTexture_Cookie( const int &index, ITexture *pTexCookie ) = 0;
 	virtual void CommitTexture_VolumePrePass( ITexture *pTexVolumePrePass ) = 0;
 	virtual void CommitTexture_ShadowRadOutput_Ortho( ITexture *pAlbedo, ITexture *pNormal ) = 0;
-	virtual void CommitTexture_Radiosity( ITexture *pTexRadBuffer0, ITexture *pTexRadBuffer1, ITexture *pTexRadNormal ) = 0;
+	virtual void CommitTexture_Radiosity( ITexture *pTexRadBuffer0, ITexture *pTexRadBuffer1,
+		ITexture *pTexRadNormal0, ITexture *pTexRadNormal1 ) = 0;
 };
 
 #define DEFERRED_EXTENSION_VERSION "DeferredExtensionVersion001"
@@ -161,7 +162,8 @@ public:
 	virtual void CommitTexture_Cookie( const int &index, ITexture *pTexCookie );
 	virtual void CommitTexture_VolumePrePass( ITexture *pTexVolumePrePass );
 	virtual void CommitTexture_ShadowRadOutput_Ortho( ITexture *pAlbedo, ITexture *pNormal );
-	virtual void CommitTexture_Radiosity( ITexture *pTexRadBuffer0, ITexture *pTexRadBuffer1, ITexture *pTexRadNormal );
+	virtual void CommitTexture_Radiosity( ITexture *pTexRadBuffer0, ITexture *pTexRadBuffer1,
+		ITexture *pTexRadNormal0, ITexture *pTexRadNormal1 );
 
 	inline float *GetOriginBase();
 	inline float *GetForwardBase();
@@ -200,7 +202,7 @@ public:
 	inline ITexture *GetTexture_ShadowRad_Ortho_Albedo();
 	inline ITexture *GetTexture_ShadowRad_Ortho_Normal();
 	inline ITexture *GetTexture_RadBuffer( const int &index );
-	inline ITexture *GetTexture_RadNormal();
+	inline ITexture *GetTexture_RadNormal( const int &index );
 
 private:
 	bool m_bDefLightingEnabled;
@@ -238,7 +240,7 @@ private:
 	ITexture *m_pTexVolumePrePass;
 	ITexture *m_pTexShadowRad_Ortho[ 2 ];
 	ITexture *m_pTexRadBuffer[ 2 ];
-	ITexture *m_pTexRadNormal;
+	ITexture *m_pTexRadNormal[ 2 ];
 };
 
 float *CDeferredExtension::GetOriginBase()
@@ -375,9 +377,10 @@ ITexture *CDeferredExtension::GetTexture_RadBuffer( const int &index )
 	Assert( index >= 0 && index < 2 );
 	return m_pTexRadBuffer[index];
 }
-ITexture *CDeferredExtension::GetTexture_RadNormal()
+ITexture *CDeferredExtension::GetTexture_RadNormal( const int &index )
 {
-	return m_pTexRadNormal;
+	Assert( index >= 0 && index < 2 );
+	return m_pTexRadNormal[index];
 }
 #endif
 

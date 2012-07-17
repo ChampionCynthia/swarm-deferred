@@ -7,6 +7,7 @@
 BEGIN_VS_SHADER( RADIOSITY_PROPAGATE, "" )
 	BEGIN_SHADER_PARAMS
 
+		SHADER_PARAM( NORMALMAP, SHADER_PARAM_TYPE_TEXTURE, "", "" )
 		SHADER_PARAM( BLUR, SHADER_PARAM_TYPE_BOOL, "", "" )
 
 	END_SHADER_PARAMS
@@ -18,9 +19,13 @@ BEGIN_VS_SHADER( RADIOSITY_PROPAGATE, "" )
 	SHADER_INIT
 	{
 		Assert( params[ BASETEXTURE ]->IsDefined() );
+		Assert( params[ NORMALMAP ]->IsDefined() );
 
 		if ( params[ BASETEXTURE ]->IsDefined() )
 			LoadTexture( BASETEXTURE );
+
+		if ( params[ NORMALMAP ]->IsDefined() )
+			LoadTexture( NORMALMAP );
 	}
 
 	SHADER_FALLBACK
@@ -41,8 +46,8 @@ BEGIN_VS_SHADER( RADIOSITY_PROPAGATE, "" )
 			pShaderShadow->EnableTexture( SHADER_SAMPLER0, true );
 			pShaderShadow->EnableTexture( SHADER_SAMPLER1, true );
 
-			int iTexDim[] = { 2, 4, 4 };
-			pShaderShadow->VertexShaderVertexFormat( VERTEX_POSITION, 3, iTexDim, 0 );
+			int iTexDim[] = { 4, 4 };
+			pShaderShadow->VertexShaderVertexFormat( VERTEX_POSITION, 2, iTexDim, 0 );
 
 			DECLARE_STATIC_VERTEX_SHADER( radiosity_propagate_vs30 );
 			SET_STATIC_VERTEX_SHADER( radiosity_propagate_vs30 );
@@ -62,7 +67,7 @@ BEGIN_VS_SHADER( RADIOSITY_PROPAGATE, "" )
 			SET_DYNAMIC_PIXEL_SHADER( radiosity_propagate_ps30 );
 
 			BindTexture( SHADER_SAMPLER0, BASETEXTURE );
-			BindTexture( SHADER_SAMPLER1, GetDeferredExt()->GetTexture_RadNormal() );
+			BindTexture( SHADER_SAMPLER1, NORMALMAP );
 		}
 
 		Draw();

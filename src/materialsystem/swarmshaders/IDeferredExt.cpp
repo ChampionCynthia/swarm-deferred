@@ -27,7 +27,7 @@ CDeferredExtension::CDeferredExtension()
 	m_pTexVolumePrePass = NULL;
 	Q_memset( m_pTexShadowRad_Ortho, 0, sizeof( ITexture* ) * 2 );
 	Q_memset( m_pTexRadBuffer, 0, sizeof( ITexture* ) * 2 );
-	m_pTexRadNormal = NULL;
+	Q_memset( m_pTexRadNormal, 0, sizeof( ITexture* ) * 2 );
 
 	m_pflCommonLightData = NULL;
 	m_iCommon_NumRows = 0;
@@ -163,9 +163,11 @@ void CDeferredExtension::CommitTexture_ShadowRadOutput_Ortho( ITexture *pAlbedo,
 	m_pTexShadowRad_Ortho[0] = pAlbedo;
 	m_pTexShadowRad_Ortho[1] = pNormal;
 }
-void CDeferredExtension::CommitTexture_Radiosity( ITexture *pTexRadBuffer0, ITexture *pTexRadBuffer1, ITexture *pTexRadNormal )
+void CDeferredExtension::CommitTexture_Radiosity( ITexture *pTexRadBuffer0, ITexture *pTexRadBuffer1,
+		ITexture *pTexRadNormal0, ITexture *pTexRadNormal1 )
 {
 	m_pTexRadBuffer[0] = pTexRadBuffer0;
 	m_pTexRadBuffer[1] = pTexRadBuffer1;
-	m_pTexRadNormal = pTexRadNormal;
+	m_pTexRadNormal[0] = pTexRadNormal0;
+	m_pTexRadNormal[1] = pTexRadNormal1;
 }

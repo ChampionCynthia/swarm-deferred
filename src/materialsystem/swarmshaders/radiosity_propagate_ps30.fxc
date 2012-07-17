@@ -5,11 +5,11 @@
 #include "common_deferred_fxc.h"
 
 
+static const float flTexelSize =			1.0f / RADIOSITY_BUFFER_RES;
+
 sampler sRadiosity						: register( s0 );
 sampler sNormals						: register( s1 );
 
-static const float flTexelSize =			1.0f / RADIOSITY_BUFFER_RES;
-static const float flTexelSizeDouble =		2.0f / RADIOSITY_BUFFER_RES;
 
 static const float3 vecPropagationDirection[6] = {
 	float3( 1, 0, 0 ),
@@ -22,55 +22,79 @@ static const float3 vecPropagationDirection[6] = {
 
 struct PS_INPUT
 {
-	float4 vTexCoord				: TEXCOORD0;
-
-	float2 vGOrig_Cur				: TEXCOORD0;
+	float4 vGOrig_Cur				: TEXCOORD0;
 	float4 vGOrig_One				: TEXCOORD1;
-	float4 vGOrig_Two				: TEXCOORD2;
+	float4 vGOrig_CurOffset			: TEXCOORD2;
 };
 
 
 struct PS_OUTPUT
 {
 	float4 vColor_0				:	COLOR0;
+	float4 vColor_1				:	COLOR1;
 };
 
-void DoPropagate( inout float3 color, const in float2 uvbase, const in int index )
+void DoPropagate( inout float3 color, inout float3 normal, const float2 uvbase, const int index )
 {
+	float3 n = tex2D( sNormals, uvbase ).xyz * 2 - 1;
+	float amt = step( dot( n, vecPropagationDirection[index] ), 0.01f );
+
 	color = max( color, tex2D( sRadiosity, uvbase ).rgb
-		* step( dot( tex2D( sNormals, uvbase ).xyz * 2 - 1, vecPropagationDirection[index] ), 0.01f ) );
+		* amt );
+
+	normal = lerp( normal, n * amt, step( abs(normal), 0.01 ) );
+}
+
+void DoBlur( inout float3 color, inout float3 normal, inout float sampleAmount, const float2 uvbase, const int index )
+{
+	float3 n = tex2D( sNormals, uvbase ).xyz * 2 - 1;
+	float amt = step( dot( n, vecPropagationDirection[index] ), 0.01f );
+
+	color += tex2D( sRadiosity, uvbase ).rgb * amt;
+	normal += n * amt;
+	sampleAmount += amt;
 }
 
 PS_OUTPUT main( const PS_INPUT In )
 {
+#if VENDOR == VENDOR_FXC_AMD
+	AMD_PRE_5K_NON_COMPLIANT
+#else
+	clip( 0 - any( floor( In.vGOrig_Cur.zw ) ) );
+#endif
+
 	PS_OUTPUT Out;
 
-	float3 color = tex2D( sRadiosity, In.vTexCoord.xy ).rgb;
+	float3 color = tex2D( sRadiosity, In.vGOrig_Cur.xy ).rgb;
+	float3 normal = tex2D( sNormals, In.vGOrig_Cur.xy ).rgb * 2 - 1;
 
 #if BLUR
 
-	color += tex2D( sRadiosity, In.vGOrig_Cur.xy + float2( flTexelSize, 0 ) ).rgb;
-	color += tex2D( sRadiosity, In.vGOrig_Cur.xy + float2( -flTexelSize, 0 ) ).rgb;
-	color += tex2D( sRadiosity, In.vGOrig_Cur.xy + float2( 0, flTexelSize ) ).rgb;
-	color += tex2D( sRadiosity, In.vGOrig_Cur.xy + float2( 0, -flTexelSize ) ).rgb;
+	float flFactor = 1;
+	DoBlur( color, normal, flFactor, In.vGOrig_Cur.xy + float2( flTexelSize, 0 ), 0 );
+	DoBlur( color, normal, flFactor, In.vGOrig_Cur.xy + float2( -flTexelSize, 0 ), 1 );
+	DoBlur( color, normal, flFactor, In.vGOrig_Cur.xy + float2( 0, flTexelSize ), 2 );
+	DoBlur( color, normal, flFactor, In.vGOrig_Cur.xy + float2( 0, -flTexelSize ), 3 );
 
-	color += tex2D( sRadiosity, In.vGOrig_One.xy ).rgb;
-	color += tex2D( sRadiosity, In.vGOrig_One.zw ).rgb;
+	DoBlur( color, normal, flFactor, In.vGOrig_One.xy, 4 );
+	DoBlur( color, normal, flFactor, In.vGOrig_One.zw, 5 );
 
-	color *= ( 1.0f / 7.0f );
+	color /= flFactor;
+	normal /= flFactor;
 
 #else
 
-	DoPropagate( color, In.vGOrig_Cur.xy + float2( flTexelSize, 0 ), 0 );
-	DoPropagate( color, In.vGOrig_Cur.xy + float2( -flTexelSize, 0 ), 1 );
-	DoPropagate( color, In.vGOrig_Cur.xy + float2( 0, flTexelSize ), 2 );
-	DoPropagate( color, In.vGOrig_Cur.xy + float2( 0, -flTexelSize ), 3 );
-	DoPropagate( color, In.vGOrig_One.xy, 4 );
-	DoPropagate( color, In.vGOrig_One.zw, 5 );
+	DoPropagate( color, normal, In.vGOrig_Cur.xy + float2( flTexelSize, 0 ), 0 );
+	DoPropagate( color, normal, In.vGOrig_Cur.xy + float2( -flTexelSize, 0 ), 1 );
+	DoPropagate( color, normal, In.vGOrig_Cur.xy + float2( 0, flTexelSize ), 2 );
+	DoPropagate( color, normal, In.vGOrig_Cur.xy + float2( 0, -flTexelSize ), 3 );
+	DoPropagate( color, normal, In.vGOrig_One.xy, 4 );
+	DoPropagate( color, normal, In.vGOrig_One.zw, 5 );
 
 #endif
 
 	Out.vColor_0 = float4( color, 1 );
+	Out.vColor_1 = float4( normal * 0.5f + 0.5f, 1 );
 
 	return Out;
 }

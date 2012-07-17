@@ -205,12 +205,12 @@ void CDeferredViewRender::CreateRadiosityScreenGrid()
 	Assert( m_pMesh_RadiosityScreenGrid == NULL );
 
 	VertexFormat_t format = VERTEX_POSITION
-		| VERTEX_TEXCOORD_SIZE( 0, 2 )
+		| VERTEX_TEXCOORD_SIZE( 0, 4 )
 		| VERTEX_TEXCOORD_SIZE( 1, 4 )
-		| VERTEX_TEXCOORD_SIZE( 2, 4 )
 		| VERTEX_TANGENT_S;
 
 	const float flLocalCoordSingle = 1.0f / RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+	const float flTexelGridMargin = 1.5f / RADIOSITY_BUFFER_SAMPLES;
 	const float flTexelHalf = 0.5f / RADIOSITY_BUFFER_RES;
 	const float flLocalCoords[4][2] = {
 		0, 0,
@@ -244,6 +244,12 @@ void CDeferredViewRender::CreateRadiosityScreenGrid()
 		flGridSize, flGridSize,
 		0, flGridSize,
 	};
+	const float flLocalGridLimits[4][2] = {
+		-flTexelGridMargin, -flTexelGridMargin,
+		1 + flTexelGridMargin, -flTexelGridMargin,
+		1 + flTexelGridMargin, 1 + flTexelGridMargin,
+		-flTexelGridMargin, 1 + flTexelGridMargin,
+	};
 
 	for ( int x = 0; x < RADIOSITY_BUFFER_GRIDS_PER_AXIS; x++ )
 	{
@@ -251,7 +257,6 @@ void CDeferredViewRender::CreateRadiosityScreenGrid()
 		{
 			const int iIndexLocal = x + y * RADIOSITY_BUFFER_GRIDS_PER_AXIS;
 			const int iIndicesOne[2] = { MIN( RADIOSITY_BUFFER_SAMPLES - 1, iIndexLocal + 1 ), MAX( 0, iIndexLocal - 1 ) };
-			const int iIndicesTwo[2] = { MIN( RADIOSITY_BUFFER_SAMPLES - 1, iIndexLocal + 2 ), MAX( 0, iIndexLocal - 2 ) };
 
 			for ( int q = 0; q < 4; q++ )
 			{
@@ -260,16 +265,13 @@ void CDeferredViewRender::CreateRadiosityScreenGrid()
 					flLocalCoordSingle * RADIOSITY_BUFFER_GRIDS_PER_AXIS - (y * flLocalCoordSingle + flLocalCoords[q][1]) * 2,
 					0 );
 
-				meshBuilder.TexCoord2f( 0,
-					flGridOrigins[iIndexLocal][0] + flLocalCoords[q][0], flGridOrigins[iIndexLocal][1] + flLocalCoords[q][1] );
+				meshBuilder.TexCoord4f( 0,
+					flGridOrigins[iIndexLocal][0] + flLocalCoords[q][0], flGridOrigins[iIndexLocal][1] + flLocalCoords[q][1],
+					flLocalGridLimits[q][0], flLocalGridLimits[q][1] );
 
 				meshBuilder.TexCoord4f( 1,
 					flGridOrigins[iIndicesOne[0]][0] + flLocalCoords[q][0], flGridOrigins[iIndicesOne[0]][1] + flLocalCoords[q][1],
 					flGridOrigins[iIndicesOne[1]][0] + flLocalCoords[q][0], flGridOrigins[iIndicesOne[1]][1] + flLocalCoords[q][1] );
-
-				meshBuilder.TexCoord4f( 2,
-					flGridOrigins[iIndicesTwo[0]][0] + flLocalCoords[q][0], flGridOrigins[iIndicesTwo[0]][1] + flLocalCoords[q][1],
-					flGridOrigins[iIndicesTwo[1]][0] + flLocalCoords[q][0], flGridOrigins[iIndicesTwo[1]][1] + flLocalCoords[q][1] );
 
 				meshBuilder.TangentS3f( flLocalGridSize[q][0],
 					flLocalGridSize[q][1],
@@ -965,6 +967,7 @@ void CDeferredViewRender::BeginRadiosity( const CViewSetup &view )
 	UpdateRadiosityPosition();
 
 	const int iSourceBuffer = GetSourceRadBufferIndex();
+	static int iLastSourceBuffer = iSourceBuffer;
 
 	CMatRenderContextPtr pRenderContext( materials );
 
@@ -974,7 +977,24 @@ void CDeferredViewRender::BeginRadiosity( const CViewSetup &view )
 	pRenderContext->ClearBuffers( true, false );
 	pRenderContext->PopRenderTargetAndViewport();
 
-	pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityNormal(), NULL,
+	if ( iLastSourceBuffer != iSourceBuffer )
+	{
+		iLastSourceBuffer = iSourceBuffer;
+
+		pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( 1 - iSourceBuffer ), NULL,
+			0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
+		pRenderContext->ClearColor3ub( 0, 0, 0 );
+		pRenderContext->ClearBuffers( true, false );
+		pRenderContext->PopRenderTargetAndViewport();
+
+		pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityNormal( 1 - iSourceBuffer ), NULL,
+			0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
+		pRenderContext->ClearColor3ub( 127, 127, 127 );
+		pRenderContext->ClearBuffers( true, false );
+		pRenderContext->PopRenderTargetAndViewport();
+	}
+
+	pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityNormal( iSourceBuffer ), NULL,
 		0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
 	pRenderContext->ClearColor3ub( 127, 127, 127 );
 	pRenderContext->ClearBuffers( true, false );
@@ -1009,7 +1029,7 @@ void CDeferredViewRender::PerformRadiosityGlobal( const CViewSetup &view )
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( iSourceBuffer ), NULL,
 		0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
-	pRenderContext->SetRenderTargetEx( 1, GetDefRT_RadiosityNormal() );
+	pRenderContext->SetRenderTargetEx( 1, GetDefRT_RadiosityNormal( iSourceBuffer ) );
 
 	pRenderContext->Bind( GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_GLOBAL ) );
 	GetRadiosityScreenGrid()->Draw();
@@ -1035,10 +1055,13 @@ void CDeferredViewRender::EndRadiosity( const CViewSetup &view )
 
 	for ( int i = 0; i < iNumPropagateSteps; i++ )
 	{
+		const int index = bSecondDestBuffer ? 1 : 0;
 		CMatRenderContextPtr pRenderContext( materials );
-		pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( bSecondDestBuffer ? 1 : 0 ), NULL,
+		pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( index ), NULL,
 			0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
-		pRenderContext->Bind( pPropagateMat[ bSecondDestBuffer ? 0 : 1 ] );
+		pRenderContext->SetRenderTargetEx( 1, GetDefRT_RadiosityNormal( index ) );
+
+		pRenderContext->Bind( pPropagateMat[ 1 - index ] );
 
 		GetRadiosityScreenGrid()->Draw();
 
@@ -1048,10 +1071,13 @@ void CDeferredViewRender::EndRadiosity( const CViewSetup &view )
 
 	for ( int i = 0; i < iNumBlurSteps; i++ )
 	{
+		const int index = bSecondDestBuffer ? 1 : 0;
 		CMatRenderContextPtr pRenderContext( materials );
-		pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( bSecondDestBuffer ? 1 : 0 ), NULL,
+		pRenderContext->PushRenderTargetAndViewport( GetDefRT_RadiosityBuffer( index ), NULL,
 			0, 0, RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES );
-		pRenderContext->Bind( pBlurMat[ bSecondDestBuffer ? 0 : 1 ] );
+		pRenderContext->SetRenderTargetEx( 1, GetDefRT_RadiosityNormal( index ) );
+
+		pRenderContext->Bind( pBlurMat[ 1 - index ] );
 
 		GetRadiosityScreenGrid()->Draw();
 

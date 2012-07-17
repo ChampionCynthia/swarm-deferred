@@ -36,7 +36,11 @@ PS_OUTPUT main( const PS_INPUT In )
 	float3 worldPos = g_vecGridOrigin + In.vWorldPos;
 
 	float3 shadowPos = mul( float4( worldPos, 1 ), g_matOrtho );
+#if VENDOR == VENDOR_FXC_AMD
+	AMD_PRE_5K_NON_COMPLIANT
+#else
 	float flMask = 1.0f - any( floor( shadowPos.xy ) );
+#endif
 
 	shadowPos.xy = shadowPos.xy * g_vecUVTransform.zw + g_vecUVTransform.xy;
 	float flShadowDepth = dot( worldPos - g_vecShadowOrigin, g_vecShadowForward ) * g_vecSlopeSettings.w;
