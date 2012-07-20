@@ -1,4 +1,5 @@
 
+// DYNAMIC:		"CASCADE"		"0..1"
 
 #include "common_ps_fxc.h"
 #include "common_deferred_fxc.h"
@@ -51,7 +52,12 @@ PS_OUTPUT main( const PS_INPUT In )
 
 	clip( step( 0, flDepthDelta )
 		* step( flDepthDelta,
-		RADIOSITY_BUFFER_GRID_STEP_SIZE * ( 3.0f + dot( flNormalSample * 2 - 1, g_vecShadowForward ) * 2.5f ) * g_vecSlopeSettings.w
+#if CASCADE == 0
+		RADIOSITY_BUFFER_GRID_STEP_SIZE_CLOSE
+#else
+		RADIOSITY_BUFFER_GRID_STEP_SIZE_FAR
+#endif
+		* ( 3.0f + dot( flNormalSample * 2 - 1, g_vecShadowForward ) * 2.5f ) * g_vecSlopeSettings.w
 		) - 0.5f );
 
 	float3 flRadiositySample = tex2D( sShadowAlbedo, shadowPos.xy ).rgb;

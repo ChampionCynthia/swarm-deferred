@@ -19,7 +19,7 @@ set GAMEDIR=D:\steam\STEAMA~1\SOURCE~1\SWARMD~1
 rem == Set the relative path to SourceSDK\bin\orangebox\bin ==
 rem == As above, this path does not support long directory names or spaces ==
 rem == e.g. ..\..\..\..\..\PROGRA~2\Steam\steamapps\<USER NAME>\sourcesdk\bin\orangebox\bin ==
-set SDKBINDIR=..\..\..\steam\STEAMA~1\common\ALIENS~1\bin
+set SDKBINDIR=..\..\..\STEAML~1\STEAMA~1\common\ALIENS~1\bin
 
 rem ==  Set the Path to your mods root source code ==
 rem this should already be correct, accepts relative paths only!
@@ -50,7 +50,7 @@ set tt_all_chkpt=%tt_start%
 set BUILD_SHADER=call buildshaders.bat
 set ARG_EXTRA=
 
-%BUILD_SHADER% deferred_shaders		-game %GAMEDIR% -source %SOURCEDIR%
+%BUILD_SHADER% deferred_shaders_short		-game %GAMEDIR% -source %SOURCEDIR%
 
 
 rem echo.

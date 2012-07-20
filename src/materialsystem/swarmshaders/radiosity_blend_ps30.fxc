@@ -10,7 +10,8 @@ sampler sRadiosity						: register( s1 );
 
 const float3 g_vecViewOrigin				: register( c0 );
 const float3 g_vecRadiosityOrigin			: register( c1 );
-const float g_flRadiositySettings			: register( c2 );
+const float3 g_vecRadiosityOrigin_Far		: register( c2 );
+const float g_flRadiositySettings			: register( c3 );
 
 
 struct PS_INPUT
@@ -35,7 +36,8 @@ PS_OUTPUT main( const PS_INPUT In )
 
 	float3 worldPos = g_vecViewOrigin + In.vecWorldRay * flDepth;
 
-	float3 color = DoRadiosity( worldPos, sRadiosity, g_vecRadiosityOrigin, g_flRadiositySettings );
+	float3 color = DoRadiosity( worldPos, sRadiosity,
+		g_vecRadiosityOrigin, g_vecRadiosityOrigin_Far, g_flRadiositySettings );
 
 	Out.vColor_0 = float4( color , 1 );
 

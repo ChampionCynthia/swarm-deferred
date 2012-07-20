@@ -65,12 +65,16 @@ BEGIN_VS_SHADER( RADIOSITY_BLEND, "" )
 			CommitBaseDeferredConstants_Origin( pShaderAPI, 0 );
 
 			const radiosityData_t &data = GetDeferredExt()->GetRadiosityData();
-			Vector vecOrigin = data.vecOrigin;
-			float fl1[4] = { vecOrigin.x, vecOrigin.y, vecOrigin.z, 0 };
-			pShaderAPI->SetPixelShaderConstant( 1, fl1 );
 
-			float fl2[4] = { deferred_radiosity_multiplier.GetFloat() };
+			const Vector &vecOrigin = data.vecOrigin[0];
+			const Vector &vecOrigin2 = data.vecOrigin[1];
+			float fl1[4] = { vecOrigin.x, vecOrigin.y, vecOrigin.z, 0 };
+			float fl2[4] = { vecOrigin2.x, vecOrigin2.y, vecOrigin2.z, 0 };
+			pShaderAPI->SetPixelShaderConstant( 1, fl1 );
 			pShaderAPI->SetPixelShaderConstant( 2, fl2 );
+
+			float fl3[4] = { deferred_radiosity_multiplier.GetFloat() };
+			pShaderAPI->SetPixelShaderConstant( 3, fl3 );
 		}
 
 		Draw();

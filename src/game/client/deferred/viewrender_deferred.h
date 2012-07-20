@@ -51,8 +51,8 @@ private:
 	void PerformLighting( const CViewSetup &view );
 
 	void BeginRadiosity( const CViewSetup &view );
-	void UpdateRadiosityPosition( Vector *offset = NULL );
-	void PerformRadiosityGlobal( const CViewSetup &view );
+	void UpdateRadiosityPosition();
+	void PerformRadiosityGlobal( const int iRadiosityCascade, const CViewSetup &view );
 	void EndRadiosity( const CViewSetup &view );
 	void DebugRadiosity( const CViewSetup &view );
 
@@ -60,11 +60,11 @@ private:
 
 	float m_flRenderDelay[SHADOW_NUM_CASCADES];
 
-	IMesh *GetRadiosityScreenGrid();
-	void CreateRadiosityScreenGrid();
+	IMesh *GetRadiosityScreenGrid( const int iCascade );
+	IMesh *CreateRadiosityScreenGrid( const Vector2D &vecViewportBase, const float flWorldStepSize );
 
-	Vector m_vecRadiosityOrigin;
-	IMesh *m_pMesh_RadiosityScreenGrid;
+	Vector m_vecRadiosityOrigin[2];
+	IMesh *m_pMesh_RadiosityScreenGrid[2];
 };
 
 

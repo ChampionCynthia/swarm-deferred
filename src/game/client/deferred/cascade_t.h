@@ -17,6 +17,7 @@ struct cascade_t
 
 	float flUpdateDelay;
 	bool bOutputRadiosityData;
+	int iRadiosityCascadeTarget;
 
 #if CSM_USE_COMPOSITED_TARGET
 	int iViewport_x;

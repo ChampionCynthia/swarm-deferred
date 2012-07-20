@@ -2,8 +2,20 @@
 #ifndef COMMON_LIGHTING_H
 #define COMMON_LIGHTING_H
 
-static const float flWorldGridSize = RADIOSITY_BUFFER_GRID_STEP_SIZE * RADIOSITY_BUFFER_SAMPLES;
-static const float flRadiosityTexelSizeHalf = 0.5f / RADIOSITY_BUFFER_RES;
+static const float3 flWorldGridSize = float3(
+	RADIOSITY_BUFFER_GRID_STEP_SIZE_CLOSE * RADIOSITY_BUFFER_SAMPLES_XY,
+	RADIOSITY_BUFFER_GRID_STEP_SIZE_CLOSE * RADIOSITY_BUFFER_SAMPLES_XY,
+	RADIOSITY_BUFFER_GRID_STEP_SIZE_CLOSE * RADIOSITY_BUFFER_SAMPLES_Z
+	);
+static const float3 flWorldGridSize_Far = float3(
+	RADIOSITY_BUFFER_GRID_STEP_SIZE_FAR * RADIOSITY_BUFFER_SAMPLES_XY,
+	RADIOSITY_BUFFER_GRID_STEP_SIZE_FAR * RADIOSITY_BUFFER_SAMPLES_XY,
+	RADIOSITY_BUFFER_GRID_STEP_SIZE_FAR * RADIOSITY_BUFFER_SAMPLES_Z
+	);
+
+static const float2 flRadiosityTexelSizeHalf = float2( 0.5f / RADIOSITY_BUFFER_RES_X,
+	0.5f / RADIOSITY_BUFFER_RES_Y );
+static const float2 flRadiosityUVRatio = float2( RADIOSITY_UVRATIO_X, RADIOSITY_UVRATIO_Y );
 
 float3 DoStandardCookie( sampler sCookie, float2 uvs )
 {
@@ -40,10 +52,68 @@ float4 DoLightFinalCookied( float3 diffuse, float3 ambient, float4 litdot_lamoun
 #endif
 }
 
-float3 DoRadiosity( float3 worldPos,
-	sampler RadiositySampler, float3 vecRadiosityOrigin, float flRadiositySettings )
+float3 GetBilinearRadiositySample( sampler RadiositySampler, float3 vecPositionDelta, float2 vecUVOffset )
 {
+	float2 flGridUVLocal = vecPositionDelta.xy / RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+
+	float2 flGridIndexSplit;
+	flGridIndexSplit.x = modf( vecPositionDelta.z * RADIOSITY_BUFFER_GRIDS_PER_AXIS, flGridIndexSplit.y );
+
+	flGridIndexSplit.x *= RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+	float flSampleFrac = modf( flGridIndexSplit.x, flGridIndexSplit.x );
+
+	flGridIndexSplit /= RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+
+	float2 flGridUVLow = flRadiosityUVRatio * (flGridUVLocal + flGridIndexSplit) + flRadiosityTexelSizeHalf;
+
+	flGridIndexSplit.x = modf(
+		( floor( vecPositionDelta.z * RADIOSITY_BUFFER_SAMPLES_Z ) + 1 ) / RADIOSITY_BUFFER_GRIDS_PER_AXIS,
+		flGridIndexSplit.y );
+	flGridIndexSplit.y /= RADIOSITY_BUFFER_GRIDS_PER_AXIS;
+
+	float2 flGridUVHigh = flRadiosityUVRatio * (flGridUVLocal + flGridIndexSplit) + flRadiosityTexelSizeHalf;
+
+	return lerp( tex2D( RadiositySampler, flGridUVLow + vecUVOffset ).rgb,
+		tex2D( RadiositySampler, flGridUVHigh + vecUVOffset ).rgb, flSampleFrac );
+}
+
+
+float3 DoRadiosity( float3 worldPos,
+	sampler RadiositySampler, float3 vecRadiosityOrigin, float3 vecRadiosityOrigin_Far,
+	float flRadiositySettings )
+{
+#if RADIOSITY_SMOOTH_TRANSITION == 1
+	float3 vecDeltaFar = ( worldPos - vecRadiosityOrigin_Far ) / flWorldGridSize_Far;
+
+#if VENDOR == VENDOR_FXC_AMD
+	AMD_PRE_5K_NON_COMPLIANT
+#else
+	clip( 0.5f - any( floor( vecDeltaFar ) ) );
+#endif
+
+	float3 vecDeltaClose = ( worldPos - vecRadiosityOrigin ) / flWorldGridSize;
+
+	float3 flTransition = abs( saturate( vecDeltaClose ) * 2 - 1 );
+	float flBlendAmt = max( flTransition.x, max( flTransition.y, flTransition.z ) );
+	flBlendAmt = smoothstep( 0.7f, 1.0f, flBlendAmt );
+
+	return lerp( GetBilinearRadiositySample( RadiositySampler, vecDeltaClose, float2(0,0) ),
+		GetBilinearRadiositySample( RadiositySampler, vecDeltaFar, float2(0,0.5f) ),
+		flBlendAmt ) * flRadiositySettings.x;
+#else
 	float3 vecDelta = ( worldPos - vecRadiosityOrigin ) / flWorldGridSize;
+
+#if VENDOR == VENDOR_FXC_AMD
+	AMD_PRE_5K_NON_COMPLIANT
+#else
+	float flLerpTo1 = any( floor( (vecDelta.xyz - 0.025f) * 1.05f) );
+#endif
+
+	vecDelta = lerp( vecDelta,
+		( worldPos - vecRadiosityOrigin_Far ) / flWorldGridSize_Far,
+		flLerpTo1 );
+
+	float2 flUV_Y_Offset = float2( 0, flLerpTo1 ) * 0.5f;
 
 #if VENDOR == VENDOR_FXC_AMD
 	AMD_PRE_5K_NON_COMPLIANT
@@ -51,27 +121,8 @@ float3 DoRadiosity( float3 worldPos,
 	clip( 0.5f - any( floor( vecDelta ) ) );
 #endif
 
-	float2 flGridUVLocal = vecDelta.xy / RADIOSITY_BUFFER_GRIDS_PER_AXIS;
-
-	float2 flGridIndexSplit;
-	flGridIndexSplit.x = modf( vecDelta.z * RADIOSITY_BUFFER_GRIDS_PER_AXIS, flGridIndexSplit.y );
-
-	flGridIndexSplit.x *= RADIOSITY_BUFFER_GRIDS_PER_AXIS;
-	float flSampleFrac = modf( flGridIndexSplit.x, flGridIndexSplit.x );
-
-	flGridIndexSplit /= RADIOSITY_BUFFER_GRIDS_PER_AXIS;
-
-	float2 flGridUVLow = flGridUVLocal + flGridIndexSplit + flRadiosityTexelSizeHalf;
-
-	flGridIndexSplit.x = modf(
-		( floor( vecDelta.z * RADIOSITY_BUFFER_SAMPLES ) + 1 ) / RADIOSITY_BUFFER_GRIDS_PER_AXIS,
-		flGridIndexSplit.y );
-	flGridIndexSplit.y /= RADIOSITY_BUFFER_GRIDS_PER_AXIS;
-
-	float2 flGridUVHigh = flGridUVLocal + flGridIndexSplit + flRadiosityTexelSizeHalf;
-
-	return lerp( tex2D( RadiositySampler, flGridUVLow ).rgb,
-		tex2D( RadiositySampler, flGridUVHigh ).rgb, flSampleFrac ) * flRadiositySettings.x;
+	return GetBilinearRadiositySample( RadiositySampler, vecDelta, flUV_Y_Offset ) * flRadiositySettings.x;
+#endif
 }
 
 #endif

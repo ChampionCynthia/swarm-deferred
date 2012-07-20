@@ -22,7 +22,9 @@ extern ConVar deferred_override_globalLight_ambient_low;
 
 extern ConVar deferred_radiosity_enable;
 extern ConVar deferred_radiosity_propagate_count;
+extern ConVar deferred_radiosity_propagate_count_far;
 extern ConVar deferred_radiosity_blur_count;
+extern ConVar deferred_radiosity_blur_count_far;
 extern ConVar deferred_radiosity_debug;
 
 

@@ -215,16 +215,16 @@ void InitDeferredRTs( bool bInitial )
 		}
 
 #if DEFCFG_ENABLE_RADIOSITY
-		AssertMsg( sqrt( (double)(RADIOSITY_BUFFER_SAMPLES * RADIOSITY_BUFFER_SAMPLES * RADIOSITY_BUFFER_SAMPLES) ) == RADIOSITY_BUFFER_RES,
-			"Sample algorithm relies on count and size to be correct..." );
-		AssertMsg( sqrt( (double)RADIOSITY_BUFFER_SAMPLES ) == RADIOSITY_BUFFER_GRIDS_PER_AXIS,
-			"Sample algorithm relies on grid layout to be defined based on sample count..." );
+		//AssertMsg( sqrt( (double)(RADIOSITY_BUFFER_SAMPLES * RADIOSITY_BUFFER_SAMPLES * RADIOSITY_BUFFER_SAMPLES) ) == RADIOSITY_BUFFER_RES,
+		//	"Sample algorithm relies on count and size to be correct..." );
+		//AssertMsg( sqrt( (double)RADIOSITY_BUFFER_SAMPLES ) == RADIOSITY_BUFFER_GRIDS_PER_AXIS,
+		//	"Sample algorithm relies on grid layout to be defined based on sample count..." );
 
 		for ( int i = 0; i < 2; i++ )
 		{
 			g_tex_RadiosityBuffer[i].Init( materials->CreateNamedRenderTargetTextureEx2(
 				VarArgs( "%s%02i", DEFRTNAME_RADIOSITY_BUFFER, i ),
-				RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES,
+				RADIOSITY_BUFFER_RES_X, RADIOSITY_BUFFER_RES_Y,
 				RT_SIZE_NO_CHANGE,
 				fmt_radBuffer,
 				MATERIAL_RT_DEPTH_NONE,
@@ -232,7 +232,7 @@ void InitDeferredRTs( bool bInitial )
 
 			g_tex_RadiosityNormal[i].Init( materials->CreateNamedRenderTargetTextureEx2(
 				VarArgs( "%s%02i", DEFRTNAME_RADIOSITY_NORMAL, i ),
-				RADIOSITY_BUFFER_RES, RADIOSITY_BUFFER_RES,
+				RADIOSITY_BUFFER_RES_X, RADIOSITY_BUFFER_RES_Y,
 				RT_SIZE_NO_CHANGE,
 				fmt_radNormal,
 				MATERIAL_RT_DEPTH_NONE,

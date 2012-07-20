@@ -78,7 +78,7 @@ struct volumeData_t
 
 struct radiosityData_t
 {
-	Vector vecOrigin;
+	Vector vecOrigin[2];
 };
 
 class IDeferredExtension : public IBaseInterface

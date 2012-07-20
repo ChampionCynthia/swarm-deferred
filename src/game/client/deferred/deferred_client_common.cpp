@@ -15,7 +15,9 @@ ConVar deferred_override_globalLight_ambient_low( "deferred_override_globalLight
 
 ConVar deferred_radiosity_enable( "deferred_radiosity_enable", "1" );
 ConVar deferred_radiosity_propagate_count( "deferred_radiosity_propagate_count", "1" );
+ConVar deferred_radiosity_propagate_count_far( "deferred_radiosity_propagate_count_far", "0" );
 ConVar deferred_radiosity_blur_count( "deferred_radiosity_blur_count", "2" );
+ConVar deferred_radiosity_blur_count_far( "deferred_radiosity_blur_count_far", "1" );
 ConVar deferred_radiosity_debug( "deferred_radiosity_debug", "0" );
 
 void OnCookieTableChanged( void *object, INetworkStringTable *stringTable, int stringNumber, const char *newString, void const *newData )
