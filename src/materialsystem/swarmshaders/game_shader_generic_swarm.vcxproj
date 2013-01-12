@@ -202,6 +202,7 @@ if exist "$(TargetDir)"$(ProjectName).map copy "$(TargetDir)"$(ProjectName).map 
     <ClCompile Include="debug_radiosity_grid.cpp" />
     <ClCompile Include="debug_shadow.cpp" />
     <ClCompile Include="deferred_brush.cpp" />
+    <ClCompile Include="deferred_decalModulate.cpp" />
     <ClCompile Include="deferred_model.cpp" />
     <ClCompile Include="deferred_utility.cpp" />
     <ClCompile Include="defpass_composite.cpp" />
@@ -216,6 +217,8 @@ if exist "$(TargetDir)"$(ProjectName).map copy "$(TargetDir)"$(ProjectName).map 
     <ClCompile Include="radiosity_blend.cpp" />
     <ClCompile Include="radiosity_global.cpp" />
     <ClCompile Include="radiosity_propagate.cpp" />
+    <ClCompile Include="screenspace_combine.cpp" />
+    <ClCompile Include="screenspace_shading.cpp" />
     <ClCompile Include="volume_blend.cpp" />
     <ClCompile Include="volume_prepass.cpp" />
   </ItemGroup>
@@ -281,6 +284,7 @@ if exist "$(TargetDir)"$(ProjectName).map copy "$(TargetDir)"$(ProjectName).map 
     <None Include="defconstruct_vs30.fxc" />
     <None Include="deferred_shaders.txt" />
     <None Include="gaussianblur_6_ps30.fxc" />
+    <None Include="gbuffer_defshading_ps30.fxc" />
     <None Include="gbuffer_ps30.fxc" />
     <None Include="gbuffer_vs30.fxc" />
     <None Include="lightingpass_global_ps30.fxc" />
@@ -291,6 +295,8 @@ if exist "$(TargetDir)"$(ProjectName).map copy "$(TargetDir)"$(ProjectName).map 
     <None Include="radiosity_gen_vs30.fxc" />
     <None Include="radiosity_propagate_ps30.fxc" />
     <None Include="radiosity_propagate_vs30.fxc" />
+    <None Include="screenspace_combine_ps30.fxc" />
+    <None Include="screenspace_shading_ps30.fxc" />
     <None Include="screenspace_vs30.fxc" />
     <None Include="shadowpass_ps30.fxc" />
     <None Include="shadowpass_vs30.fxc" />

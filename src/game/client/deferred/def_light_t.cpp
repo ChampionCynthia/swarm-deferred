@@ -48,6 +48,8 @@ BEGIN_DATADESC_NO_BASE( def_light_t )
 
 END_DATADESC()
 
+IMesh *def_light_t::pMeshUnitSphere = NULL;
+
 def_light_t::def_light_t( bool bWorld )
 {
 	bWorldLight = bWorld;
@@ -101,6 +103,41 @@ def_light_t::def_light_t( bool bWorld )
 def_light_t::~def_light_t()
 {
 	ClearCookie();
+
+	DestroyMeshes();
+}
+
+void def_light_t::DestroyMeshes()
+{
+	if ( IsPoint() )
+		return;
+
+	CMatRenderContextPtr pRenderContext( materials );
+
+	if ( pMesh_World )
+		pRenderContext->DestroyStaticMesh( pMesh_World );
+
+	if ( pMesh_Volumetrics )
+		pRenderContext->DestroyStaticMesh( pMesh_Volumetrics );
+
+	if ( pMesh_VolumPrepass )
+		pRenderContext->DestroyStaticMesh( pMesh_VolumPrepass );
+
+#if DEBUG
+	if ( pMesh_Debug )
+		pRenderContext->DestroyStaticMesh( pMesh_Debug );
+
+	if ( pMesh_Debug_Volumetrics )
+		pRenderContext->DestroyStaticMesh( pMesh_Debug_Volumetrics );
+#endif
+}
+
+void def_light_t::ShutdownSharedMeshes()
+{
+	CMatRenderContextPtr pRenderContext( materials );
+
+	if ( pMeshUnitSphere )
+		pRenderContext->DestroyStaticMesh( pMeshUnitSphere );
 }
 
 def_light_t *def_light_t::AllocateFromKeyValues( KeyValues *pKV )
@@ -479,7 +516,20 @@ void def_light_t::UpdateXForms()
 	if ( IsPoint() )
 		worldAng.Init();
 
-	worldTransform.SetupMatrixOrgAngles( pos, worldAng );
+	if ( iLighttype == DEFLIGHTTYPE_POINT )
+	{
+		VMatrix tmp;
+		tmp.SetupMatrixOrgAngles( vec3_origin, worldAng );
+
+		VMatrix scale;
+		scale.Identity();
+		MatrixBuildScale( scale, flRadius, flRadius, flRadius );
+		MatrixMultiply( tmp, scale, worldTransform );
+
+		worldTransform.SetTranslation( pos );
+	}
+	else
+		worldTransform.SetupMatrixOrgAngles( pos, worldAng );
 
 	CLightLeafEnum leaves;
 	ISpatialQuery* pQuery = engine->GetBSPTreeQuery();
@@ -493,6 +543,14 @@ void def_light_t::UpdateXForms()
 
 void def_light_t::UpdateRenderMesh()
 {
+	if ( iLighttype == DEFLIGHTTYPE_POINT && pMesh_World != NULL )
+	{
+		Assert( pMesh_Debug );
+		Assert( pMeshUnitSphere );
+		Assert( pMesh_World == pMeshUnitSphere );
+		return;
+	}
+
 	CMatRenderContextPtr pRenderContext( materials );
 
 #if DEBUG
@@ -509,7 +567,7 @@ void def_light_t::UpdateRenderMesh()
 		Assert( 0 );
 		break;
 	case DEFLIGHTTYPE_POINT:
-			BuildSphere( pMesh_Debug );
+			BuildSphere( &pMesh_Debug );
 		break;
 	case DEFLIGHTTYPE_SPOT:
 			BuildCone( pMesh_Debug );
@@ -547,7 +605,7 @@ void def_light_t::UpdateRenderMesh()
 		Assert( 0 );
 		break;
 	case DEFLIGHTTYPE_POINT:
-			BuildSphere( pMesh_World );
+			BuildSphere( &pMesh_World );
 		break;
 	case DEFLIGHTTYPE_SPOT:
 			BuildCone( pMesh_World );
@@ -557,6 +615,14 @@ void def_light_t::UpdateRenderMesh()
 
 void def_light_t::UpdateVolumetrics()
 {
+	if ( iLighttype == DEFLIGHTTYPE_POINT && pMesh_Volumetrics != NULL )
+	{
+		Assert( pMesh_Debug_Volumetrics );
+		Assert( pMeshUnitSphere );
+		Assert( pMesh_Volumetrics == pMeshUnitSphere );
+		return;
+	}
+
 	CMatRenderContextPtr pRenderContext( materials );
 
 #if DEBUG
@@ -576,7 +642,7 @@ void def_light_t::UpdateVolumetrics()
 			Assert( 0 );
 			break;
 		case DEFLIGHTTYPE_POINT:
-				BuildSphere( pMesh_Debug_Volumetrics );
+				BuildSphere( &pMesh_Debug_Volumetrics );
 			break;
 		case DEFLIGHTTYPE_SPOT:
 				BuildCone( pMesh_Debug_Volumetrics );
@@ -609,7 +675,7 @@ void def_light_t::UpdateVolumetrics()
 			{
 				pMesh_Volumetrics = pRenderContext->CreateStaticMesh( VERTEX_POSITION | VERTEX_TEXCOORD_SIZE( 0, 2 ),
 					TEXTURE_GROUP_OTHER, pVolumeMaterial );
-				BuildSphere( pMesh_Volumetrics );
+				BuildSphere( &pMesh_Volumetrics );
 			}
 		}
 		break;
@@ -697,98 +763,104 @@ void def_light_t::BuildBox( IMesh *pMesh )
 	meshBuilder.End();
 }
 
-void def_light_t::BuildSphere( IMesh *pMesh )
+void def_light_t::BuildSphere( IMesh **pMesh )
 {
-	CMeshBuilder meshBuilder;
-
-	const float flAngle = 45.0f;
-	const float halfAngle = flAngle / 2.0f;
-	const float halfAngleCos = abs( FastCos( DEG2RAD( halfAngle ) ) );
-	float rayMultiply = flRadius / (halfAngleCos * halfAngleCos);
-	float rayMultiply_outer = flRadius / (halfAngleCos);
-
-	const int numQuads = 8 * 4;
-
-	meshBuilder.Begin( pMesh, MATERIAL_QUADS, numQuads );
-
-	const int numCachedPoints = 8 * 4;
-	Vector cachedPoints[numCachedPoints];
-
-	for ( int iLevel = 0; iLevel < 4; iLevel++ )
+	if ( pMeshUnitSphere )
 	{
-		QAngle ang( 90 - halfAngle - flAngle * iLevel,
-			halfAngle,
-			0 );
-
-		Vector fwd;
-
-		for ( int iPoint = 0; iPoint < 8; iPoint++ )
-		{
-			AngleVectors( ang, &fwd );
-
-			if ( iLevel > 0 && iLevel < 3 )
-				fwd *= rayMultiply;
-			else
-				fwd *= rayMultiply_outer;
-
-			cachedPoints[ iLevel * 8 + iPoint ] = fwd;
-
-			ang.y -= flAngle;
-		}
+		*pMesh = pMeshUnitSphere;
+		return;
 	}
 
-	for ( int iLevel = 0; iLevel < 3; iLevel++ )
+	const float flRadius = 1.05f; // overlap member var
+	const int iNumLa = 10;
+	const int iNumLo = 11;
+
+	const int iNumPoints = iNumLa * iNumLo;
+	Vector cachedPoints[ iNumPoints ];
+
+	for ( int iLa = 0; iLa < iNumLa; iLa++ )
+	for ( int iLo = 0; iLo < iNumLo; iLo++ )
 	{
-		for ( int iPoint = 0; iPoint < 8; iPoint++ )
-		{
-			int iBase2 = iPoint + 1;
+		const int iPoint = iLa * iNumLo + iLo;
+		const float flLa = iLa / (float)( iNumLa - 1.0f );
+		const float flLo = iLo / (float)iNumLo;
 
-			if ( iPoint == 7 )
-				iBase2 = 0;
+		Assert( iPoint >= 0 && iPoint < iNumPoints );
 
-			meshBuilder.Position3fv( cachedPoints[iPoint + iLevel * 8].Base() ); meshBuilder.AdvanceVertex();
-			meshBuilder.Position3fv( cachedPoints[iBase2 + iLevel * 8].Base() ); meshBuilder.AdvanceVertex();
-			meshBuilder.Position3fv( cachedPoints[iBase2 + (iLevel+1) * 8].Base() ); meshBuilder.AdvanceVertex();
-			meshBuilder.Position3fv( cachedPoints[iPoint + (iLevel+1) * 8].Base() ); meshBuilder.AdvanceVertex();
-		}
+		cachedPoints[ iPoint ].Init( sin( M_PI * flLa ) * cos( 2.0f * M_PI * flLo ),
+			sin( M_PI * flLa ) * sin( 2.0f * M_PI * flLo ),
+			cos( M_PI * flLa ) );
+
+		cachedPoints[ iPoint ] *= flRadius;
 	}
 
-	Vector top( 0, 0, flRadius );
-	Vector bottom = -top;
+	const int iNumVerts = iNumLo * 2 * ( iNumLa - 1 ) + ( iNumLo - 1 ) * 2 + 1;
 
-	for ( int iSide = 0; iSide < 2; iSide++ )
+	CMeshBuilder meshbuilder;
+	meshbuilder.Begin( *pMesh, MATERIAL_TRIANGLE_STRIP, iNumVerts );
+
+	for ( int iLo = 0; iLo < iNumLo; iLo++ )
+	for ( int iLa = 0; iLa < iNumLa - 1; iLa++ )
 	{
-		const bool bBottom = iSide == 1;
+		const bool bLimitLo = iLo == iNumLo - 1;
+		const bool bLimitLa = iLa == iNumLa - 1;
 
-		Vector side = bBottom ? bottom : top;
+		int iPoint0 = iLa * iNumLo + iLo;
+		int iPoint2 = ( bLimitLa ? 0 : ( iLa + 1 ) * iNumLo ) + iLo;
+		int iPoint3 = ( iLa + 1 ) * iNumLo + ( bLimitLo ? 0 : iLo + 1 );
 
-		for ( int iPlane = 0; iPlane < 4; iPlane++ )
+		Assert( iPoint0 >= 0 && iPoint0 < iNumPoints );
+		Assert( iPoint2 >= 0 && iPoint2 < iNumPoints );
+
+		Vector p;
+
+		if ( iLa == 0 )
 		{
-			int iBase = ( bBottom ? 0 : (8*3) );
-			int iPoint = iPlane * 2 + iBase;
-			int iPoint2 = iPoint;
+			Assert( iPoint3 >= 0 && iPoint3 < iNumPoints );
 
-			if ( iPlane == 3 )
-				iPoint2 = iBase - 2;
-
-			if ( bBottom )
+			if ( iLo != 0 )
 			{
-				meshBuilder.Position3fv( side.Base() ); meshBuilder.AdvanceVertex();
-				meshBuilder.Position3fv( cachedPoints[iPoint2+2].Base() ); meshBuilder.AdvanceVertex();
-				meshBuilder.Position3fv( cachedPoints[iPoint+1].Base() ); meshBuilder.AdvanceVertex();
-				meshBuilder.Position3fv( cachedPoints[iPoint].Base() ); meshBuilder.AdvanceVertex();
+				// degenerate
+				meshbuilder.Position3fv( cachedPoints[ iPoint0 ].Base() );
+				meshbuilder.AdvanceVertex();
 			}
-			else
-			{
-				meshBuilder.Position3fv( cachedPoints[iPoint].Base() ); meshBuilder.AdvanceVertex();
-				meshBuilder.Position3fv( cachedPoints[iPoint+1].Base() ); meshBuilder.AdvanceVertex();
-				meshBuilder.Position3fv( cachedPoints[iPoint2+2].Base() ); meshBuilder.AdvanceVertex();
-				meshBuilder.Position3fv( side.Base() ); meshBuilder.AdvanceVertex();
-			}
+
+			// top triangle
+			meshbuilder.Position3fv( cachedPoints[ iPoint0 ].Base() );
+			meshbuilder.AdvanceVertex();
+
+			meshbuilder.Position3fv( cachedPoints[ iPoint3 ].Base() );
+			meshbuilder.AdvanceVertex();
+
+			meshbuilder.Position3fv( cachedPoints[ iPoint2 ].Base() );
+			meshbuilder.AdvanceVertex();
+		}
+		else if ( iLa == ( iNumLa - 2 ) )
+		{
+			// center vert
+			meshbuilder.Position3fv( cachedPoints[ iPoint2 ].Base() );
+			meshbuilder.AdvanceVertex();
+
+			// degenerate
+			meshbuilder.Position3fv( cachedPoints[ iPoint2 ].Base() );
+			meshbuilder.AdvanceVertex();
+		}
+		else
+		{
+			Assert( iPoint3 >= 0 && iPoint3 < iNumPoints );
+
+			// lower two points per quad
+			meshbuilder.Position3fv( cachedPoints[ iPoint3 ].Base() );
+			meshbuilder.AdvanceVertex();
+
+			meshbuilder.Position3fv( cachedPoints[ iPoint2 ].Base() );
+			meshbuilder.AdvanceVertex();
 		}
 	}
 
-	meshBuilder.End();
+	meshbuilder.End();
+
+	pMeshUnitSphere = *pMesh;
 }
 
 void def_light_t::BuildCone( IMesh *pMesh )

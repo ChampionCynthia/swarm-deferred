@@ -254,8 +254,7 @@ void CDeferredLight::ClientThink()
 	{
 		ApplyDataToLight();
 
-		if ( m_pLight->flRadius != GetRadius() ||
-			m_pLight->flSpotCone_Outer != GetSpotCone_Outer() )
+		if ( m_pLight->flSpotCone_Outer != GetSpotCone_Outer() )
 			m_pLight->MakeDirtyAll();
 		else
 			m_pLight->MakeDirtyXForms();

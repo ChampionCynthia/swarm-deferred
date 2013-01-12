@@ -1,6 +1,8 @@
 #ifndef DEFERRED_INCLUDES_H
 #define DEFERRED_INCLUDES_H
 
+#include "deferred_global_common.h"
+
 #include "commandbuilder.h"
 #include "IDeferredExt.h"
 
@@ -10,8 +12,6 @@
 #include "ConVar.h"
 
 #include "lighting_helper.h"
-
-#include "deferred_global_common.h"
 
 #include "renderparm.h"
 

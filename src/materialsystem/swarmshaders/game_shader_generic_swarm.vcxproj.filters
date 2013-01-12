@@ -105,6 +105,15 @@
     <ClCompile Include="radiosity_blend.cpp">
       <Filter>Source Files\lighting</Filter>
     </ClCompile>
+    <ClCompile Include="screenspace_shading.cpp">
+      <Filter>Source Files\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred_decalModulate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="screenspace_combine.cpp">
+      <Filter>Source Files\lighting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseVSShader.h">
@@ -296,6 +305,15 @@
       <Filter>Shader Source\fxc</Filter>
     </None>
     <None Include="radiosity_blend_ps30.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </None>
+    <None Include="screenspace_shading_ps30.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </None>
+    <None Include="screenspace_combine_ps30.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </None>
+    <None Include="gbuffer_defshading_ps30.fxc">
       <Filter>Shader Source\fxc</Filter>
     </None>
   </ItemGroup>

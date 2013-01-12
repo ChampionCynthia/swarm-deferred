@@ -140,6 +140,8 @@ static const char *pszShaderReplaceDict[][2] = {
 	"lightmappedgeneric",		"DEFERRED_BRUSH",
 	"worldvertextransition",	"DEFERRED_BRUSH",
 	"multiblend",				"DEFERRED_BRUSH",
+
+	"decalmodulate",			"DEFERRED_DECALMODULATE",
 };
 static const int iNumShaderReplaceDict = ARRAYSIZE( pszShaderReplaceDict );
 

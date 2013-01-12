@@ -158,6 +158,8 @@ bool CDeferredManagerClient::Init()
 
 void CDeferredManagerClient::Shutdown()
 {
+	def_light_t::ShutdownSharedMeshes();
+
 	ShutdownDeferredMaterials();
 	ShutdownDeferredExt();
 
@@ -326,6 +328,22 @@ void CDeferredManagerClient::InitializeDeferredMaterials()
 	m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLEND ] = new KeyValues( "RADIOSITY_BLEND" );
 	if ( m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLEND ] != NULL )
 		m_pMat_Def[ DEF_MAT_LIGHT_RADIOSITY_BLEND ] = materials->CreateMaterial( "__radpass_blend", m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLEND ] );
+
+#if DEFCFG_DEFERRED_SHADING
+	/*
+
+	deferred shading
+
+	*/
+
+	m_pKV_Def[ DEF_MAT_SCREENSPACE_SHADING ] = new KeyValues( "SCREENSPACE_SHADING" );
+	if ( m_pKV_Def[ DEF_MAT_SCREENSPACE_SHADING ] != NULL )
+		m_pMat_Def[ DEF_MAT_SCREENSPACE_SHADING ] = materials->CreateMaterial( "__screenspace_shading", m_pKV_Def[ DEF_MAT_SCREENSPACE_SHADING ] );
+
+	m_pKV_Def[ DEF_MAT_SCREENSPACE_COMBINE ] = new KeyValues( "SCREENSPACE_COMBINE" );
+	if ( m_pKV_Def[ DEF_MAT_SCREENSPACE_COMBINE ] != NULL )
+		m_pMat_Def[ DEF_MAT_SCREENSPACE_COMBINE ] = materials->CreateMaterial( "__screenspace_combine", m_pKV_Def[ DEF_MAT_SCREENSPACE_COMBINE ] );
+#endif
 
 	/*
 

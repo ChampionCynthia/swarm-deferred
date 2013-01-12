@@ -221,7 +221,7 @@ void VerifySequenceIndex( CStudioHdr *pstudiohdr )
 		return;
 	}
 
-	if( pstudiohdr->GetActivityListVersion( ) != g_nActivityListVersion )
+	if( pstudiohdr->GetActivityListVersion( ) < g_nActivityListVersion )
 	{
 		// this model's sequences have not yet been indexed by activity
 		IndexModelSequences( pstudiohdr );

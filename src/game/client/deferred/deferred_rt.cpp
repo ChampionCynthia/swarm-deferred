@@ -10,6 +10,8 @@ static CTextureReference g_tex_Depth;
 static CTextureReference g_tex_LightCtrl;
 #endif
 static CTextureReference g_tex_Lightaccum;
+static CTextureReference g_tex_Albedo;
+static CTextureReference g_tex_Specular;
 
 static CTextureReference g_tex_VolumePrepass;
 static CTextureReference g_tex_VolumetricsBuffer[ 2 ];
@@ -57,6 +59,10 @@ void InitDeferredRTs( bool bInitial )
 		IMAGE_FORMAT_RGB888;
 
 	const ImageFormat fmt_gbuffer2 = IMAGE_FORMAT_RGBA8888;
+#endif
+#if DEFCFG_DEFERRED_SHADING
+	const ImageFormat fmt_gbuffer2 = IMAGE_FORMAT_RGBA8888;
+	const ImageFormat fmt_gbuffer3 = IMAGE_FORMAT_RGB888;
 #endif
 	const ImageFormat fmt_gbuffer1 = IMAGE_FORMAT_R32F;
 	const ImageFormat fmt_lightAccum =
@@ -109,7 +115,11 @@ void InitDeferredRTs( bool bInitial )
 			dummy, dummy,
 			RT_SIZE_FULL_FRAME_BUFFER_ROUNDED_UP,
 			fmt_gbuffer0,
+#if DEFCFG_DEFERRED_SHADING
+			MATERIAL_RT_DEPTH_NONE,
+#else
 			MATERIAL_RT_DEPTH_SHARED,
+#endif
 			gbufferFlags, 0 ) );
 
 		g_tex_Depth.Init( materials->CreateNamedRenderTargetTextureEx2( DEFRTNAME_GBUFFER1,
@@ -124,6 +134,21 @@ void InitDeferredRTs( bool bInitial )
 			dummy, dummy,
 			RT_SIZE_FULL_FRAME_BUFFER_ROUNDED_UP,
 			fmt_gbuffer2,
+			MATERIAL_RT_DEPTH_NONE,
+			gbufferFlags, 0 ) );
+
+#elif DEFCFG_DEFERRED_SHADING
+		g_tex_Albedo.Init( materials->CreateNamedRenderTargetTextureEx2( DEFRTNAME_GBUFFER2,
+			dummy, dummy,
+			RT_SIZE_FULL_FRAME_BUFFER_ROUNDED_UP,
+			fmt_gbuffer2,
+			MATERIAL_RT_DEPTH_SHARED,
+			gbufferFlags, 0 ) );
+
+		g_tex_Specular.Init( materials->CreateNamedRenderTargetTextureEx2( DEFRTNAME_GBUFFER3,
+			dummy, dummy,
+			RT_SIZE_FULL_FRAME_BUFFER_ROUNDED_UP,
+			fmt_gbuffer3,
 			MATERIAL_RT_DEPTH_NONE,
 			gbufferFlags, 0 ) );
 #endif
@@ -215,11 +240,6 @@ void InitDeferredRTs( bool bInitial )
 		}
 
 #if DEFCFG_ENABLE_RADIOSITY
-		//AssertMsg( sqrt( (double)(RADIOSITY_BUFFER_SAMPLES * RADIOSITY_BUFFER_SAMPLES * RADIOSITY_BUFFER_SAMPLES) ) == RADIOSITY_BUFFER_RES,
-		//	"Sample algorithm relies on count and size to be correct..." );
-		//AssertMsg( sqrt( (double)RADIOSITY_BUFFER_SAMPLES ) == RADIOSITY_BUFFER_GRIDS_PER_AXIS,
-		//	"Sample algorithm relies on grid layout to be defined based on sample count..." );
-
 		for ( int i = 0; i < 2; i++ )
 		{
 			g_tex_RadiosityBuffer[i].Init( materials->CreateNamedRenderTargetTextureEx2(
@@ -318,6 +338,9 @@ void InitDeferredRTs( bool bInitial )
 	GetDeferredExt()->CommitTexture_General( g_tex_Normals, g_tex_Depth,
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 		g_tex_LightCtrl,
+#elif DEFCFG_DEFERRED_SHADING
+		g_tex_Albedo,
+		g_tex_Specular,
 #endif
 		g_tex_Lightaccum );
 
@@ -361,12 +384,26 @@ int GetShadowResolution_Point()
 
 ITexture *GetDefRT_Normals()
 {
+	Assert( g_tex_Normals.IsValid() );
 	return g_tex_Normals;
 }
 
 ITexture *GetDefRT_Depth()
 {
+	Assert( g_tex_Depth.IsValid() );
 	return g_tex_Depth;
+}
+
+ITexture *GetDefRT_Albedo()
+{
+	Assert( g_tex_Albedo.IsValid() );
+	return g_tex_Albedo;
+}
+
+ITexture *GetDefRT_Specular()
+{
+	Assert( g_tex_Specular.IsValid() );
+	return g_tex_Specular;
 }
 
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
@@ -378,76 +415,90 @@ ITexture *GetDefRT_LightCtrl()
 
 ITexture *GetDefRT_Lightaccum()
 {
+	Assert( g_tex_Lightaccum.IsValid() );
 	return g_tex_Lightaccum;
 }
 
 ITexture *GetDefRT_VolumePrepass()
 {
+	Assert( g_tex_VolumePrepass.IsValid() );
 	return g_tex_VolumePrepass;
 }
 
 ITexture *GetDefRT_VolumetricsBuffer( int index )
 {
+	Assert( g_tex_VolumetricsBuffer[ index ].IsValid() );
 	return g_tex_VolumetricsBuffer[ index ];
 }
 
 ITexture *GetDefRT_RadiosityBuffer( int index )
 {
 	Assert( index >= 0 && index < 2 );
+	Assert( g_tex_RadiosityBuffer[ index ].IsValid() );
 	return g_tex_RadiosityBuffer[ index ];
 }
 
 ITexture *GetDefRT_RadiosityNormal( int index )
 {
 	Assert( index >= 0 && index < 2 );
+	Assert( g_tex_RadiosityNormal[ index ].IsValid() );
 	return g_tex_RadiosityNormal[ index ];
 }
 
 ITexture *GetShadowColorRT_Ortho( int index )
 {
 	Assert( index >= 0 && index < MAX_SHADOW_ORTHO );
+	Assert( g_tex_ShadowColor_Ortho[ index ].IsValid() );
 	return g_tex_ShadowColor_Ortho[ index ];
 }
 ITexture *GetShadowDepthRT_Ortho( int index )
 {
 	Assert( index >= 0 && index < MAX_SHADOW_ORTHO );
+	Assert( g_tex_ShadowDepth_Ortho[ index ].IsValid() );
 	return g_tex_ShadowDepth_Ortho[ index ];
 }
 
 ITexture *GetShadowColorRT_Proj( int index )
 {
 	Assert( index >= 0 && index < MAX_SHADOW_PROJ );
+	Assert( g_tex_ShadowColor_Proj[ index ].IsValid() );
 	return g_tex_ShadowColor_Proj[ index ];
 }
 ITexture *GetShadowDepthRT_Proj( int index )
 {
 	Assert( index >= 0 && index < MAX_SHADOW_PROJ );
+	Assert( g_tex_ShadowDepth_Proj[ index ].IsValid() );
 	return g_tex_ShadowDepth_Proj[ index ];
 }
 
 ITexture *GetShadowColorRT_DP( int index )
 {
 	Assert( index >= 0 && index < MAX_SHADOW_DP );
+	Assert( g_tex_ShadowColor_DP[ index ].IsValid() );
 	return g_tex_ShadowColor_DP[ index ];
 }
 ITexture *GetShadowDepthRT_DP( int index )
 {
 	Assert( index >= 0 && index < MAX_SHADOW_DP );
+	Assert( g_tex_ShadowDepth_DP[ index ].IsValid() );
 	return g_tex_ShadowDepth_DP[ index ];
 }
 ITexture *GetProjectableVguiRT( int index )
 {
 	Assert( index >= 0 && index < NUM_PROJECTABLE_VGUI );
+	Assert( g_tex_ProjectableVGUI[ index ].IsValid() );
 	return g_tex_ProjectableVGUI[ index ];
 }
 
 ITexture *GetRadiosityAlbedoRT_Ortho( int index )
 {
 	Assert( index >= 0 && index < MAX_SHADOW_DP );
+	Assert( g_tex_ShadowRad_Albedo_Ortho[ index ].IsValid() );
 	return g_tex_ShadowRad_Albedo_Ortho[ index ];
 }
 ITexture *GetRadiosityNormalRT_Ortho( int index )
 {
 	Assert( index >= 0 && index < MAX_SHADOW_DP );
+	Assert( g_tex_ShadowRad_Normal_Ortho[ index ].IsValid() );
 	return g_tex_ShadowRad_Normal_Ortho[ index ];
 }

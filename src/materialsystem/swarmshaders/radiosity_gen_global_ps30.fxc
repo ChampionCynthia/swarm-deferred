@@ -50,6 +50,7 @@ PS_OUTPUT main( const PS_INPUT In )
 	float flDepthSample = tex2D( sShadowDepth, shadowPos.xy ).r;
 	float flDepthDelta = flDepthSample - flShadowDepth;
 
+#if 0
 	clip( step( 0, flDepthDelta )
 		* step( flDepthDelta,
 #if CASCADE == 0
@@ -59,6 +60,16 @@ PS_OUTPUT main( const PS_INPUT In )
 #endif
 		* ( 3.0f + dot( flNormalSample * 2 - 1, g_vecShadowForward ) * 2.5f ) * g_vecSlopeSettings.w
 		) - 0.5f );
+#else
+	flMask *= step( 0, flDepthDelta ) * step( flDepthDelta,
+#if CASCADE == 0
+		RADIOSITY_BUFFER_GRID_STEP_SIZE_CLOSE
+#else
+		RADIOSITY_BUFFER_GRID_STEP_SIZE_FAR
+#endif
+		* ( 3.0f + dot( flNormalSample * 2 - 1, g_vecShadowForward ) * 2.5f ) * g_vecSlopeSettings.w
+		);
+#endif
 
 	float3 flRadiositySample = tex2D( sShadowAlbedo, shadowPos.xy ).rgb;
 

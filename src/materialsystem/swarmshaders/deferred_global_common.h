@@ -10,6 +10,12 @@
 #define DEFERRED_GLOBAL_COMMON_H
 
 
+/* Run with deferred shading instead of deferred lighting,
+ * Light accumulation is used for both.
+ */
+#define DEFCFG_DEFERRED_SHADING 0
+
+
 /* Toggles packing mode of lighting controls (phong, halflambert, litface)
  * 0 - DISABLE packing, gbuffer 0 at 3 bytes, gbuffer 2 at 4 bytes, less expensive math
  * 1 - ENABLE packing, gbuffer 0 at 4 bytes, gbuffer 2 disabled, more expensive math
@@ -46,6 +52,10 @@
 #define DEFRTNAME_GBUFFER1 "_rt_defProjDepth"
 #if DEFCFG_LIGHTCTRL_PACKING == 0
 #	define DEFRTNAME_GBUFFER2 "_rt_def_UnpackedLightControl"
+#endif
+#if DEFCFG_DEFERRED_SHADING
+#	define DEFRTNAME_GBUFFER2 "_rt_defAlbedo"
+#	define DEFRTNAME_GBUFFER3 "_rt_defSpecular"
 #endif
 #define DEFRTNAME_LIGHTACCUM "_rt_LightAccum"
 
@@ -96,7 +106,9 @@
 #	define RADIOSITY_BUFFER_VIEWPORT_SY 252
 
 #	define RADIOSITY_BUFFER_GRID_STEP_SIZE_CLOSE 20.0f
-#	define RADIOSITY_BUFFER_GRID_STEP_SIZE_FAR 96.0f
+#	define RADIOSITY_BUFFER_GRID_STEP_DISTANCEMULT_CLOSE 0.3f
+#	define RADIOSITY_BUFFER_GRID_STEP_SIZE_FAR 72.0f
+#	define RADIOSITY_BUFFER_GRID_STEP_DISTANCEMULT_FAR 0.5f
 #	define RADIOSITY_BUFFER_GRIDS_PER_AXIS 6
 
 #	define RADIOSITY_UVRATIO_X (RADIOSITY_BUFFER_VIEWPORT_SX/(float)RADIOSITY_BUFFER_RES_X)
@@ -226,6 +238,10 @@
 /* DON'T TOUCH THE STUFF BELOW
  */
 static const int SHADOW_NUM_CASCADES = MAX_SHADOW_ORTHO;
+
+#if DEFCFG_DEFERRED_SHADING && DEFCFG_LIGHTCTRL_PACKING == 0
+#error "can't use deferred shading and unpacked lighting controls at the same time"
+#endif
 
 #ifdef __cplusplus
 static const int NUM_COOKIE_SLOTS = MAX_LIGHTS_SHADOWEDCOOKIE + MAX_LIGHTS_COOKIE;

@@ -14,6 +14,10 @@ struct defParms_gBuffer
 
 	// textures
 	int iAlbedo;
+	int iAlbedo2;
+	int iAlbedo3;
+	int iAlbedo4;
+
 	int iBumpmap;
 	int iBumpmap2;
 	int iBumpmap3;

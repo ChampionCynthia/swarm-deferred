@@ -3,7 +3,6 @@
 
 #include "tier0/memdbgon.h"
 
-ConVar deferred_radiosity_enable( "deferred_radiosity_enable", "1" ); // from client.dll
 ConVar deferred_radiosity_multiplier( "deferred_radiosity_multiplier", "0.4" );
 
 void GetTexcoordSettings( const bool bDecal, const bool bMultiBlend,

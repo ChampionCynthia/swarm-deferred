@@ -320,7 +320,8 @@ protected:
 	// BUGBUG this causes all sorts of problems
 	virtual bool	ShouldCacheLists(){ return false; };
 
-	void			DrawOpaqueRenderablesDeferred( bool bNoDecals );
+	virtual void	DrawWorldDeferred( float waterZAdjust );
+	virtual void	DrawOpaqueRenderablesDeferred( bool bNoDecals );
 
 protected:
 
@@ -395,6 +396,30 @@ protected:
 	sky3dparams_t *m_pSky3dParams;
 
 	bool		m_bGBufferPass;
+};
+
+class CPostLightingView : public CBaseWorldViewDeferred
+{
+	DECLARE_CLASS( CPostLightingView, CBaseWorldViewDeferred );
+public:
+	CPostLightingView(CViewRender *pMainView) : CBaseWorldViewDeferred( pMainView )
+	{
+	}
+
+	void			Setup( const CViewSetup &view );
+	void			Draw();
+
+	virtual void	PushView( float waterHeight );
+	virtual void	PopView();
+
+	virtual void	DrawWorldDeferred( float waterZAdjust );
+	virtual void	DrawOpaqueRenderablesDeferred( bool bNoDecals );
+
+	static void		PushDeferredShadingFrameBuffer();
+	static void		PopDeferredShadingFrameBuffer();
+
+private: 
+	VisibleFogVolumeInfo_t m_fogInfo;
 };
 
 abstract_class CBaseShadowView : public CBaseWorldViewDeferred
@@ -643,6 +668,27 @@ void CDeferredViewRender::Init()
 
 void CDeferredViewRender::Shutdown()
 {
+	CMatRenderContextPtr pRenderContext( materials );
+	for ( int i = 0; i < 2; i++ )
+	{
+		if ( m_pMesh_RadiosityScreenGrid[ i ] != NULL )
+			pRenderContext->DestroyStaticMesh( m_pMesh_RadiosityScreenGrid[ i ] );
+
+		m_pMesh_RadiosityScreenGrid[ i ] = NULL;
+	}
+
+	for ( int i = 0; i < 2; i++ )
+	{
+		FOR_EACH_VEC( m_hRadiosityDebugMeshList[ i ], iMesh )
+		{
+			Assert( m_hRadiosityDebugMeshList[i][iMesh] != NULL );
+
+			pRenderContext->DestroyStaticMesh( m_hRadiosityDebugMeshList[ i ][ iMesh ] );
+			m_hRadiosityDebugMeshList[ i ].Remove( iMesh );
+			iMesh--;
+		}
+	}
+
 	BaseClass::Shutdown();
 }
 
@@ -678,11 +724,19 @@ void CDeferredViewRender::ViewDrawSceneDeferred( const CViewSetup &view, int nCl
 
 	PerformLighting( view );
 
+#if DEFCFG_DEFERRED_SHADING
+	ViewCombineDeferredShading( view, viewID );
+#else
 	ViewDrawComposite( view, bDrew3dSkybox, nSkyboxVisible, nClearFlags, viewID, bDrawViewModel );
+#endif
 
 #if DEFCFG_ENABLE_RADIOSITY
 	if ( deferred_radiosity_debug.GetBool() )
 		DebugRadiosity( view );
+#endif
+
+#if DEFCFG_DEFERRED_SHADING
+	CPostLightingView::PushDeferredShadingFrameBuffer();
 #endif
 
 	g_ShaderEditorSystem->UpdateSkymask( bDrew3dSkybox );
@@ -719,6 +773,12 @@ void CDeferredViewRender::ViewDrawSceneDeferred( const CViewSetup &view, int nCl
 
 	// Invoke post-render methods
 	IGameSystem::PostRenderAllSystems();
+
+#if DEFCFG_DEFERRED_SHADING
+	CPostLightingView::PopDeferredShadingFrameBuffer();
+
+	ViewOutputDeferredShading( view );
+#endif
 
 	FinishCurrentView();
 
@@ -792,16 +852,52 @@ void CDeferredViewRender::ViewDrawComposite( const CViewSetup &view, bool &bDrew
 
 	bool drawSkybox = r_skybox.GetBool();
 	if ( bDrew3dSkybox || ( nSkyboxVisible == SKYBOX_NOT_VISIBLE ) )
-	{
 		drawSkybox = false;
-	}
 
 	ParticleMgr()->IncrementFrameCode();
 
 	DrawWorldComposite( view, nClearFlags, drawSkybox );
 
 	DrawViewModels( view, bDrawViewModel, false );
+}
 
+void CDeferredViewRender::ViewCombineDeferredShading( const CViewSetup &view, view_id_t viewID )
+{
+#if DEFCFG_DEFERRED_SHADING
+
+	DrawLightPassFullscreen( GetDeferredManager()->GetDeferredMaterial( DEF_MAT_SCREENSPACE_SHADING ),
+		view.width, view.height );
+
+	g_viewscene_refractUpdateFrame = gpGlobals->framecount - 1;
+
+	m_BaseDrawFlags = 0;
+
+	SetupCurrentView( view.origin, view.angles, viewID, view.m_bDrawWorldNormal, view.m_bCullFrontFaces );
+
+	IGameSystem::PreRenderAllSystems();
+
+	ParticleMgr()->IncrementFrameCode();
+
+	MDLCACHE_CRITICAL_SECTION();
+
+	CRefPtr<CPostLightingView> pPostLightingView = new CPostLightingView( this );
+	pPostLightingView->Setup( view );
+	AddViewToScene( pPostLightingView );
+
+	CMatRenderContextPtr pRenderContext( materials );
+	pRenderContext->ClearBuffers( false, true );
+
+#endif
+}
+
+void CDeferredViewRender::ViewOutputDeferredShading( const CViewSetup &view )
+{
+#if DEFCFG_DEFERRED_SHADING
+
+	DrawLightPassFullscreen( GetDeferredManager()->GetDeferredMaterial( DEF_MAT_SCREENSPACE_COMBINE ),
+		view.width, view.height );
+
+#endif
 }
 
 void CDeferredViewRender::DrawSkyboxComposite( const CViewSetup &view, const bool &bDrew3dSkybox )
@@ -835,26 +931,6 @@ void CDeferredViewRender::DrawWorldComposite( const CViewSetup &view, int nClear
 	CRefPtr<CSimpleWorldViewDeferred> pNoWaterView = new CSimpleWorldViewDeferred( this );
 	pNoWaterView->Setup( view, nClearFlags, bDrawSkybox, fogVolumeInfo, info );
 	AddViewToScene( pNoWaterView );
-
-	// Blat out the visible fog leaf if we're not going to use it
-	//if ( !r_ForceWaterLeaf.GetBool() )
-	//{
-	//	fogVolumeInfo.m_nVisibleFogVolumeLeaf = -1;
-	//}
-
-	//// We can see water of some sort
-	//if ( !fogVolumeInfo.m_bEyeInFogVolume )
-	//{
-	//	CRefPtr<CAboveWaterView> pAboveWaterView = new CAboveWaterView( this );
-	//	pAboveWaterView->Setup( viewIn, bDrawSkybox, fogVolumeInfo, info );
-	//	AddViewToScene( pAboveWaterView );
-	//}
-	//else
-	//{
-	//	CRefPtr<CUnderWaterView> pUnderWaterView = new CUnderWaterView( this );
-	//	pUnderWaterView->Setup( viewIn, bDrawSkybox, fogVolumeInfo, info );
-	//	AddViewToScene( pUnderWaterView );
-	//}
 }
 
 static lightData_Global_t GetActiveGlobalLightState()
@@ -960,6 +1036,8 @@ void CDeferredViewRender::PerformLighting( const CViewSetup &view )
 
 static int GetSourceRadBufferIndex( const int index )
 {
+	Assert( index == 0 || index == 1 );
+
 	const bool bFar = index == 1;
 	const int iNumSteps = bFar ? deferred_radiosity_propagate_count_far.GetInt() : deferred_radiosity_propagate_count.GetInt()
 		+ bFar ? deferred_radiosity_blur_count_far.GetInt() : deferred_radiosity_blur_count.GetInt();
@@ -968,19 +1046,28 @@ static int GetSourceRadBufferIndex( const int index )
 
 void CDeferredViewRender::BeginRadiosity( const CViewSetup &view )
 {
+	Vector fwd;
+	AngleVectors( view.angles, &fwd );
+
+	float flAmtVertical = abs( DotProduct( fwd, Vector( 0, 0, 1 ) ) );
+	flAmtVertical = RemapValClamped( flAmtVertical, 0, 1, 1, 0.5f );
+
 	for ( int iCascade = 0; iCascade < 2; iCascade++ )
 	{
+		const bool bFar = iCascade == 1;
 		const Vector gridSize( RADIOSITY_BUFFER_SAMPLES_XY, RADIOSITY_BUFFER_SAMPLES_XY,
 								RADIOSITY_BUFFER_SAMPLES_Z );
 		const Vector gridSizeHalf = gridSize / 2;
-		const float gridStepSize = (iCascade==1) ? RADIOSITY_BUFFER_GRID_STEP_SIZE_FAR
+		const float gridStepSize = bFar ? RADIOSITY_BUFFER_GRID_STEP_SIZE_FAR
 			: RADIOSITY_BUFFER_GRID_STEP_SIZE_CLOSE;
+		const float flGridDistance = bFar ? RADIOSITY_BUFFER_GRID_STEP_DISTANCEMULT_FAR
+			: RADIOSITY_BUFFER_GRID_STEP_DISTANCEMULT_CLOSE;
 
 		Vector vecFwd;
 		AngleVectors( view.angles, &vecFwd );
 
 		m_vecRadiosityOrigin[iCascade] = view.origin
-			+ vecFwd * gridStepSize * RADIOSITY_BUFFER_SAMPLES_XY * 0.3f;
+			+ vecFwd * gridStepSize * RADIOSITY_BUFFER_SAMPLES_XY * flGridDistance * flAmtVertical;
 
 		for ( int i = 0; i < 3; i++ )
 			m_vecRadiosityOrigin[iCascade][i] -= fmod( m_vecRadiosityOrigin[iCascade][i], gridStepSize );
@@ -1121,8 +1208,10 @@ void CDeferredViewRender::EndRadiosity( const CViewSetup &view )
 		}
 	}
 
+#if ( DEFCFG_DEFERRED_SHADING == 0 )
 	DrawLightPassFullscreen( GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_BLEND ),
 		view.width, view.height );
+#endif
 }
 
 void CDeferredViewRender::DebugRadiosity( const CViewSetup &view )
@@ -1170,10 +1259,9 @@ void CDeferredViewRender::DebugRadiosity( const CViewSetup &view )
 	}
 #endif
 
-	static CUtlVector< IMesh* > hMeshList[2];
 	IMaterial *pMatDbgRadGrid = GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_DEBUG );
 
-	if ( hMeshList[0].Count() == 0 )
+	if ( m_hRadiosityDebugMeshList[0].Count() == 0 )
 	{
 		for ( int iCascade = 0; iCascade < 2; iCascade++ )
 		{
@@ -1195,7 +1283,7 @@ void CDeferredViewRender::DebugRadiosity( const CViewSetup &view )
 			IMesh *pMesh = pRenderContext->CreateStaticMesh( VERTEX_POSITION | VERTEX_TEXCOORD_SIZE( 0, 2 ),
 				TEXTURE_GROUP_OTHER,
 				pMatDbgRadGrid );
-			hMeshList[iCascade].AddToTail( pMesh );
+			m_hRadiosityDebugMeshList[iCascade].AddToTail( pMesh );
 
 			IMesh *pMeshDummy = pRenderContext->GetDynamicMesh( true, NULL, NULL, pMatDbgRadGrid );
 			pRenderContext->GetMaxToRender( pMeshDummy, false, &nMaxVerts, &nMaxIndices );
@@ -1226,7 +1314,7 @@ void CDeferredViewRender::DebugRadiosity( const CViewSetup &view )
 					pMesh = pRenderContext->CreateStaticMesh( VERTEX_POSITION | VERTEX_TEXCOORD_SIZE( 0, 2 ),
 								TEXTURE_GROUP_OTHER,
 								GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_RADIOSITY_DEBUG ) );
-					hMeshList[iCascade].AddToTail( pMesh );
+					m_hRadiosityDebugMeshList[iCascade].AddToTail( pMesh );
 					meshBuilder.Begin( pMesh, MATERIAL_QUADS, nMaxCubes * 6 );
 				}
 
@@ -1264,8 +1352,8 @@ void CDeferredViewRender::DebugRadiosity( const CViewSetup &view )
 		pRenderContext->PushMatrix();
 		pRenderContext->LoadMatrix( pos );
 
-		for ( int i = 0; i < hMeshList[iCascade].Count(); i++ )
-			hMeshList[iCascade][ i ]->Draw();
+		for ( int i = 0; i < m_hRadiosityDebugMeshList[iCascade].Count(); i++ )
+			m_hRadiosityDebugMeshList[iCascade][ i ]->Draw();
 
 		pRenderContext->MatrixMode( MATERIAL_MODEL );
 		pRenderContext->PopMatrix();
@@ -2354,6 +2442,11 @@ static inline void DrawTranslucentRenderable( IClientRenderable *pEnt, const Ren
 	DrawRenderable( pEnt, flags, instance );
 }
 
+void CBaseWorldViewDeferred::DrawWorldDeferred( float waterZAdjust )
+{
+	DrawWorld( waterZAdjust );
+}
+
 void CBaseWorldViewDeferred::DrawOpaqueRenderablesDeferred( bool bNoDecals )
 {
 	VPROF("CViewRender::DrawOpaqueRenderables" );
@@ -2617,6 +2710,10 @@ void CSkyboxViewDeferred::DrawInternal( view_id_t iSkyBoxViewID, bool bInvokePre
 	if ( m_bGBufferPass )
 	{
 		m_DrawFlags |= DF_SKIP_WORLD_DECALS_AND_OVERLAYS;
+
+#if DEFCFG_DEFERRED_SHADING
+		m_DrawFlags |= DF_DRAWSKYBOX;
+#endif
 	}
 
 	unsigned char **areabits = render->GetAreaBits();
@@ -2793,6 +2890,11 @@ void CGBufferView::Setup( const CViewSetup &view, bool bDrewSkybox )
 	m_DrawFlags = DF_DRAW_ENTITITES;
 
 	m_DrawFlags |= DF_RENDER_UNDERWATER | DF_RENDER_ABOVEWATER;
+
+#if DEFCFG_DEFERRED_SHADING
+	if ( !bDrewSkybox )
+		m_DrawFlags |= DF_DRAWSKYBOX;
+#endif
 }
 
 void CGBufferView::Draw()
@@ -2808,13 +2910,10 @@ void CGBufferView::Draw()
 
 	SetupCurrentView( origin, angles, VIEW_DEFERRED_GBUFFER );
 
-	pRenderContext.SafeRelease();
-
 	DrawSetup( 0, m_DrawFlags, 0 );
 
-	pRenderContext.SafeRelease();
-
-	DrawExecute( 0, CurrentViewID(), 0, true );
+	const bool bOptimizedGbuffer = DEFCFG_DEFERRED_SHADING == 0;
+	DrawExecute( 0, CurrentViewID(), 0, bOptimizedGbuffer );
 
 	pRenderContext.GetFrom( materials );
 	pRenderContext->ClearColor4ub( 0, 0, 0, 255 );
@@ -2836,8 +2935,8 @@ void CGBufferView::PopView()
 
 void CGBufferView::PushGBuffer( bool bInitial, float zScale, bool bClearDepth )
 {
-	static ITexture *pNormals = GetDefRT_Normals();
-	static ITexture *pDepth = GetDefRT_Depth();
+	ITexture *pNormals = GetDefRT_Normals();
+	ITexture *pDepth = GetDefRT_Depth();
 
 	CMatRenderContextPtr pRenderContext( materials );
 
@@ -2850,12 +2949,21 @@ void CGBufferView::PushGBuffer( bool bInitial, float zScale, bool bClearDepth )
 		pRenderContext->PopRenderTargetAndViewport();
 	}
 
+#if DEFCFG_DEFERRED_SHADING
+	pRenderContext->PushRenderTargetAndViewport( GetDefRT_Albedo() );
+#else
 	pRenderContext->PushRenderTargetAndViewport( pNormals );
+#endif
 
 	if ( bClearDepth )
 		pRenderContext->ClearBuffers( false, true );
 
 	pRenderContext->SetRenderTargetEx( 1, pDepth );
+
+#if DEFCFG_DEFERRED_SHADING
+	pRenderContext->SetRenderTargetEx( 2, pNormals );
+	pRenderContext->SetRenderTargetEx( 3, GetDefRT_Specular() );
+#endif
 
 	pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE,
 		DEFERRED_RENDER_STAGE_GBUFFER );
@@ -3098,7 +3206,7 @@ void CBaseWorldViewDeferred::DrawExecute( float waterHeight, view_id_t viewID, f
 
 	Begin360ZPass();
 	m_DrawFlags |= DF_SKIP_WORLD_DECALS_AND_OVERLAYS;
-	DrawWorld( waterZAdjust );
+	DrawWorldDeferred( waterZAdjust );
 	m_DrawFlags &= ~DF_SKIP_WORLD_DECALS_AND_OVERLAYS;
 	if ( m_DrawFlags & DF_DRAW_ENTITITES )
 	{
@@ -3112,7 +3220,7 @@ void CBaseWorldViewDeferred::DrawExecute( float waterHeight, view_id_t viewID, f
 	if ( !bShadowDepth )
 	{
 		m_DrawFlags |= DF_SKIP_WORLD;
-		DrawWorld( waterZAdjust );
+		DrawWorldDeferred( waterZAdjust );
 		m_DrawFlags &= ~DF_SKIP_WORLD;
 	}
 		
@@ -3204,7 +3312,6 @@ void CSimpleWorldViewDeferred::Setup( const CViewSetup &view, int nClearFlags, b
 	m_fogInfo = fogInfo;
 }
 
-
 //-----------------------------------------------------------------------------
 // Draws the scene when there's no water or only cheap water
 //-----------------------------------------------------------------------------
@@ -3256,6 +3363,93 @@ void CSimpleWorldViewDeferred::Draw()
 }
 
 
+void CPostLightingView::Setup( const CViewSetup &view )
+{
+	m_fogInfo.m_bEyeInFogVolume = false;
+
+	BaseClass::Setup( view );
+
+	m_ClearFlags = 0;
+
+	m_DrawFlags = DF_DRAW_ENTITITES | DF_SKIP_WORLD_DECALS_AND_OVERLAYS;
+	m_DrawFlags |= DF_RENDER_UNDERWATER | DF_RENDER_ABOVEWATER;
+}
+
+void CPostLightingView::Draw()
+{
+	VPROF( "CViewRender::ViewDrawScene_NoWater" );
+
+	CMatRenderContextPtr pRenderContext( materials );
+	PIXEVENT( pRenderContext, "CSimpleWorldViewDeferred::Draw" );
+
+#if defined( _X360 )
+	pRenderContext->PushVertexShaderGPRAllocation( 32 ); //lean toward pixel shader threads
+#endif
+
+	ITexture *pTexAlbedo = GetDefRT_Albedo();
+	pRenderContext->CopyRenderTargetToTexture( pTexAlbedo );
+	pRenderContext->PushRenderTargetAndViewport( pTexAlbedo );
+	pRenderContext.SafeRelease();
+	PushComposite();
+
+	SetupCurrentView( origin, angles, VIEW_MAIN );
+
+	DrawSetup( 0, m_DrawFlags, 0 );
+
+	DrawExecute( 0, CurrentViewID(), 0, false );
+
+	PopComposite();
+
+	pRenderContext.GetFrom( materials );
+	pRenderContext->PopRenderTargetAndViewport();
+
+#if defined( _X360 )
+	pRenderContext->PopVertexShaderGPRAllocation();
+#endif
+}
+
+void CPostLightingView::PushView( float waterHeight )
+{
+	//PushGBuffer( !m_bDrewSkybox );
+	BaseClass::PushView( waterHeight );
+}
+
+void CPostLightingView::PopView()
+{
+	BaseClass::PopView();
+}
+
+void CPostLightingView::DrawWorldDeferred( float waterZAdjust )
+{
+#if 0
+	int iOldDrawFlags = m_DrawFlags;
+
+	m_DrawFlags &= ~DF_DRAW_ENTITITES;
+	m_DrawFlags &= ~DF_RENDER_UNDERWATER;
+	m_DrawFlags &= ~DF_RENDER_ABOVEWATER;
+	m_DrawFlags &= ~DF_DRAW_ENTITITES;
+
+	BaseClass::DrawWorldDeferred( waterZAdjust );
+
+	m_DrawFlags = iOldDrawFlags;
+#endif
+}
+
+void CPostLightingView::DrawOpaqueRenderablesDeferred( bool bNoDecals )
+{
+}
+
+void CPostLightingView::PushDeferredShadingFrameBuffer()
+{
+	CMatRenderContextPtr pRenderContext( materials );
+	pRenderContext->PushRenderTargetAndViewport( GetDefRT_Albedo() );
+}
+
+void CPostLightingView::PopDeferredShadingFrameBuffer()
+{
+	CMatRenderContextPtr pRenderContext( materials );
+	pRenderContext->PopRenderTargetAndViewport();
+}
 
 void CBaseShadowView::Setup( const CViewSetup &view, ITexture *pDepthTexture, ITexture *pDummyTexture )
 {

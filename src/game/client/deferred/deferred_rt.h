@@ -9,6 +9,8 @@ void InitDeferredRTs( bool bInitial = false );
 
 ITexture *GetDefRT_Normals();
 ITexture *GetDefRT_Depth();
+ITexture *GetDefRT_Albedo();
+ITexture *GetDefRT_Specular();
 ITexture *GetDefRT_LightCtrl();
 ITexture *GetDefRT_Lightaccum();
 

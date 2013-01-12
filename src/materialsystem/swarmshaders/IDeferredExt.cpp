@@ -18,6 +18,9 @@ CDeferredExtension::CDeferredExtension()
 	m_pTexLightAccum = NULL;
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 	m_pTexLightCtrl = NULL;
+#elif DEFCFG_DEFERRED_SHADING
+	m_pTexAlbedo = NULL;
+	m_pTexSpecular = NULL;
 #endif
 
 	Q_memset( m_pTexShadowDepth_Ortho, 0, sizeof( ITexture* ) * MAX_SHADOW_ORTHO );
@@ -52,6 +55,14 @@ bool CDeferredExtension::IsDeferredLightingEnabled()
 	return m_bDefLightingEnabled;
 }
 
+bool CDeferredExtension::IsRadiosityEnabled()
+{
+	static ConVarRef refRadiosity( "deferred_radiosity_enable" );
+
+	Assert( refRadiosity.IsValid() );
+
+	return refRadiosity.GetBool();
+}
 
 void CDeferredExtension::CommitOrigin( const Vector &origin )
 {
@@ -124,6 +135,9 @@ float *CDeferredExtension::CommitLightData_Common( float *pFlData, int numRows,
 void CDeferredExtension::CommitTexture_General( ITexture *pTexNormals, ITexture *pTexDepth,
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 		ITexture *pTexLightingCtrl,
+#elif DEFCFG_DEFERRED_SHADING
+		ITexture *pTexAlbedo,
+		ITexture *pTexSpecular,
 #endif
 		ITexture *pTexLightAccum )
 {
@@ -132,6 +146,9 @@ void CDeferredExtension::CommitTexture_General( ITexture *pTexNormals, ITexture 
 	m_pTexLightAccum = pTexLightAccum;
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 	m_pTexLightCtrl = pTexLightingCtrl;
+#elif DEFCFG_DEFERRED_SHADING
+	m_pTexAlbedo = pTexAlbedo;
+	m_pTexSpecular = pTexSpecular;
 #endif
 }
 void CDeferredExtension::CommitTexture_CascadedDepth( const int &index, ITexture *pTexShadowDepth )

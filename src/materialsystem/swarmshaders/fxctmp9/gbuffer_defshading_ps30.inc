@@ -1,9 +1,8 @@
 // ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
-// !$BUMPMAP2 && !$MULTIBLEND && $BLENDMODULATE
-// !$BUMPMAP && $BUMPMAP2
-// $MODEL && $BUMPMAP2
+// !$TWOTEXTURE && !$MULTIBLEND && $BLENDMODULATE
+// $MODEL && $TWOTEXTURE
 // $MODEL && $MULTIBLEND
-// $BUMPMAP2 && $MULTIBLEND
+// $TWOTEXTURE && $MULTIBLEND
 // $DECAL && $MULTIBLEND
 // $DECAL && $BLENDMODULATE
 // $DECAL && $BUMPMAP
@@ -19,7 +18,7 @@
 // !$MODEL && $SKINNING
 // !$MODEL && $MORPHING_VTEX
 #include "shaderlib/cshader.h"
-class gbuffer_ps30_Static_Index
+class gbuffer_defshading_ps30_Static_Index
 {
 private:
 	int m_nALPHATEST;
@@ -106,24 +105,24 @@ public:
 #endif
 	}
 private:
-	int m_nBUMPMAP2;
+	int m_nTWOTEXTURE;
 #ifdef _DEBUG
-	bool m_bBUMPMAP2;
+	bool m_bTWOTEXTURE;
 #endif
 public:
-	void SetBUMPMAP2( int i )
+	void SetTWOTEXTURE( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
-		m_nBUMPMAP2 = i;
+		m_nTWOTEXTURE = i;
 #ifdef _DEBUG
-		m_bBUMPMAP2 = true;
+		m_bTWOTEXTURE = true;
 #endif
 	}
-	void SetBUMPMAP2( bool i )
+	void SetTWOTEXTURE( bool i )
 	{
-		m_nBUMPMAP2 = i ? 1 : 0;
+		m_nTWOTEXTURE = i ? 1 : 0;
 #ifdef _DEBUG
-		m_bBUMPMAP2 = true;
+		m_bTWOTEXTURE = true;
 #endif
 	}
 private:
@@ -168,9 +167,30 @@ public:
 		m_bMULTIBLEND = true;
 #endif
 	}
+private:
+	int m_nDECAL;
+#ifdef _DEBUG
+	bool m_bDECAL;
+#endif
+public:
+	void SetDECAL( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nDECAL = i;
+#ifdef _DEBUG
+		m_bDECAL = true;
+#endif
+	}
+	void SetDECAL( bool i )
+	{
+		m_nDECAL = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bDECAL = true;
+#endif
+	}
 public:
 	// CONSTRUCTOR
-	gbuffer_ps30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
+	gbuffer_defshading_ps30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
 	{
 #ifdef _DEBUG
 		m_bALPHATEST = false;
@@ -189,9 +209,9 @@ public:
 #endif // _DEBUG
 		m_nPHONGMAP = 0;
 #ifdef _DEBUG
-		m_bBUMPMAP2 = false;
+		m_bTWOTEXTURE = false;
 #endif // _DEBUG
-		m_nBUMPMAP2 = 0;
+		m_nTWOTEXTURE = 0;
 #ifdef _DEBUG
 		m_bBLENDMODULATE = false;
 #endif // _DEBUG
@@ -200,24 +220,28 @@ public:
 		m_bMULTIBLEND = false;
 #endif // _DEBUG
 		m_nMULTIBLEND = 0;
+#ifdef _DEBUG
+		m_bDECAL = false;
+#endif // _DEBUG
+		m_nDECAL = 0;
 	}
 	int GetIndex()
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bALPHATEST && m_bBUMPMAP && m_bNOCULL && m_bPHONGMAP && m_bBUMPMAP2 && m_bBLENDMODULATE && m_bMULTIBLEND;
+		bool bAllStaticVarsDefined = m_bALPHATEST && m_bBUMPMAP && m_bNOCULL && m_bPHONGMAP && m_bTWOTEXTURE && m_bBLENDMODULATE && m_bMULTIBLEND && m_bDECAL;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 1 * m_nALPHATEST ) + ( 2 * m_nBUMPMAP ) + ( 6 * m_nNOCULL ) + ( 12 * m_nPHONGMAP ) + ( 24 * m_nBUMPMAP2 ) + ( 48 * m_nBLENDMODULATE ) + ( 96 * m_nMULTIBLEND ) + 0;
+		return ( 1 * m_nALPHATEST ) + ( 2 * m_nBUMPMAP ) + ( 6 * m_nNOCULL ) + ( 12 * m_nPHONGMAP ) + ( 24 * m_nTWOTEXTURE ) + ( 48 * m_nBLENDMODULATE ) + ( 96 * m_nMULTIBLEND ) + ( 192 * m_nDECAL ) + 0;
 	}
 };
-#define shaderStaticTest_gbuffer_ps30 psh_forgot_to_set_static_ALPHATEST + psh_forgot_to_set_static_BUMPMAP + psh_forgot_to_set_static_NOCULL + psh_forgot_to_set_static_PHONGMAP + psh_forgot_to_set_static_BUMPMAP2 + psh_forgot_to_set_static_BLENDMODULATE + psh_forgot_to_set_static_MULTIBLEND + 0
-class gbuffer_ps30_Dynamic_Index
+#define shaderStaticTest_gbuffer_defshading_ps30 psh_forgot_to_set_static_ALPHATEST + psh_forgot_to_set_static_BUMPMAP + psh_forgot_to_set_static_NOCULL + psh_forgot_to_set_static_PHONGMAP + psh_forgot_to_set_static_TWOTEXTURE + psh_forgot_to_set_static_BLENDMODULATE + psh_forgot_to_set_static_MULTIBLEND + psh_forgot_to_set_static_DECAL + 0
+class gbuffer_defshading_ps30_Dynamic_Index
 {
 public:
 	// CONSTRUCTOR
-	gbuffer_ps30_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
+	gbuffer_defshading_ps30_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
 	{
 	}
 	int GetIndex()
@@ -229,4 +253,4 @@ public:
 		return 0;
 	}
 };
-#define shaderDynamicTest_gbuffer_ps30 0
+#define shaderDynamicTest_gbuffer_defshading_ps30 0

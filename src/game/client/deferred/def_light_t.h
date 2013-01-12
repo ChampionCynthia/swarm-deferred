@@ -48,13 +48,12 @@ struct def_light_t
 	float flStyle_Random;
 	float flStyle_Speed;
 
-	void BuildWorldMesh( IMesh *pMesh );
-	void BuildVolumetricsMesh( IMesh *pMesh );
-
 	void BuildBox( IMesh *pMesh );
-	void BuildSphere( IMesh *pMesh );
+	void BuildSphere( IMesh **pMesh );
 	void BuildCone( IMesh *pMesh );
 	void BuildConeFlipped( IMesh *pMesh );
+
+	static void ShutdownSharedMeshes();
 
 	FORCEINLINE bool IsWorldLight()
 	{
@@ -148,6 +147,8 @@ private:
 
 	def_light_t( const def_light_t &o );
 
+	void DestroyMeshes();
+
 	// *********************************************
 	// * volatile data, not guaranteed to be valid *
 	// *********************************************
@@ -182,6 +183,8 @@ private:
 	IMesh *pMesh_Debug;
 	IMesh *pMesh_Debug_Volumetrics;
 #endif
+
+	static IMesh *pMeshUnitSphere;
 
 	void UpdateCookieTexture();
 	uint8 iOldCookieIndex;

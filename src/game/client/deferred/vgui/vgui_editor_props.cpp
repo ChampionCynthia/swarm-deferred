@@ -11,6 +11,7 @@
 #include "vgui_controls/panellistpanel.h"
 #include "vgui_controls/scrollbar.h"
 #include "vgui_controls/textentry.h"
+#include "matsys_controls/colorpickerpanel.h"
 
 using namespace vgui;
 
@@ -524,6 +525,142 @@ private:
 	int m_iComponentCount;
 };
 
+class PropertyColorPicker : public Panel, public PropertyClient
+{
+	DECLARE_CLASS_SIMPLE( PropertyColorPicker, Panel );
+
+public:
+	PropertyColorPicker( KeyValues *prop ): 
+	Panel( NULL, "" ),
+	PropertyClient( prop ),
+	m_pButton( new Button( this, "OpenPicker", "Choose", this, "OpenPicker" ) ),
+	m_pPreviewPanel( new Panel( this ) )
+	{
+		m_pButton->SetDragEnabled( false );
+		m_pButton->SetDropEnabled( false );
+	};
+
+	MESSAGE_FUNC_PARAMS( OnPreview, "ColorPickerPreview", data )
+	{
+		Color newColor( data->GetColor( "color" ) );
+		newColor[3] = 255;
+
+		m_pPreviewPanel->SetBgColor( newColor );
+
+		m_pValues[0] = newColor.r();
+		m_pValues[1] = newColor.g();
+		m_pValues[2] = newColor.b();
+
+		WriteValue();
+
+		m_pPreviewPanel->SetBgColor( Color( m_pValues[0], m_pValues[1], m_pValues[2], 255 ) );
+		OnPropertyChanged();
+	}
+
+	MESSAGE_FUNC_PARAMS( OnPicked, "ColorPickerPicked", data )
+	{
+		m_pButton->SetEnabled( true );
+		
+		Color newColor( data->GetColor( "color" ) );
+		newColor[3] = 255;
+
+		m_pPreviewPanel->SetBgColor( newColor );
+
+		m_pValues[0] = newColor.r();
+		m_pValues[1] = newColor.g();
+		m_pValues[2] = newColor.b();
+
+		WriteValue();
+
+		OnPropertyChanged();
+	}
+
+	MESSAGE_FUNC( OnCancelled, "ColorPickerCancel" )
+	{
+		m_pButton->SetEnabled( true );
+		
+		m_pValues[0] = m_pOldValues[0];
+		m_pValues[1] = m_pOldValues[1];
+		m_pValues[2] = m_pOldValues[2];
+		m_pValues[3] = m_pOldValues[3];
+
+		WriteValue();
+
+		m_pPreviewPanel->SetBgColor( Color( m_pValues[0], m_pValues[1], m_pValues[2], 255 ) );
+
+		OnPropertyChanged();
+	}
+
+	void OnCommand( const char *command )
+	{
+		if( !Q_strcmp( command, "OpenPicker" ) )
+		{
+			ReadValue();
+
+			m_pButton->SetEnabled( false );
+
+			CColorPickerFrame* pColorPickerFrame = new CColorPickerFrame( this, "Select Color" ); 
+			pColorPickerFrame->SetName( "ColorPicker" );
+			pColorPickerFrame->AddActionSignalTarget( this );
+			pColorPickerFrame->DoModal( Color( m_pOldValues[0], m_pOldValues[1], m_pOldValues[2], 255 ) );
+		}
+		else
+		{
+			Panel::OnCommand( command );
+		}
+	}
+
+	void ApplySchemeSettings(IScheme *pScheme)
+	{
+		BaseClass::ApplySchemeSettings( pScheme );
+
+		Color bgColor( PropertyClient::GetValue()->GetColor() );
+		bgColor[3] = 255;
+
+		m_pPreviewPanel->SetBgColor( bgColor );
+
+		m_pPreviewPanel->SetPos( m_pButton->GetWide() + 2, 0 );
+
+		m_pPreviewPanel->SetBorder( pScheme->GetBorder( "GenericPanelListBorder" ) );		
+	}
+
+	virtual void ReadValue()
+	{
+		UTIL_StringToIntArray( m_pValues, 4, PropertyClient::GetValue()->GetString() );
+
+		m_pOldValues[0] = m_pValues[0];
+		m_pOldValues[1] = m_pValues[1];
+		m_pOldValues[2] = m_pValues[2];
+		m_pOldValues[3] = m_pValues[3];
+	}
+
+	virtual void WriteValue()
+	{
+		PropertyClient::GetValue()->SetString( NULL, VarArgs( "%d %d %d %d", m_pValues[0], m_pValues[1], m_pValues[2], m_pValues[3] ) );
+	};
+
+	void UpdateIntensity( const int iNewIntensity )
+	{
+		m_pValues[3] = iNewIntensity;
+		WriteValue();
+		OnPropertyChanged();
+	};
+
+	Color GetBgColor()
+	{
+		if ( IsMultiSelected() )
+			return GetWarningColor();
+		return Panel::GetBgColor();
+	};
+
+private:
+	Button*	m_pButton;
+	Panel*	m_pPreviewPanel;
+
+	int		m_pValues[4];
+	int		m_pOldValues[4];
+};
+
 CVGUILightEditor_Properties::CVGUILightEditor_Properties( Panel *pParent )
 	: BaseClass( pParent, "LightEditorProperties" )
 {
@@ -744,6 +881,7 @@ void CVGUILightEditor_Properties::CreateProperties_LightEntity()
 	PropertyCheckButton *pCheckButton = NULL;
 	PropertySlider *pSlider = NULL;
 	PropertyComboBox *pComboBox = NULL;
+	PropertyColorPicker* pColorPickerPanel = NULL;
 
 	pTextEntry = new PropertyTextEntry(
 		MakeKey( GetLightParamName( LPARAM_ORIGIN ), "0 0 0" ),
@@ -764,17 +902,31 @@ void CVGUILightEditor_Properties::CreateProperties_LightEntity()
 
 	Visibility_ComboBox vis_spotlight = Visibility_ComboBox( pComboBox, DEFLIGHTTYPE_SPOT );
 
-	pTextEntry = new PropertyTextEntry(
-		MakeKey( GetLightParamName( LPARAM_DIFFUSE ), "255 255 255 255" ),
-		PropertyTextEntry::PTENTRY_STRING, true );
-	pTextEntry->SetLabelName( "Diffuse" );
-	m_hProperties.AddToTail( pTextEntry );
+	KeyValues* pDiffuseKey = MakeKey( GetLightParamName( LPARAM_DIFFUSE ), "255 255 255 255" );
 
-	pTextEntry = new PropertyTextEntry(
-		MakeKey( GetLightParamName( LPARAM_AMBIENT ), "0 0 0 0" ),
-		PropertyTextEntry::PTENTRY_STRING, true );
-	pTextEntry->SetLabelName( "Ambient" );
-	m_hProperties.AddToTail( pTextEntry );
+	pColorPickerPanel = new PropertyColorPicker( pDiffuseKey );
+	pColorPickerPanel->SetLabelName( "Diffuse" );
+	m_hProperties.AddToTail( pColorPickerPanel );
+
+	pSlider = new PropertySlider( pDiffuseKey );
+	pSlider->SetRange( 0, 5000 );
+	pSlider->SetNumTicks( 10 );
+	pSlider->SetComponentIndex( 4, 3 );
+	pSlider->SetLabelName( "Diffuse Intensity" );
+	m_hProperties.AddToTail( pSlider );
+
+	KeyValues* pAmbientKey = MakeKey( GetLightParamName( LPARAM_AMBIENT ), "255 255 255 0" );
+
+	pColorPickerPanel = new PropertyColorPicker( pAmbientKey  );
+	pColorPickerPanel->SetLabelName( "Ambient" );
+	m_hProperties.AddToTail( pColorPickerPanel );
+
+	pSlider = new PropertySlider( pAmbientKey );
+	pSlider->SetRange( 0, 5000 );
+	pSlider->SetNumTicks( 10 );
+	pSlider->SetComponentIndex( 4, 3 );
+	pSlider->SetLabelName( "Ambient Intensity" );
+	m_hProperties.AddToTail( pSlider );
 
 	pTextEntry = new PropertyTextEntry(
 		MakeKey( GetLightParamName( LPARAM_RADIUS ), "256" ),
@@ -948,6 +1100,7 @@ void CVGUILightEditor_Properties::CreateProperties_GlobalLight()
 	PropertyTextEntry *pTextEntry = NULL;
 	PropertyCheckButton *pCheckButton = NULL;
 	PropertySlider *pSlider = NULL;
+	PropertyColorPicker* pColorPickerPanel = NULL;
 
 	pTextEntry = new PropertyTextEntry(
 		MakeKey( GetLightParamName( LPARAM_ANGLES ), "0 0 0" ),
@@ -971,23 +1124,44 @@ void CVGUILightEditor_Properties::CreateProperties_GlobalLight()
 	pSlider->SetComponentIndex( 3, 0 );
 	m_hProperties.AddToTail( pSlider );
 
-	pTextEntry = new PropertyTextEntry(
-		MakeKey( GetLightParamName( LPARAM_DIFFUSE ), "128 128 128 255" ),
-		PropertyTextEntry::PTENTRY_STRING, true );
-	pTextEntry->SetLabelName( "Diffuse" );
+	KeyValues* pDiffuseKey = MakeKey( GetLightParamName( LPARAM_DIFFUSE ), "128 128 128 255" );
+
+	pColorPickerPanel = new PropertyColorPicker( pDiffuseKey );
+	pColorPickerPanel->SetLabelName( "Diffuse" );
+	m_hProperties.AddToTail( pColorPickerPanel );
+
+	pSlider = new PropertySlider( pDiffuseKey );
+	pSlider->SetRange( 0, 5000 );
+	pSlider->SetNumTicks( 10 );
+	pSlider->SetComponentIndex( 4, 3 );
+	pSlider->SetLabelName( "Diffuse Intensity" );
+	m_hProperties.AddToTail( pSlider );
+
+	KeyValues* pAmbientLowKey = MakeKey( GetLightParamName( LPARAM_AMBIENT_LOW ), "255 255 255 0" );
+
+	pColorPickerPanel = new PropertyColorPicker( pAmbientLowKey );
+	pColorPickerPanel->SetLabelName( "Ambient low" );
+	m_hProperties.AddToTail( pColorPickerPanel );
+
+	pSlider = new PropertySlider( pAmbientLowKey );
+	pSlider->SetRange( 0, 5000 );
+	pSlider->SetNumTicks( 10 );
+	pSlider->SetComponentIndex( 4, 3 );
+	pSlider->SetLabelName( "Ambient Low Intensity" );
+	m_hProperties.AddToTail( pSlider );
+
+	KeyValues* pAmbientHighKey = MakeKey( GetLightParamName( LPARAM_AMBIENT_HIGH ), "255 255 255 0" );
+
+	pColorPickerPanel = new PropertyColorPicker( pAmbientHighKey );
+	pColorPickerPanel->SetLabelName( "Ambient high" );
 	m_hProperties.AddToTail( pTextEntry );
 
-	pTextEntry = new PropertyTextEntry(
-		MakeKey( GetLightParamName( LPARAM_AMBIENT_LOW ), "0 0 0 0" ),
-		PropertyTextEntry::PTENTRY_STRING, true );
-	pTextEntry->SetLabelName( "Ambient low" );
-	m_hProperties.AddToTail( pTextEntry );
-
-	pTextEntry = new PropertyTextEntry(
-		MakeKey( GetLightParamName( LPARAM_AMBIENT_HIGH ), "0 0 0 0" ),
-		PropertyTextEntry::PTENTRY_STRING, true );
-	pTextEntry->SetLabelName( "Ambient high" );
-	m_hProperties.AddToTail( pTextEntry );
+	pSlider = new PropertySlider( pAmbientHighKey );
+	pSlider->SetRange( 0, 5000 );
+	pSlider->SetNumTicks( 10 );
+	pSlider->SetComponentIndex( 4, 3 );
+	pSlider->SetLabelName( "Ambient high Intensity" );
+	m_hProperties.AddToTail( pSlider );
 
 	pCheckButton = new PropertyCheckButton(
 		MakeKey( GetLightParamName( LPARAM_SPAWNFLAGS ), "1" ),

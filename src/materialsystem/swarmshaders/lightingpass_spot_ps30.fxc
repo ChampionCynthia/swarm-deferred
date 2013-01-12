@@ -8,6 +8,18 @@
 
 // SKIP:		!$NUM_SHADOWED_COOKIE && !$NUM_SHADOWED && !$NUM_COOKIE && !$NUM_SIMPLE
 
+// SKIP:		$USEWORLDTRANSFORM && $NUM_SHADOWED_COOKIE && $NUM_SHADOWED
+// SKIP:		$USEWORLDTRANSFORM && $NUM_SHADOWED_COOKIE && $NUM_COOKIE
+// SKIP:		$USEWORLDTRANSFORM && $NUM_SHADOWED_COOKIE && $NUM_SIMPLE
+// SKIP:		$USEWORLDTRANSFORM && $NUM_SHADOWED && $NUM_COOKIE
+// SKIP:		$USEWORLDTRANSFORM && $NUM_SHADOWED && $NUM_SIMPLE
+// SKIP:		$USEWORLDTRANSFORM && $NUM_COOKIE && $NUM_SIMPLE
+
+// SKIP:		$USEWORLDTRANSFORM && $NUM_SHADOWED_COOKIE > 1
+// SKIP:		$USEWORLDTRANSFORM && $NUM_SHADOWED > 1
+// SKIP:		$USEWORLDTRANSFORM && $NUM_COOKIE > 1
+// SKIP:		$USEWORLDTRANSFORM && $NUM_SIMPLE > 1
+
 #include "common_ps_fxc.h"
 #include "common_deferred_fxc.h"
 
@@ -45,8 +57,8 @@ const float3 g_vecFrustumUp			: register( c5 );
 const float2 g_vecHalfScreenTexel		: register( c6 );
 #endif
 
-sampler sMixedSampler[FREE_LIGHT_SAMPLERS]						: register( FIRST_LIGHT_SAMPLER_FXC );
-const float4 g_flMixedData[MAX_LIGHTDATA_CONSTANT_ROWS]			: register( FIRST_SHARED_LIGHTDATA_CONSTANT_FXC );
+sampler sMixedSampler[FREE_LIGHT_SAMPLERS]			: register( FIRST_LIGHT_SAMPLER_FXC );
+const float4 g_flMixedData[112]						: register( FIRST_SHARED_LIGHTDATA_CONSTANT_FXC ); // MAX_LIGHTDATA_CONSTANT_ROWS
 
 
 struct PS_INPUT
@@ -69,7 +81,7 @@ struct PS_OUTPUT
 float4 DoSpotLightBasic( const int index, float3 normal,
 	float3 vecWorldToLight, float lightToWorldDist,
 	float3 vecWorldRayInv,
-	float litface, float half_lambert,
+	bool litface, bool half_lambert,
 	float phong_exp, const bool bDoSpotAttn )
 {
 #if DEFCFG_CHEAP_LIGHTS
@@ -88,10 +100,10 @@ float4 DoSpotLightBasic( const int index, float3 normal,
 	return float4( 0, saturate( litDot ) * fade, 0, 0 );
 #else
 	float3 normalizedLightVec = vecWorldToLight / lightToWorldDist;
-	float3 flLitNormal = lerp( 1, dot( normal, normalizedLightVec ), litface ) * normal;
+	float3 flLitNormal = lerp( normal, dot( normal, normalizedLightVec ) * normal, litface );
 
 #if DEFCFG_BLINN_PHONG
-	float flSpecular = max( 0, dot( normalize( vecWorldRayInv + normalizedLightVec ), flLitNormal ) );
+	float flSpecular = saturate( dot( normalize( vecWorldRayInv + normalizedLightVec ), flLitNormal ) );
 	flSpecular = pow( flSpecular, phong_exp ) * dot( vecWorldRayInv, flLitNormal );
 #else
 	float flSpecular = dot( reflect( -normalizedLightVec, flLitNormal ), vecWorldRayInv );
@@ -148,7 +160,8 @@ PS_OUTPUT main( const PS_INPUT In )
 	float4 flNormalCtrl = tex2D( sNormals, vecTexcoords );
 	float3 flNormal = normalize( flNormalCtrl.xyz * 2.0f - 1.0f );
 
-	float phong_exp, half_lambert, litface;
+	float phong_exp;
+	bool half_lambert, litface;
 #if DEFCFG_CHEAP_LIGHTS
 	phong_exp = half_lambert = litface = 0;
 #else
@@ -160,13 +173,13 @@ PS_OUTPUT main( const PS_INPUT In )
 		worldRayInv = normalize( worldRayInv );
 #endif
 
-	int iDataIndex = 0;
-	int iSamplerIndex = 0;
-
 	float4 flLight = 0;
 
 	for ( int i = 0; i < NUM_SHADOWED_COOKIE; i++ )
 	{
+		int iDataIndex = i * NUM_CONSTS_SPOT_ADVANCED;
+		int iSamplerIndex = i * 2;
+
 		float3 vecDelta = worldPos - g_flMixedData[ iDataIndex ].xyz;
 		float dist = length( vecDelta );
 
@@ -198,18 +211,17 @@ PS_OUTPUT main( const PS_INPUT In )
 		localLight.w *= 1.0f - any( floor( depthPos.xyz ) );
 #endif
 
-		localLight = DoLightFinalCookied( g_flMixedData[ iDataIndex + 1 ].xyz,
+		flLight += DoLightFinalCookied( g_flMixedData[ iDataIndex + 1 ].xyz,
 			g_flMixedData[ iDataIndex + 2 ].xyz,
 			localLight, DoStandardCookie( sMixedSampler[ iSamplerIndex + 1 ], depthPos.xy ) );
-
-		flLight += localLight;
-
-		iDataIndex += NUM_CONSTS_SPOT_ADVANCED;
-		iSamplerIndex += 2;
 	}
 
 	for ( int i = 0; i < NUM_SHADOWED; i++ )
 	{
+		int iDataIndex = NUM_SHADOWED_COOKIE * NUM_CONSTS_SPOT_ADVANCED
+			+ i * NUM_CONSTS_SPOT_ADVANCED;
+		int iSamplerIndex = NUM_SHADOWED_COOKIE * 2 + i;
+
 		float3 vecDelta = worldPos - g_flMixedData[ iDataIndex ].xyz;
 		float dist = length( vecDelta );
 
@@ -232,18 +244,18 @@ PS_OUTPUT main( const PS_INPUT In )
 			depthPos, g_vecShadowMappingTweaks_0, g_vecShadowMappingTweaks_1,
 			g_flMixedData[ iDataIndex + 4 ].x );
 
-		localLight = DoLightFinal( g_flMixedData[ iDataIndex + 1 ].xyz,
+		flLight += DoLightFinal( g_flMixedData[ iDataIndex + 1 ].xyz,
 			g_flMixedData[ iDataIndex + 2 ].xyz,
 			localLight );
-
-		flLight += localLight;
-
-		iDataIndex += NUM_CONSTS_SPOT_ADVANCED;
-		iSamplerIndex += 1;
 	}
 
 	for ( int i = 0; i < NUM_COOKIE; i++ )
 	{
+		int iDataIndex = NUM_SHADOWED_COOKIE * NUM_CONSTS_SPOT_ADVANCED
+			+ NUM_SHADOWED * NUM_CONSTS_SPOT_ADVANCED
+			+ i * NUM_CONSTS_SPOT_ADVANCED;
+		int iSamplerIndex = NUM_SHADOWED_COOKIE * 2 + NUM_SHADOWED + i;
+
 		float3 vecDelta = worldPos - g_flMixedData[ iDataIndex ].xyz;
 		float dist = length( vecDelta );
 
@@ -268,19 +280,18 @@ PS_OUTPUT main( const PS_INPUT In )
 		localLight.w *= 1.0f - any( floor( depthPos.xyz ) );
 #endif
 
-		localLight = DoLightFinalCookied( g_flMixedData[ iDataIndex + 1 ].xyz,
+		flLight += DoLightFinalCookied( g_flMixedData[ iDataIndex + 1 ].xyz,
 			g_flMixedData[ iDataIndex + 2 ].xyz,
 			localLight, DoStandardCookie( sMixedSampler[ iSamplerIndex ], depthPos.xy ) );
-
-		flLight += localLight;
-
-		iDataIndex += NUM_CONSTS_SPOT_ADVANCED;
-		iSamplerIndex += 1;
 	}
-
 
 	for ( int i = 0; i < NUM_SIMPLE; i++ )
 	{
+		int iDataIndex = NUM_SHADOWED_COOKIE * NUM_CONSTS_SPOT_ADVANCED
+			+ NUM_SHADOWED * NUM_CONSTS_SPOT_ADVANCED
+			+ NUM_COOKIE * NUM_CONSTS_SPOT_ADVANCED
+			+ i * NUM_CONSTS_SPOT_SIMPLE;
+
 		float3 vecDelta = worldPos - g_flMixedData[ iDataIndex ].xyz;
 		float dist = length( vecDelta );
 
@@ -288,13 +299,9 @@ PS_OUTPUT main( const PS_INPUT In )
 									-vecDelta, dist, worldRayInv,
 									litface, half_lambert, phong_exp, true );
 
-		localLight = DoLightFinal( g_flMixedData[ iDataIndex + 1 ].xyz,
+		flLight += DoLightFinal( g_flMixedData[ iDataIndex + 1 ].xyz,
 			g_flMixedData[ iDataIndex + 2 ].xyz,
 			localLight );
-
-		flLight += localLight;
-
-		iDataIndex += NUM_CONSTS_SPOT_SIMPLE;
 	}
 
 	PS_OUTPUT Out;

@@ -108,6 +108,9 @@ public:
 	virtual void CommitTexture_General( ITexture *pTexNormals, ITexture *pTexDepth,
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 		ITexture *pTexLightingCtrl,
+#elif DEFCFG_DEFERRED_SHADING
+		ITexture *pTexAlbedo,
+		ITexture *pTexSpecular,
 #endif
 		ITexture *pTexLightAccum ) = 0;
 	virtual void CommitTexture_CascadedDepth( const int &index, ITexture *pTexShadowDepth ) = 0;
@@ -132,6 +135,7 @@ public:
 
 	virtual void EnableDeferredLighting();
 	bool IsDeferredLightingEnabled();
+	bool IsRadiosityEnabled();
 
 	virtual void CommitOrigin( const Vector &origin );
 	virtual void CommitViewForward( const Vector &fwd );
@@ -154,6 +158,9 @@ public:
 	virtual void CommitTexture_General( ITexture *pTexNormals, ITexture *pTexDepth,
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 		ITexture *pTexLightingCtrl,
+#elif DEFCFG_DEFERRED_SHADING
+		ITexture *pTexAlbedo,
+		ITexture *pTexSpecular,
 #endif
 		ITexture *pTexLightAccum );
 	virtual void CommitTexture_CascadedDepth( const int &index, ITexture *pTexShadowDepth );
@@ -193,6 +200,9 @@ public:
 	inline ITexture *GetTexture_LightAccum();
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 	inline ITexture *GetTexture_LightCtrl();
+#elif DEFCFG_DEFERRED_SHADING
+	inline ITexture *GetTexture_Albedo();
+	inline ITexture *GetTexture_Specular();
 #endif
 	inline ITexture *GetTexture_ShadowDepth_Ortho( const int &index );
 	inline ITexture *GetTexture_ShadowDepth_DP( const int &index );
@@ -232,6 +242,9 @@ private:
 	ITexture *m_pTexLightAccum;
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 	ITexture *m_pTexLightCtrl;
+#elif DEFCFG_DEFERRED_SHADING
+	ITexture *m_pTexAlbedo;
+	ITexture *m_pTexSpecular;
 #endif
 	ITexture *m_pTexShadowDepth_Ortho[ MAX_SHADOW_ORTHO ];
 	ITexture *m_pTexShadowDepth_DP[ MAX_SHADOW_DP ];
@@ -338,6 +351,15 @@ ITexture *CDeferredExtension::GetTexture_LightAccum()
 ITexture *CDeferredExtension::GetTexture_LightCtrl()
 {
 	return m_pTexLightCtrl;
+}
+#elif DEFCFG_DEFERRED_SHADING
+ITexture *CDeferredExtension::GetTexture_Albedo()
+{
+	return m_pTexAlbedo;
+}
+ITexture *CDeferredExtension::GetTexture_Specular()
+{
+	return m_pTexSpecular;
 }
 #endif
 ITexture *CDeferredExtension::GetTexture_ShadowDepth_Ortho( const int &index )

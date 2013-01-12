@@ -2,8 +2,8 @@
 #include "cbase.h"
 #include "deferred/deferred_shared_common.h"
 
-ConVar deferred_rt_shadowspot_res( "deferred_rt_shadowspot_res", "1024", FCVAR_HIDDEN );
-ConVar deferred_rt_shadowpoint_res( "deferred_rt_shadowpoint_res", "1024", FCVAR_HIDDEN );
+ConVar deferred_rt_shadowspot_res( "deferred_rt_shadowspot_res", "1024", FCVAR_HIDDEN | FCVAR_RELOAD_TEXTURES | FCVAR_RELOAD_MATERIALS );
+ConVar deferred_rt_shadowpoint_res( "deferred_rt_shadowpoint_res", "1024", FCVAR_HIDDEN | FCVAR_RELOAD_TEXTURES | FCVAR_RELOAD_MATERIALS );
 
 ConVar deferred_lightmanager_debug( "deferred_lightmanager_debug", "0" );
 
@@ -13,11 +13,11 @@ ConVar deferred_override_globalLight_diffuse( "deferred_override_globalLight_dif
 ConVar deferred_override_globalLight_ambient_high( "deferred_override_globalLight_ambient_high", "0 0.04 0.08" );
 ConVar deferred_override_globalLight_ambient_low( "deferred_override_globalLight_ambient_low", "0 0.07 0.09" );
 
-ConVar deferred_radiosity_enable( "deferred_radiosity_enable", "1" );
-ConVar deferred_radiosity_propagate_count( "deferred_radiosity_propagate_count", "1" );
+ConVar deferred_radiosity_enable( "deferred_radiosity_enable", "0" );
+ConVar deferred_radiosity_propagate_count( "deferred_radiosity_propagate_count", "1" ); // 1
 ConVar deferred_radiosity_propagate_count_far( "deferred_radiosity_propagate_count_far", "0" );
-ConVar deferred_radiosity_blur_count( "deferred_radiosity_blur_count", "2" );
-ConVar deferred_radiosity_blur_count_far( "deferred_radiosity_blur_count_far", "1" );
+ConVar deferred_radiosity_blur_count( "deferred_radiosity_blur_count", "2" ); // 2
+ConVar deferred_radiosity_blur_count_far( "deferred_radiosity_blur_count_far", "1" ); // 1
 ConVar deferred_radiosity_debug( "deferred_radiosity_debug", "0" );
 
 void OnCookieTableChanged( void *object, INetworkStringTable *stringTable, int stringNumber, const char *newString, void const *newData )

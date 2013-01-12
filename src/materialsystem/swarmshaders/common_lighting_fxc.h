@@ -87,8 +87,10 @@ float3 DoRadiosity( float3 worldPos,
 
 #if VENDOR == VENDOR_FXC_AMD
 	AMD_PRE_5K_NON_COMPLIANT
-#else
+#elif ( DEFCFG_DEFERRED_SHADING == 0 )
 	clip( 0.5f - any( floor( vecDeltaFar ) ) );
+#else
+	flRadiositySettings *= 1 - any( floor( vecDeltaFar ) );
 #endif
 
 	float3 vecDeltaClose = ( worldPos - vecRadiosityOrigin ) / flWorldGridSize;
@@ -117,8 +119,10 @@ float3 DoRadiosity( float3 worldPos,
 
 #if VENDOR == VENDOR_FXC_AMD
 	AMD_PRE_5K_NON_COMPLIANT
-#else
+#elif ( DEFCFG_DEFERRED_SHADING == 0 )
 	clip( 0.5f - any( floor( vecDelta ) ) );
+#else
+	flRadiositySettings *= 1 - any( floor( vecDeltaFar ) );
 #endif
 
 	return GetBilinearRadiositySample( RadiositySampler, vecDelta, flUV_Y_Offset ) * flRadiositySettings.x;

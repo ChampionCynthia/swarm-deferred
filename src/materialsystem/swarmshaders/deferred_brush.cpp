@@ -55,6 +55,11 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		p.bModel = false;
 
 		p.iAlbedo = BASETEXTURE;
+#if DEFCFG_DEFERRED_SHADING
+		p.iAlbedo2 = BASETEXTURE2;
+		p.iAlbedo3 = BASETEXTURE3;
+		p.iAlbedo4 = BASETEXTURE4;
+#endif
 		p.iBumpmap = BUMPMAP;
 		p.iBumpmap2 = BUMPMAP2;
 		p.iBumpmap3 = BUMPMAP3;
@@ -127,10 +132,14 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 
 	bool DrawToGBuffer( IMaterialVar **params )
 	{
+#if DEFCFG_DEFERRED_SHADING
+		return true;
+#else
 		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
 		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
 
 		return !bTranslucent && !bIsDecal;
+#endif
 	}
 
 	SHADER_INIT_PARAMS()
@@ -239,6 +248,7 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 				SkipPass();
 		}
 
+#if ( DEFCFG_DEFERRED_SHADING == 0 )
 		if ( pShaderShadow != NULL ||
 			iDeferredRenderStage == DEFERRED_RENDER_STAGE_COMPOSITION )
 		{
@@ -249,6 +259,7 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		}
 		else
 			SkipPass();
+#endif
 
 		if ( pShaderAPI != NULL && pDefContext->m_bMaterialVarsChanged )
 			pDefContext->m_bMaterialVarsChanged = false;
