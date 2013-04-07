@@ -71,6 +71,10 @@ PS_OUTPUT main( const PS_INPUT In )
 	clip( In.flBack );
 #endif
 
+#if DEFCFG_BILATERAL_DEPTH_TEST
+	clip( ShadowColor_Raw( sCameraDepth, In.vCameraDepthTexPos.xyz ) == 0  ); 
+#endif
+
 	PS_OUTPUT Out;
 
 #if RADIOSITY

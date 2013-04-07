@@ -43,7 +43,6 @@ const float4x3 g_matView			: register( SHADER_SPECIFIC_CONST_7 );
 
 #endif
 
-
 struct VS_INPUT
 {
 #if MODEL
@@ -180,7 +179,6 @@ VS_OUTPUT main( const VS_INPUT In )
 	Out.vProjPos = mul( float4( worldPos, 1 ), cViewProj );
 
 #endif
-
 
 	Out.vTexCoord = In.vTexCoord_0;
 

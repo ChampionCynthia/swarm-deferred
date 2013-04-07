@@ -42,7 +42,9 @@ void DrawPassShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, IM
 	const bool bAlbedo = PARM_TEX( info.iAlbedo );
 	const bool bAlbedo2 = PARM_TEX( info.iAlbedo2 );
 	const bool bAlbedo3 = PARM_TEX( info.iAlbedo3 );
+#if DEFCFG_ENABLE_RADIOSITY
 	const bool bAlbedo4 = PARM_TEX( info.iAlbedo4 );
+#endif
 	const bool bAlphatest = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST ) && bAlbedo;
 
 	const bool bMultiBlend = PARM_SET( info.iMultiblend ) && bAlbedo && bAlbedo2 && bAlbedo3;
@@ -87,6 +89,10 @@ void DrawPassShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, IM
 				pShaderShadow->EnableTexture( SHADER_SAMPLER3, true );
 			}
 		}
+
+#if DEFCFG_BILATERAL_DEPTH_TEST
+		pShaderShadow->EnableTexture( SHADER_SAMPLER4, true );
+#endif
 
 		pShaderShadow->VertexShaderVertexFormat( iVFmtFlags, iTexCoordNum, pTexCoordDim, iUserDataSize );
 
@@ -148,6 +154,10 @@ void DrawPassShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, IM
 		}
 
 		pShaderAPI->SetDefaultState();
+
+#if DEFCFG_BILATERAL_DEPTH_TEST
+		pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_3, GetDeferredExt()->GetWorldToCameraDepthTexBase(), 4, true );
+#endif
 
 		if ( bModel && bFastVTex )
 			pShader->SetHWMorphVertexShaderState( VERTEX_SHADER_SHADER_SPECIFIC_CONST_10, VERTEX_SHADER_SHADER_SPECIFIC_CONST_11, SHADER_VERTEXTEXTURE_SAMPLER0 );

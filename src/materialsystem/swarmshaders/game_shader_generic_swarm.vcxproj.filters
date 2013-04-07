@@ -316,5 +316,14 @@
     <None Include="gbuffer_defshading_ps30.fxc">
       <Filter>Shader Source\fxc</Filter>
     </None>
+    <None Include="gbuffer_defshading2_ps30.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </None>
+    <None Include="gbuffer_defshading2_vs30.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </None>
+    <None Include="lightingpass_area_ps30.fxc">
+      <Filter>Shader Source\fxc</Filter>
+    </None>
   </ItemGroup>
 </Project>

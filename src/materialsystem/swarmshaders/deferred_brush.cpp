@@ -55,7 +55,7 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		p.bModel = false;
 
 		p.iAlbedo = BASETEXTURE;
-#if DEFCFG_DEFERRED_SHADING
+#if DEFCFG_DEFERRED_SHADING == 1
 		p.iAlbedo2 = BASETEXTURE2;
 		p.iAlbedo3 = BASETEXTURE3;
 		p.iAlbedo4 = BASETEXTURE4;
@@ -132,7 +132,7 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 
 	bool DrawToGBuffer( IMaterialVar **params )
 	{
-#if DEFCFG_DEFERRED_SHADING
+#if DEFCFG_DEFERRED_SHADING == 1
 		return true;
 #else
 		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );

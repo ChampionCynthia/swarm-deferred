@@ -18,7 +18,7 @@ CDeferredExtension::CDeferredExtension()
 	m_pTexLightAccum = NULL;
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 	m_pTexLightCtrl = NULL;
-#elif DEFCFG_DEFERRED_SHADING
+#elif DEFCFG_DEFERRED_SHADING == 1
 	m_pTexAlbedo = NULL;
 	m_pTexSpecular = NULL;
 #endif
@@ -85,7 +85,12 @@ void CDeferredExtension::CommitFrustumDeltas( const VMatrix &matTFrustum )
 {
 	m_matTFrustumD = matTFrustum;
 }
-
+#if DEFCFG_BILATERAL_DEPTH_TEST
+void CDeferredExtension::CommitWorldToCameraDepthTex( const VMatrix &matWorldCameraDepthTex )
+{
+	m_matWorldCameraDepthTex = matWorldCameraDepthTex;
+}
+#endif
 void CDeferredExtension::CommitShadowData_Ortho( const int &index, const shadowData_ortho_t &data )
 {
 	Assert( index >= 0 && index < SHADOW_NUM_CASCADES );
@@ -135,7 +140,7 @@ float *CDeferredExtension::CommitLightData_Common( float *pFlData, int numRows,
 void CDeferredExtension::CommitTexture_General( ITexture *pTexNormals, ITexture *pTexDepth,
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 		ITexture *pTexLightingCtrl,
-#elif DEFCFG_DEFERRED_SHADING
+#elif DEFCFG_DEFERRED_SHADING == 1
 		ITexture *pTexAlbedo,
 		ITexture *pTexSpecular,
 #endif
@@ -146,7 +151,7 @@ void CDeferredExtension::CommitTexture_General( ITexture *pTexNormals, ITexture 
 	m_pTexLightAccum = pTexLightAccum;
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 	m_pTexLightCtrl = pTexLightingCtrl;
-#elif DEFCFG_DEFERRED_SHADING
+#elif DEFCFG_DEFERRED_SHADING == 1
 	m_pTexAlbedo = pTexAlbedo;
 	m_pTexSpecular = pTexSpecular;
 #endif

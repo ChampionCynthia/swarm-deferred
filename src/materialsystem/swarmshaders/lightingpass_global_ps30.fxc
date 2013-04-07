@@ -45,10 +45,11 @@ PS_OUTPUT main( const PS_INPUT In )
 
 	clip( flDepth - 0.1f );
 
+	float phong_exp;
+	bool half_lambert, litface;
+
 	float4 flNormalCtrl = tex2D( sNormals, In.vTexCoord );
 	float3 flNormal = normalize( flNormalCtrl.xyz * 2.0f - 1.0f );
-
-	float phong_exp, half_lambert, litface;
 	UnpackLightingControls( flNormalCtrl.a, phong_exp, half_lambert, litface );
 
 	float3 flLitNormal = lerp( 1, dot( flNormal, g_vecLightVec_Forward ), litface ) * flNormal;

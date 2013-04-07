@@ -53,7 +53,7 @@ BEGIN_VS_SHADER( SCREENSPACE_COMBINE, "" )
 			DECLARE_DYNAMIC_PIXEL_SHADER( screenspace_combine_ps30 );
 			SET_DYNAMIC_PIXEL_SHADER( screenspace_combine_ps30 );
 
-#if DEFCFG_DEFERRED_SHADING
+#if DEFCFG_DEFERRED_SHADING == 1
 			BindTexture( SHADER_SAMPLER0, GetDeferredExt()->GetTexture_Albedo() );
 #else
 			Assert( 0 );

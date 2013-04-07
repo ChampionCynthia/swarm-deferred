@@ -15,7 +15,6 @@
  */
 #define DEFCFG_DEFERRED_SHADING 0
 
-
 /* Toggles packing mode of lighting controls (phong, halflambert, litface)
  * 0 - DISABLE packing, gbuffer 0 at 3 bytes, gbuffer 2 at 4 bytes, less expensive math
  * 1 - ENABLE packing, gbuffer 0 at 4 bytes, gbuffer 2 disabled, more expensive math
@@ -45,6 +44,32 @@
  */
 #define DEFCFG_BLINN_PHONG 1
 
+/* Use SSE vector processor instrinsics to speed up
+ * deferred light performance
+ */
+#define DEFCFG_USE_SSE 1
+
+/* Use extra sorting to diminish render context state
+ * changes.
+  */
+#define DEFCFG_EXTRA_SORT 0
+
+/* Enable adaptive shadowmap LOD controls.
+ */
+#define DEFCFG_ADAPTIVE_SHADOWMAP_LOD 0
+
+/* Enable adaptive volumetrics LOD controls.
+ */
+#define DEFCFG_ADAPTIVE_VOLUMETRIC_LOD	0
+
+/* Enable configurable volumetrics LOD controls.
+ */
+#define DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD	1
+
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD && DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+#	undef	DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+#	define	DEFCFG_ADAPTIVE_VOLUMETRIC_LOD 0
+#endif
 
 /* RT Names
  */
@@ -67,6 +92,12 @@
 #define DEFRTNAME_SHADOWDEPTH_DP "_rt_ShadowDepth_dp_"			// + %02i
 #define DEFRTNAME_SHADOWCOLOR_ORTHO "_rt_ShadowColor_ortho_"	// + %02i
 #define DEFRTNAME_SHADOWCOLOR_PROJ "_rt_ShadowColor_proj_"		// + %02i
+#if DEFCFG_ADAPTIVE_SHADOWMAP_LOD
+#	define DEFRTNAME_SHADOWDEPTH_PROJ_LOD1 "_rt_ShadowDepth_proj_lod1_"	// + %02i	
+#	define DEFRTNAME_SHADOWCOLOR_PROJ_LOD1 "_rt_ShadowColor_proj_lod1_"	// + %02i	
+#	define DEFRTNAME_SHADOWDEPTH_PROJ_LOD2 "_rt_ShadowDepth_proj_lod2_"	// + %02i	
+#	define DEFRTNAME_SHADOWCOLOR_PROJ_LOD2 "_rt_ShadowColor_proj_lod2_"	// + %02i	
+#endif
 #define DEFRTNAME_SHADOWCOLOR_DP "_rt_ShadowColor_dp_"			// + %02i
 #define DEFRTNAME_SHADOWRAD_ALBEDO_ORTHO "_rt_ShadowRad_Albedo_ortho_"	// + %02i
 #define DEFRTNAME_SHADOWRAD_NORMAL_ORTHO "_rt_ShadowRad_Normal_ortho_"	// + %02i
@@ -139,7 +170,6 @@
 #define MAX_LIGHTS_COOKIE			3
 #define MAX_LIGHTS_SIMPLE			10
 
-
 /* Num consts per light type
 */
 #define NUM_CONSTS_POINT_SIMPLE		3
@@ -161,13 +191,14 @@
 #define SHADOWMAPPING_DEPTH_COLOR__4X4_SOFTWARE_BILINEAR_BOX 1
 #define SHADOWMAPPING_DEPTH_COLOR__4X4_SOFTWARE_BILINEAR_GAUSSIAN 2
 #define SHADOWMAPPING_DEPTH_COLOR__5X5_SOFTWARE_BILINEAR_GAUSSIAN 3
-#define SHADOWMAPPING_DEPTH_STENCIL__RAW 4
-#define SHADOWMAPPING_DEPTH_STENCIL__3X3_GAUSSIAN 5
-#define SHADOWMAPPING_DEPTH_STENCIL__5X5_GAUSSIAN 6
+#define SHADOWMAPPING_DEPTH_COLOR__PCSS_4X4_PCF_4X4 4
+#define SHADOWMAPPING_DEPTH_STENCIL__RAW 5
+#define SHADOWMAPPING_DEPTH_STENCIL__3X3_GAUSSIAN 6
+#define SHADOWMAPPING_DEPTH_STENCIL__5X5_GAUSSIAN 7
 
 #define SHADOWMAPPING_METHOD	SHADOWMAPPING_DEPTH_COLOR__5X5_SOFTWARE_BILINEAR_GAUSSIAN
 
-#if ( SHADOWMAPPING_METHOD <= SHADOWMAPPING_DEPTH_COLOR__5X5_SOFTWARE_BILINEAR_GAUSSIAN )
+#if ( SHADOWMAPPING_METHOD <= SHADOWMAPPING_DEPTH_COLOR__PCSS_4X4_PCF_4X4 )
 #	define SHADOWMAPPING_USE_COLOR 1
 #endif
 
@@ -181,11 +212,23 @@
 
 /* Volumetrics quality/tweaks
  */
-#define VOLUMQUALITY_POINT_SAMPLES 50
-#define VOLUMQUALITY_SPOT_SAMPLES 50
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+#	define VOLUMQUALITY_POINT_SAMPLES_LOD0	49
+#	define VOLUMQUALITY_POINT_SAMPLES_LOD1	25
+#	define VOLUMQUALITY_POINT_SAMPLES_LOD2	13
+#	define VOLUMQUALITY_POINT_SAMPLES_LOD3	7
+#	define VOLUMQUALITY_POINT_SAMPLES_LOD4	4
+#	define VOLUMQUALITY_SPOT_SAMPLES_LOD0	49
+#	define VOLUMQUALITY_SPOT_SAMPLES_LOD1	25
+#	define VOLUMQUALITY_SPOT_SAMPLES_LOD2	13
+#	define VOLUMQUALITY_SPOT_SAMPLES_LOD3	7
+#	define VOLUMQUALITY_SPOT_SAMPLES_LOD4	4
+#else
+#	define VOLUMQUALITY_POINT_SAMPLES 50
+#	define VOLUMQUALITY_SPOT_SAMPLES 50
+#endif
 #define VOLUMTWEAK_INTENSITY_POINT 1.0f
 #define VOLUMTWEAK_INTENSITY_SPOT 0.5f
-
 
 /* Global hard coded filter tweaks
  */
@@ -228,7 +271,6 @@
 #define FIRST_SHARED_LIGHTDATA_CONSTANT 31
 #define FIRST_SHARED_LIGHTDATA_CONSTANT_FXC c31
 #define MAX_LIGHTDATA_CONSTANT_ROWS 193
-
 
 /* Projectable VGUI settings
  */

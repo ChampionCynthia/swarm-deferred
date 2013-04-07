@@ -47,7 +47,7 @@ public:
 		bool bAllStaticVarsDefined = m_bUSEWORLDTRANSFORM;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 4 * m_nUSEWORLDTRANSFORM ) + 0;
+		return ( 2020 * m_nUSEWORLDTRANSFORM ) + 0;
 	}
 };
 #define shaderStaticTest_volumpass_point_ps30 psh_forgot_to_set_static_USEWORLDTRANSFORM + 0
@@ -95,6 +95,48 @@ public:
 		m_bNUM_SHADOWED = true;
 #endif
 	}
+private:
+	int m_nVOLUME_LOD;
+#ifdef _DEBUG
+	bool m_bVOLUME_LOD;
+#endif
+public:
+	void SetVOLUME_LOD( int i )
+	{
+		Assert( i >= 0 && i <= 4 );
+		m_nVOLUME_LOD = i;
+#ifdef _DEBUG
+		m_bVOLUME_LOD = true;
+#endif
+	}
+	void SetVOLUME_LOD( bool i )
+	{
+		m_nVOLUME_LOD = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bVOLUME_LOD = true;
+#endif
+	}
+private:
+	int m_nVOLUME_SAMPLES;
+#ifdef _DEBUG
+	bool m_bVOLUME_SAMPLES;
+#endif
+public:
+	void SetVOLUME_SAMPLES( int i )
+	{
+		Assert( i >= 0 && i <= 100 );
+		m_nVOLUME_SAMPLES = i;
+#ifdef _DEBUG
+		m_bVOLUME_SAMPLES = true;
+#endif
+	}
+	void SetVOLUME_SAMPLES( bool i )
+	{
+		m_nVOLUME_SAMPLES = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bVOLUME_SAMPLES = true;
+#endif
+	}
 public:
 	// CONSTRUCTOR
 	volumpass_point_ps30_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
@@ -107,16 +149,24 @@ public:
 		m_bNUM_SHADOWED = false;
 #endif // _DEBUG
 		m_nNUM_SHADOWED = 0;
+#ifdef _DEBUG
+		m_bVOLUME_LOD = false;
+#endif // _DEBUG
+		m_nVOLUME_LOD = 0;
+#ifdef _DEBUG
+		m_bVOLUME_SAMPLES = false;
+#endif // _DEBUG
+		m_nVOLUME_SAMPLES = 0;
 	}
 	int GetIndex()
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllDynamicVarsDefined = m_bNUM_SHADOWED_COOKIE && m_bNUM_SHADOWED;
+		bool bAllDynamicVarsDefined = m_bNUM_SHADOWED_COOKIE && m_bNUM_SHADOWED && m_bVOLUME_LOD && m_bVOLUME_SAMPLES;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG
-		return ( 1 * m_nNUM_SHADOWED_COOKIE ) + ( 2 * m_nNUM_SHADOWED ) + 0;
+		return ( 1 * m_nNUM_SHADOWED_COOKIE ) + ( 2 * m_nNUM_SHADOWED ) + ( 4 * m_nVOLUME_LOD ) + ( 20 * m_nVOLUME_SAMPLES ) + 0;
 	}
 };
-#define shaderDynamicTest_volumpass_point_ps30 psh_forgot_to_set_dynamic_NUM_SHADOWED_COOKIE + psh_forgot_to_set_dynamic_NUM_SHADOWED + 0
+#define shaderDynamicTest_volumpass_point_ps30 psh_forgot_to_set_dynamic_NUM_SHADOWED_COOKIE + psh_forgot_to_set_dynamic_NUM_SHADOWED + psh_forgot_to_set_dynamic_VOLUME_LOD + psh_forgot_to_set_dynamic_VOLUME_SAMPLES + 0

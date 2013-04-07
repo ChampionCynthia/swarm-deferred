@@ -305,6 +305,192 @@ float ShadowColor_5x5SoftwareBilinear_Gauss( sampler depthMap, float3 uvw, float
 	return flLight;
 }
 
+float2 poissonDisk[16] = 
+{
+	float2( -0.94201624, -0.39906216 ),
+	float2( 0.94558609, -0.76890725 ),
+	float2( -0.094184101, -0.92938870 ),
+	float2( 0.34495938, 0.29387760 ),
+	float2( -0.91588581, 0.45771432 ),
+	float2( -0.81544232, -0.87912464 ),
+	float2( -0.38277543, 0.27676845 ),
+	float2( 0.97484398, 0.75648379 ),
+	float2( 0.44323325, -0.97511554 ),
+	float2( 0.53742981, -0.47373420 ),
+	float2( -0.26496911, -0.41893023 ),
+	float2( 0.79197514, 0.19090188 ),
+	float2( -0.24188840, 0.99706507 ),
+	float2( -0.81409955, 0.91437590 ),
+	float2( 0.19984126, 0.78641367 ),
+	float2( 0.14383161, -0.14100790 )
+};
+
+void FindBlocker4x4
+(
+	out float avgBlockerDepth,
+	out float numBlockers,
+	sampler depthMap,
+	float2 uv,
+	float zReceiver,
+	float zNear,
+	float lightSizeUV
+)
+{
+	//This uses similar triangles to compute what //area of the shadow map we should search
+	//float searchWidth = lightSizeUV * (zReceiver - zNear) / zReceiver;
+	float searchWidth = 1;
+
+	float blockerSum = 0;
+	numBlockers = 0;
+
+	float shadowMapDepth = tex2D( depthMap, uv + poissonDisk[0] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[1] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[2] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[3] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[4] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[5] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[6] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[7] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[8] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[9] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[10] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[11] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[12] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[13] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[14] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+	shadowMapDepth = tex2D( depthMap, uv + poissonDisk[15] * searchWidth ).r;
+	if ( shadowMapDepth < zReceiver ) 
+	{
+		blockerSum += shadowMapDepth;
+		numBlockers++;
+	}
+
+	avgBlockerDepth = blockerSum / numBlockers;
+}
+
+float PenumbraSize( float zReceiver, float zBlocker ) //Parallel plane estimation
+{
+	return (zReceiver - zBlocker) / zBlocker;
+}
+
+float PCFForPCSS4X4( float2 uv, sampler depthMap, float zReceiver, float filterRadiusUV )
+{
+	float sum = tex2D( depthMap, uv + poissonDisk[0] * filterRadiusUV ) > zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[1] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[2] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[3] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[4] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[5] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[6] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[7] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[8] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[9] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[10] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[11] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[12] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[13] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[14] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+	sum += tex2D( depthMap, uv + poissonDisk[15] * filterRadiusUV ) < zReceiver ? 0.0625 : 0;
+
+	return sum;
+}
+
+float ShadowColor_PCSS4X4_PCF4X4( sampler depthMap, float3 uvw, float zNear, float lightSizeUV )
+{
+	float avgBlockerDepth = 0;
+	float numBlockers = 0;
+
+	FindBlocker4x4( avgBlockerDepth, numBlockers, depthMap, uvw.xy, uvw.z, zNear, lightSizeUV );
+
+	float flOut = 1.0f;
+	
+	if( numBlockers >= 1 )
+	{
+		// STEP 2: penumbra size
+		float penumbraRatio = PenumbraSize( uvw.z, avgBlockerDepth );
+		float filterRadiusUV = penumbraRatio * lightSizeUV / uvw.z;
+
+		flOut = PCFForPCSS4X4( uvw.xy, depthMap, uvw.z, filterRadiusUV );
+	}
+
+	return flOut;
+}
+
 /*
 pFl0[0] = 1.0f / resx;
 pFl0[1] = 1.0f / resy;
@@ -337,10 +523,10 @@ float PerformShadowMapping( sampler depthMap, float3 uvw, float4 offsets_0, floa
 
 #elif SHADOWMAPPING_METHOD == SHADOWMAPPING_DEPTH_STENCIL__5X5_GAUSSIAN
 	return ShadowDepth_5x5Gauss_Nvidia( depthMap, uvw, offsets_0, offsets_1 );
-
+#elif SHADOWMAPPING_METHOD == SHADOWMAPPING_DEPTH_COLOR__PCSS_4X4_PCF_4X4
+	return ShadowColor_PCSS4X4_PCF4X4( depthMap, uvw, 10, 0.15 ); //hijack offsets_0
 #else
 	unknown_shadow_mapping_method
-
 #endif
 }
 

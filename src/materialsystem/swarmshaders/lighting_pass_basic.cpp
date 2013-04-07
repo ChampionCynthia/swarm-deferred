@@ -4,6 +4,7 @@
 #include "defconstruct_vs30.inc"
 #include "lightingpass_point_ps30.inc"
 #include "lightingpass_spot_ps30.inc"
+#include "shaderapi\ishaderapi.h"
 
 #include "tier0/memdbgon.h"
 
@@ -31,6 +32,35 @@ void DrawPassLightPass( const lightPassParms &info, CBaseVSShader *pShader, IMat
 
 	SHADOW_STATE
 	{
+		//NEED TO CLEAR STENCIL
+		//First set stencil to reflect where lit geometry lies in front of the light geometry. Set to 1 where depth test fails drawing only back faces.
+		/*ShaderStencilState_t lightGeometryStencil1;
+		lightGeometryStencil.m_bEnable = true;
+		lightGeometryStencil.m_nReferenceValue = 1;
+		lightGeometryStencil.m_nWriteMask = 1;
+		lightGeometryStencil.m_CompareFunc = ShaderStencilFunc_t::SHADER_STENCILFUNC_NEVER;
+		lightGeometryStencil.m_FailOp = ShaderStencilOp_t::SHADER_STENCILOP_KEEP;
+		lightGeometryStencil.m_ZFailOp = ShaderStencilOp_t::SHADER_STENCILOP_SET_TO_REFERENCE;*/
+
+		//Then draw only where depth test succeeds and stencil buffer has been set to 1.
+		/*ShaderStencilState_t lightGeometryStencil2;
+		lightGeometryStencil2.m_bEnable = true;
+		lightGeometryStencil2.m_nTestMask = 1;
+		lightGeometryStencil2.m_nWriteMask = 0;
+		lightGeometryStencil2.m_CompareFunc = ShaderStencilFunc_t::SHADER_STENCILFUNC_EQUAL;
+		lightGeometryStencil2.m_PassOp = ShaderStencilOp_t::SHADER_STENCILOP_ZERO;
+		lightGeometryStencil2.m_FailOp = ShaderStencilOp_t::SHADER_STENCILOP_KEEP;
+		lightGeometryStencil2.m_ZFailOp = ShaderStencilOp_t::SHADER_STENCILOP_SET_TO_REFERENCE;*/
+
+		/*
+		pShaderShadow->SetDefaultState();
+		pShaderShadow->EnableDepthTest( true );
+		pShaderShadow->DepthFunc( SHADER_DEPTHFUNC_FARTHEROREQUAL );
+		pShaderShadow->PolyMode( SHADER_POLYMODEFACE_FRONT, SHADER_POLYMODE_FILL );
+		pShaderShadow->EnableDepthWrites( false );
+		pShaderShadow->EnableAlphaWrites( true );
+		*/
+
 		pShaderShadow->SetDefaultState();
 		pShaderShadow->EnableDepthTest( false );
 		pShaderShadow->EnableDepthWrites( false );

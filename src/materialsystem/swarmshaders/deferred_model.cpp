@@ -92,7 +92,7 @@ BEGIN_VS_SHADER( DEFERRED_MODEL, "" )
 
 	bool DrawToGBuffer( IMaterialVar **params )
 	{
-#if DEFCFG_DEFERRED_SHADING
+#if DEFCFG_DEFERRED_SHADING == 1
 		return true;
 #else
 		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );

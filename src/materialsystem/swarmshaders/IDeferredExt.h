@@ -60,11 +60,30 @@ struct shadowData_general_t
 		iDPSM_Res_x = 256;
 		iDPSM_Res_y = 256;
 		iPROJ_Res = 256;
+
+#if DEFCFG_ADAPTIVE_SHADOWMAP_LOD
+		iDPSM_Res_x_LOD1 = 128;
+		iDPSM_Res_y_LOD1 = 128;
+		iDPSM_Res_x_LOD2 = 64;
+		iDPSM_Res_y_LOD2 = 64;
+		iPROJ_Res_LOD1 = 128;
+		iPROJ_Res_LOD2 = 64;
+#endif
 	};
 	int iDPSM_Res_x;
 	int iDPSM_Res_y;
 
 	int iPROJ_Res;
+
+#if DEFCFG_ADAPTIVE_SHADOWMAP_LOD
+	int iDPSM_Res_x_LOD1;
+	int iDPSM_Res_y_LOD1;
+	int iDPSM_Res_x_LOD2;
+	int iDPSM_Res_y_LOD2;
+
+	int iPROJ_Res_LOD1;
+	int iPROJ_Res_LOD2;
+#endif
 };
 
 struct volumeData_t
@@ -74,6 +93,13 @@ struct volumeData_t
 	int iNumRows;
 
 	bool bHasCookie;
+
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+	int iLOD;
+#endif
+#if DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+	int iSamples;
+#endif
 };
 
 struct radiosityData_t
@@ -91,6 +117,9 @@ public:
 	virtual void CommitZDists( const float &zNear, const float &zFar ) = 0;
 	virtual void CommitZScale( const float &zFar ) = 0;
 	virtual void CommitFrustumDeltas( const VMatrix &matTFrustum ) = 0;
+#if DEFCFG_BILATERAL_DEPTH_TEST
+	virtual void CommitWorldToCameraDepthTex( const VMatrix &matWorldCameraDepthTex ) = 0;
+#endif
 
 	virtual void CommitShadowData_Ortho( const int &index, const shadowData_ortho_t &data ) = 0;
 	virtual void CommitShadowData_Proj( const int &index, const shadowData_proj_t &data ) = 0;
@@ -108,7 +137,7 @@ public:
 	virtual void CommitTexture_General( ITexture *pTexNormals, ITexture *pTexDepth,
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 		ITexture *pTexLightingCtrl,
-#elif DEFCFG_DEFERRED_SHADING
+#elif DEFCFG_DEFERRED_SHADING == 1
 		ITexture *pTexAlbedo,
 		ITexture *pTexSpecular,
 #endif
@@ -142,6 +171,9 @@ public:
 	virtual void CommitZDists( const float &zNear, const float &zFar );
 	virtual void CommitZScale( const float &zFar );
 	virtual void CommitFrustumDeltas( const VMatrix &matTFrustum );
+#if DEFCFG_BILATERAL_DEPTH_TEST
+	virtual void CommitWorldToCameraDepthTex( const VMatrix &matWorldCameraDepthTex );
+#endif
 
 	virtual void CommitShadowData_Ortho( const int &index, const shadowData_ortho_t &data );
 	virtual void CommitShadowData_Proj( const int &index, const shadowData_proj_t &data );
@@ -158,7 +190,7 @@ public:
 	virtual void CommitTexture_General( ITexture *pTexNormals, ITexture *pTexDepth,
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 		ITexture *pTexLightingCtrl,
-#elif DEFCFG_DEFERRED_SHADING
+#elif DEFCFG_DEFERRED_SHADING == 1
 		ITexture *pTexAlbedo,
 		ITexture *pTexSpecular,
 #endif
@@ -178,6 +210,9 @@ public:
 	inline const float &GetZDistFar();
 	inline float GetZScale();
 	inline float *GetFrustumDeltaBase();
+#if DEFCFG_BILATERAL_DEPTH_TEST
+	inline float *GetWorldToCameraDepthTexBase();
+#endif
 
 	inline int GetNumActiveLights_ShadowedCookied();
 	inline int GetNumActiveLights_Shadowed();
@@ -200,7 +235,7 @@ public:
 	inline ITexture *GetTexture_LightAccum();
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 	inline ITexture *GetTexture_LightCtrl();
-#elif DEFCFG_DEFERRED_SHADING
+#elif DEFCFG_DEFERRED_SHADING == 1
 	inline ITexture *GetTexture_Albedo();
 	inline ITexture *GetTexture_Specular();
 #endif
@@ -221,6 +256,9 @@ private:
 	Vector4D m_vecForward;
 	float m_flZDists[3];
 	VMatrix m_matTFrustumD;
+#if DEFCFG_BILATERAL_DEPTH_TEST
+	VMatrix m_matWorldCameraDepthTex;
+#endif
 
 	shadowData_ortho_t m_dataOrtho[ SHADOW_NUM_CASCADES ];
 	shadowData_proj_t m_dataProj[ MAX_SHADOW_PROJ ];
@@ -242,7 +280,7 @@ private:
 	ITexture *m_pTexLightAccum;
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 	ITexture *m_pTexLightCtrl;
-#elif DEFCFG_DEFERRED_SHADING
+#elif DEFCFG_DEFERRED_SHADING == 1
 	ITexture *m_pTexAlbedo;
 	ITexture *m_pTexSpecular;
 #endif
@@ -281,6 +319,12 @@ float *CDeferredExtension::GetFrustumDeltaBase()
 	return m_matTFrustumD.Base();
 }
 
+#if DEFCFG_BILATERAL_DEPTH_TEST
+float *CDeferredExtension::GetWorldToCameraDepthTexBase()
+{
+	return m_matWorldCameraDepthTex.Base();
+}
+#endif
 const shadowData_ortho_t &CDeferredExtension::GetShadowData_Ortho( const int &index )
 {
 	Assert( index >= 0 && index < SHADOW_NUM_CASCADES );
@@ -352,7 +396,7 @@ ITexture *CDeferredExtension::GetTexture_LightCtrl()
 {
 	return m_pTexLightCtrl;
 }
-#elif DEFCFG_DEFERRED_SHADING
+#elif DEFCFG_DEFERRED_SHADING == 1
 ITexture *CDeferredExtension::GetTexture_Albedo()
 {
 	return m_pTexAlbedo;

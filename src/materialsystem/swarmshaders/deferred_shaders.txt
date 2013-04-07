@@ -10,6 +10,9 @@ composite_ps30.fxc
 
 defconstruct_vs30.fxc
 
+decalmodulate_vs20.fxc
+decalmodulate_ps2x.fxc
+
 lightingpass_global_ps30.fxc
 lightingpass_point_ps30.fxc
 lightingpass_spot_ps30.fxc

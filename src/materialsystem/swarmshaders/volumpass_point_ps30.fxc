@@ -3,6 +3,8 @@
 
 // DYNAMIC:		"NUM_SHADOWED_COOKIE"		"0..1"
 // DYNAMIC:		"NUM_SHADOWED"				"0..1"
+// DYNAMIC:		"VOLUME_LOD"				"0..4"
+// DYNAMIC:		"VOLUME_SAMPLES"			"0..100"
 
 // SKIP:		!$NUM_SHADOWED_COOKIE && !$NUM_SHADOWED
 // SKIP:		$NUM_SHADOWED_COOKIE && $NUM_SHADOWED
@@ -52,10 +54,8 @@ const float3 g_vecFrustumUp			: register( c5 );
 const float2 g_vecHalfScreenTexel		: register( c6 );
 #endif
 
-
 sampler sMixedSampler[FREE_LIGHT_SAMPLERS]						: register( FIRST_LIGHT_SAMPLER_FXC );
 const float4 g_flMixedData[MAX_LIGHTDATA_CONSTANT_ROWS]			: register( FIRST_SHARED_LIGHTDATA_CONSTANT_FXC );
-
 
 struct PS_INPUT
 {
@@ -142,7 +142,24 @@ PS_OUTPUT main( const PS_INPUT In )
 	float flCurrentRayLength = min( flApproxActualDiameter, flExpectedMaxDiameter );
 	float flDiameterIntensityAdjust = flCurrentRayLength / flExpectedMaxDiameter;
 
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+#	if VOLUME_LOD == 0
+		float iNumSamples = VOLUMQUALITY_SPOT_SAMPLES_LOD0;
+#	elif VOLUME_LOD == 1
+		float iNumSamples = VOLUMQUALITY_SPOT_SAMPLES_LOD1;
+#	elif VOLUME_LOD == 2
+		float iNumSamples = VOLUMQUALITY_SPOT_SAMPLES_LOD2;
+#	elif VOLUME_LOD == 3
+		float iNumSamples = VOLUMQUALITY_SPOT_SAMPLES_LOD3;
+#	else
+		float iNumSamples = VOLUMQUALITY_SPOT_SAMPLES_LOD4;
+#	endif
+#elif DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+	float iNumSamples = VOLUME_SAMPLES;
+#else
 	float iNumSamples = VOLUMQUALITY_POINT_SAMPLES;
+#endif
+
 
 #if USEWORLDTRANSFORM
 	vecMarchingRay = vecMarchingNormal * flCurrentRayLength;

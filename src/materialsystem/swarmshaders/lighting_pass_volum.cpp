@@ -85,6 +85,13 @@ void DrawPassLightPassVolum( const lightPassParms &info, CBaseVSShader *pShader,
 		const int iNumShadowedCookied = vData.bHasCookie ? 1:0;
 		const int iNumShadowed = vData.bHasCookie ? 0:1;
 
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+		const int iVolumeLOD = vData.iLOD;
+#endif
+#if DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+		const int iVolumeSamples = vData.iSamples;
+#endif
+
 		Assert( (iNumShadowedCookied + iNumShadowed) == 1 );
 		Assert( iNumShadowedCookied <= pExt->GetNumActiveLights_ShadowedCookied() );
 		Assert( iNumShadowed <= pExt->GetNumActiveLights_Shadowed() );
@@ -99,6 +106,16 @@ void DrawPassLightPassVolum( const lightPassParms &info, CBaseVSShader *pShader,
 				DECLARE_DYNAMIC_PIXEL_SHADER( volumpass_point_ps30 );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_SHADOWED_COOKIE, iNumShadowedCookied );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_SHADOWED, iNumShadowed );
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( VOLUME_LOD, iVolumeLOD );
+#else
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( VOLUME_LOD, 0 );
+#endif
+#if DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( VOLUME_SAMPLES, iVolumeSamples );
+#else
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( VOLUME_SAMPLES, 0 );
+#endif
 				SET_DYNAMIC_PIXEL_SHADER( volumpass_point_ps30 );
 			}
 			break;
@@ -107,6 +124,16 @@ void DrawPassLightPassVolum( const lightPassParms &info, CBaseVSShader *pShader,
 				DECLARE_DYNAMIC_PIXEL_SHADER( volumpass_spot_ps30 );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_SHADOWED_COOKIE, iNumShadowedCookied );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_SHADOWED, iNumShadowed );
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( VOLUME_LOD, iVolumeLOD );
+#else
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( VOLUME_LOD, 0 );
+#endif
+#if DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( VOLUME_SAMPLES, iVolumeSamples );
+#else
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( VOLUME_SAMPLES, 0 );
+#endif
 				SET_DYNAMIC_PIXEL_SHADER( volumpass_spot_ps30 );
 			}
 			break;

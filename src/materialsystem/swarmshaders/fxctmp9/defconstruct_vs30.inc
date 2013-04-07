@@ -1,9 +1,9 @@
 // ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
-// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
 // !$MODEL && $MORPHING_VTEX
 // !$MODEL && $COMPRESSED_VERTS
 // !$MODEL && $SKINNING
 // !$MODEL && $MORPHING_VTEX
+// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
 #include "shaderlib/cshader.h"
 class defconstruct_vs30_Static_Index
 {

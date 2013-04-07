@@ -284,9 +284,12 @@ if exist "$(TargetDir)"$(ProjectName).map copy "$(TargetDir)"$(ProjectName).map 
     <None Include="defconstruct_vs30.fxc" />
     <None Include="deferred_shaders.txt" />
     <None Include="gaussianblur_6_ps30.fxc" />
+    <None Include="gbuffer_defshading2_ps30.fxc" />
+    <None Include="gbuffer_defshading2_vs30.fxc" />
     <None Include="gbuffer_defshading_ps30.fxc" />
     <None Include="gbuffer_ps30.fxc" />
     <None Include="gbuffer_vs30.fxc" />
+    <None Include="lightingpass_area_ps30.fxc" />
     <None Include="lightingpass_global_ps30.fxc" />
     <None Include="lightingpass_point_ps30.fxc" />
     <None Include="lightingpass_spot_ps30.fxc" />

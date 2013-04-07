@@ -1,18 +1,14 @@
-
 // STATIC:		"USEWORLDTRANSFORM"			"0..1"
 // STATIC:		"SENDWORLDPOS"				"0..1"
 
-
-#include "common_vs_fxc.h"
 #include "common_deferred_fxc.h"
-
+#include "common_vs_fxc.h"
 
 #if USEWORLDTRANSFORM == 0
 const float3 g_vecFrustumCenter		: register( SHADER_SPECIFIC_CONST_0 );
 const float3 g_vecFrustumRight		: register( SHADER_SPECIFIC_CONST_1 );
 const float3 g_vecFrustumUp			: register( SHADER_SPECIFIC_CONST_2 );
 #endif
-
 
 struct VS_INPUT
 {
@@ -31,8 +27,8 @@ struct VS_OUTPUT
 	float3 vecWorldRay				: TEXCOORD1;
 #endif
 
-#if SENDWORLDPOS
-	float3 vecWorld					: TEXCOORD2;
+#if SENDWORLDPOS 
+	float3 vecWorld				: TEXCOORD2;
 #endif
 };
 

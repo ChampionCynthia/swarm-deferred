@@ -3,6 +3,8 @@
 
 // DYNAMIC:		"NUM_SHADOWED_COOKIE"		"0..1"
 // DYNAMIC:		"NUM_SHADOWED"				"0..1"
+// DYNAMIC:		"VOLUME_LOD"				"0..4"
+// DYNAMIC:		"VOLUME_SAMPLES"			"0..100"
 
 // SKIP:		!$NUM_SHADOWED_COOKIE && !$NUM_SHADOWED
 // SKIP:		$NUM_SHADOWED_COOKIE && $NUM_SHADOWED
@@ -144,19 +146,35 @@ PS_OUTPUT main( const PS_INPUT In )
 	float flProjectedDot = step( 0.0001f, dot( vecMarchingNormal, vecWorldRay ) );
 
 	clip( flProjectedDot - 0.5f );
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+#	if VOLUME_LOD == 0
+		float iNumSamples = VOLUMQUALITY_SPOT_SAMPLES_LOD0;
+#	elif VOLUME_LOD == 1
+		float iNumSamples = VOLUMQUALITY_SPOT_SAMPLES_LOD1;
+#	elif VOLUME_LOD == 2
+		float iNumSamples = VOLUMQUALITY_SPOT_SAMPLES_LOD2;
+#	elif VOLUME_LOD == 3
+		float iNumSamples = VOLUMQUALITY_SPOT_SAMPLES_LOD3;
+#	else
+		float iNumSamples = VOLUMQUALITY_SPOT_SAMPLES_LOD4;
+#	endif
+#elif DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+	float iNumSamples = VOLUME_SAMPLES;
+#else
+	float iNumSamples = VOLUMQUALITY_POINT_SAMPLES;
+#endif
 
-	float flNumSamples = VOLUMQUALITY_SPOT_SAMPLES;
 #if NUM_SHADOWED
 	float flValidSamples = 0.1f;
 #endif
 
-	vecMarchingRay /= flNumSamples;
+	vecMarchingRay /= iNumSamples;
 	float3 vecPosition = vecWorld;
 
 	float4 depthPos;
 	float3 flShadowPeeling = 0;
 
-	for ( int itr = flNumSamples; itr > 0; itr-- )
+	for ( int itr = iNumSamples; itr > 0; itr-- )
 	{
 		depthPos = mul( float4( vecPosition, 1 ), spotWorldToTexture );
 		depthPos.xyz /= depthPos.w;
@@ -189,7 +207,7 @@ PS_OUTPUT main( const PS_INPUT In )
 #if NUM_SHADOWED
 	Out.vColor_0.xyz = flShadowPeeling / flValidSamples;
 #else
-	Out.vColor_0.xyz = flShadowPeeling / flNumSamples;
+	Out.vColor_0.xyz = flShadowPeeling / iNumSamples;
 #endif
 
 	Out.vColor_0.xyz *= g_flMixedData[ 1 ].rgb *		// diffuse color
