@@ -1003,6 +1003,10 @@ void CVGUILightEditor_Properties::CreateProperties_LightEntity()
 	pCheckButton->CopyEnabledRule( &vis_shadows );
 	m_hProperties.AddToTail( pCheckButton );
 
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD || DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+	Visibility_CheckButton vis_volume( pCheckButton );
+#endif
+
 	pCheckButton = new PropertyCheckButton(
 		MakeKey( GetLightParamName( LPARAM_SPAWNFLAGS ), "1" ),
 		DEFLIGHT_COOKIE_ENABLED, "Enable cookie" );
@@ -1096,6 +1100,45 @@ void CVGUILightEditor_Properties::CreateProperties_LightEntity()
 	pSlider->SetNumTicks( 5 );
 	pSlider->CopyVisiblityRule( &vis_style );
 	m_hProperties.AddToTail( pSlider );
+
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+	pTextEntry = new PropertyTextEntry(
+		MakeKey( GetLightParamName( LPARAM_VOLUME_LOD0_DIST ), "256" ),
+		PropertyTextEntry::PTENTRY_FLOAT );
+	pTextEntry->SetLabelName( "Volume LOD 0" );
+	pTextEntry->CopyVisiblityRule( &vis_volume );
+	m_hProperties.AddToTail( pTextEntry );
+
+	pTextEntry = new PropertyTextEntry(
+		MakeKey( GetLightParamName( LPARAM_VOLUME_LOD1_DIST ), "512" ),
+		PropertyTextEntry::PTENTRY_FLOAT );
+	pTextEntry->SetLabelName( "Volume LOD 1" );
+	pTextEntry->CopyVisiblityRule( &vis_volume );
+	m_hProperties.AddToTail( pTextEntry );
+
+	pTextEntry = new PropertyTextEntry(
+		MakeKey( GetLightParamName( LPARAM_VOLUME_LOD2_DIST ), "1024" ),
+		PropertyTextEntry::PTENTRY_FLOAT );
+	pTextEntry->SetLabelName( "Volume LOD 2" );
+	pTextEntry->CopyVisiblityRule( &vis_volume );
+	m_hProperties.AddToTail( pTextEntry );
+
+	pTextEntry = new PropertyTextEntry(
+		MakeKey( GetLightParamName( LPARAM_VOLUME_LOD3_DIST ), "2048" ),
+		PropertyTextEntry::PTENTRY_FLOAT );
+	pTextEntry->SetLabelName( "Volume LOD 3" );
+	pTextEntry->CopyVisiblityRule( &vis_volume );
+	m_hProperties.AddToTail( pTextEntry );
+#endif
+
+#if DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+	pTextEntry = new PropertyTextEntry(
+		MakeKey( GetLightParamName( LPARAM_VOLUME_SAMPLES ), "50" ),
+		PropertyTextEntry::PTENTRY_INT );
+	pTextEntry->SetLabelName( "Volume Samples" );
+	pTextEntry->CopyVisiblityRule( &vis_volume );
+	m_hProperties.AddToTail( pTextEntry );
+#endif
 }
 
 void CVGUILightEditor_Properties::CreateProperties_GlobalLight()

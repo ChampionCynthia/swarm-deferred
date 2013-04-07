@@ -6,6 +6,18 @@
 class CMeshBuilder;
 class IDefCookie;
 
+#if DEFCFG_USE_SSE
+struct def_light_presortdatax4_t
+{
+	fltx4		bounds_min_naive[3];
+	fltx4		bounds_max_naive[3];
+	i32x4		hasShadow;
+	i32x4		hasVolumetrics;
+	def_light_t* lights[4];
+	uint		count;				//this throws the alignment way out
+};
+#endif
+
 struct def_light_t
 {
 	friend class CLightingManager;
@@ -47,6 +59,17 @@ struct def_light_t
 	float flStyle_Smooth;
 	float flStyle_Random;
 	float flStyle_Speed;
+
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+	float flVolumeLOD0Dist;
+	float flVolumeLOD1Dist;
+	float flVolumeLOD2Dist;
+	float flVolumeLOD3Dist;
+#endif
+
+#if DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+	int	iVolumeSamples;
+#endif
 
 	void BuildBox( IMesh *pMesh );
 	void BuildSphere( IMesh **pMesh );
@@ -167,7 +190,7 @@ private:
 
 	void UpdateFrustum();
 	Frustum_t spotFrustum;
-
+	
 	void UpdateXForms();
 	Vector bounds_min, bounds_max;
 	Vector bounds_min_naive, bounds_max_naive;
@@ -199,6 +222,5 @@ private:
 	float flLastRandomTime;
 	float flLastRandomValue;
 };
-
 
 #endif

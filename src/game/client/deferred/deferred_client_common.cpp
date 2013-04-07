@@ -3,7 +3,15 @@
 #include "deferred/deferred_shared_common.h"
 
 ConVar deferred_rt_shadowspot_res( "deferred_rt_shadowspot_res", "1024", FCVAR_HIDDEN | FCVAR_RELOAD_TEXTURES | FCVAR_RELOAD_MATERIALS );
+#if DEFCFG_ADAPTIVE_SHADOWMAP_LOD
+ConVar deferred_rt_shadowspot_lod1_res( "deferred_rt_shadowspot_lod1_res", "512", FCVAR_HIDDEN | FCVAR_RELOAD_TEXTURES | FCVAR_RELOAD_MATERIALS );
+ConVar deferred_rt_shadowspot_lod2_res( "deferred_rt_shadowspot_lod2_res", "256", FCVAR_HIDDEN | FCVAR_RELOAD_TEXTURES | FCVAR_RELOAD_MATERIALS );
+#endif
 ConVar deferred_rt_shadowpoint_res( "deferred_rt_shadowpoint_res", "1024", FCVAR_HIDDEN | FCVAR_RELOAD_TEXTURES | FCVAR_RELOAD_MATERIALS );
+#if DEFCFG_ADAPTIVE_SHADOWMAP_LOD
+ConVar deferred_rt_shadowpoint_lod1_res( "deferred_rt_shadowpoint_lod1_res", "512", FCVAR_HIDDEN | FCVAR_RELOAD_TEXTURES | FCVAR_RELOAD_MATERIALS );
+ConVar deferred_rt_shadowpoint_lod2_res( "deferred_rt_shadowpoint_lod2_res", "256", FCVAR_HIDDEN | FCVAR_RELOAD_TEXTURES | FCVAR_RELOAD_MATERIALS );
+#endif
 
 ConVar deferred_lightmanager_debug( "deferred_lightmanager_debug", "0" );
 
@@ -32,6 +40,21 @@ void CalcBoundaries( Vector *list, const int &num, Vector &min, Vector &max )
 {
 	Assert( num > 0 );
 
+#if DEFCFG_USE_SSE && 0
+	fltx4 vTestPoint = _mm_set_ps( list[0].x, list[0].y, list[0].z, 0 );
+	fltx4 vMin = vTestPoint;
+	fltx4 vMax = vTestPoint;
+
+	for( int i = 1; i < num; i++ )
+	{
+		vTestPoint = _mm_set_ps( list[i].x, list[i].y, list[i].z, 0 );
+		vMin = _mm_min_ps( vMin, vTestPoint );
+		vMax = _mm_max_ps( vMax, vTestPoint );
+	}
+
+	min = Vector( SubFloat( vMin, 0 ), SubFloat( vMin, 1 ), SubFloat( vMin, 2 ) );
+	max = Vector( SubFloat( vMax, 0 ), SubFloat( vMax, 1 ), SubFloat( vMax, 2 ) );
+#else
 	min = *list;
 	max = *list;
 
@@ -43,4 +66,5 @@ void CalcBoundaries( Vector *list, const int &num, Vector &min, Vector &max )
 			max[ x ] = MAX( max[ x ], list[ i ][ x ] );
 		}
 	}
+#endif
 }

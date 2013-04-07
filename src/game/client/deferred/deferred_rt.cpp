@@ -22,6 +22,12 @@ static CTextureReference g_tex_ShadowRad_Albedo_Ortho[ MAX_SHADOW_ORTHO ];
 static CTextureReference g_tex_ShadowRad_Normal_Ortho[ MAX_SHADOW_ORTHO ];
 static CTextureReference g_tex_ShadowColor_Proj[ MAX_SHADOW_PROJ ];
 static CTextureReference g_tex_ShadowDepth_Proj[ MAX_SHADOW_PROJ ];
+#if DEFCFG_ADAPTIVE_SHADOWMAP_LOD
+static CTextureReference g_tex_ShadowColor_Proj_LOD1[ MAX_SHADOW_PROJ ];
+static CTextureReference g_tex_ShadowDepth_Proj_LOD1[ MAX_SHADOW_PROJ ];
+static CTextureReference g_tex_ShadowColor_Proj_LOD2[ MAX_SHADOW_PROJ ];
+static CTextureReference g_tex_ShadowDepth_Proj_LOD2[ MAX_SHADOW_PROJ ];
+#endif
 static CTextureReference g_tex_ShadowColor_DP[ MAX_SHADOW_DP ];
 static CTextureReference g_tex_ShadowDepth_DP[ MAX_SHADOW_DP ];
 
@@ -52,15 +58,18 @@ void InitDeferredRTs( bool bInitial )
 
 	materials->GetBackBufferDimensions( screen_w, screen_h );
 
-	const ImageFormat fmt_gbuffer0 =
+const ImageFormat fmt_gbuffer0 =
 #if DEFCFG_LIGHTCTRL_PACKING
 		IMAGE_FORMAT_RGBA8888;
 #else
 		IMAGE_FORMAT_RGB888;
+#endif
 
+#if !DEFCFG_LIGHTCTRL_PACKING
 	const ImageFormat fmt_gbuffer2 = IMAGE_FORMAT_RGBA8888;
 #endif
-#if DEFCFG_DEFERRED_SHADING
+
+#if DEFCFG_DEFERRED_SHADING == 1
 	const ImageFormat fmt_gbuffer2 = IMAGE_FORMAT_RGBA8888;
 	const ImageFormat fmt_gbuffer3 = IMAGE_FORMAT_RGB888;
 #endif
@@ -115,7 +124,7 @@ void InitDeferredRTs( bool bInitial )
 			dummy, dummy,
 			RT_SIZE_FULL_FRAME_BUFFER_ROUNDED_UP,
 			fmt_gbuffer0,
-#if DEFCFG_DEFERRED_SHADING
+#if DEFCFG_DEFERRED_SHADING == 1
 			MATERIAL_RT_DEPTH_NONE,
 #else
 			MATERIAL_RT_DEPTH_SHARED,
@@ -130,27 +139,27 @@ void InitDeferredRTs( bool bInitial )
 			gbufferFlags, 0 ) );
 
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
-		g_tex_LightCtrl.Init( materials->CreateNamedRenderTargetTextureEx2( DEFRTNAME_GBUFFER2,
-			dummy, dummy,
-			RT_SIZE_FULL_FRAME_BUFFER_ROUNDED_UP,
-			fmt_gbuffer2,
-			MATERIAL_RT_DEPTH_NONE,
-			gbufferFlags, 0 ) );
+	g_tex_LightCtrl.Init( materials->CreateNamedRenderTargetTextureEx2( DEFRTNAME_GBUFFER2,
+		dummy, dummy,
+		RT_SIZE_FULL_FRAME_BUFFER_ROUNDED_UP,
+		fmt_gbuffer2,
+		MATERIAL_RT_DEPTH_NONE,
+		gbufferFlags, 0 ) );
 
-#elif DEFCFG_DEFERRED_SHADING
-		g_tex_Albedo.Init( materials->CreateNamedRenderTargetTextureEx2( DEFRTNAME_GBUFFER2,
-			dummy, dummy,
-			RT_SIZE_FULL_FRAME_BUFFER_ROUNDED_UP,
-			fmt_gbuffer2,
-			MATERIAL_RT_DEPTH_SHARED,
-			gbufferFlags, 0 ) );
+#elif DEFCFG_DEFERRED_SHADING == 1
+	g_tex_Albedo.Init( materials->CreateNamedRenderTargetTextureEx2( DEFRTNAME_GBUFFER2,
+		dummy, dummy,
+		RT_SIZE_FULL_FRAME_BUFFER_ROUNDED_UP,
+		fmt_gbuffer2,
+		MATERIAL_RT_DEPTH_SHARED,
+		gbufferFlags, 0 ) );
 
-		g_tex_Specular.Init( materials->CreateNamedRenderTargetTextureEx2( DEFRTNAME_GBUFFER3,
-			dummy, dummy,
-			RT_SIZE_FULL_FRAME_BUFFER_ROUNDED_UP,
-			fmt_gbuffer3,
-			MATERIAL_RT_DEPTH_NONE,
-			gbufferFlags, 0 ) );
+	g_tex_Specular.Init( materials->CreateNamedRenderTargetTextureEx2( DEFRTNAME_GBUFFER3,
+		dummy, dummy,
+		RT_SIZE_FULL_FRAME_BUFFER_ROUNDED_UP,
+		fmt_gbuffer3,
+		MATERIAL_RT_DEPTH_NONE,
+		gbufferFlags, 0 ) );
 #endif
 
 		g_tex_Lightaccum.Init( materials->CreateNamedRenderTargetTextureEx2( DEFRTNAME_LIGHTACCUM,
@@ -293,6 +302,68 @@ void InitDeferredRTs( bool bInitial )
 		Assert( res == g_tex_ShadowColor_Proj[i]->GetActualHeight() );
 		Assert( res == g_tex_ShadowDepth_Proj[i]->GetActualWidth() );
 		Assert( res == g_tex_ShadowColor_Proj[i]->GetActualWidth() );
+
+#if DEFCFG_ADAPTIVE_SHADOWMAP_LOD
+		res = GetShadowResolution_Spot_LOD1();
+		generalShadowData.iPROJ_Res_LOD1 = res;
+
+		if ( !bShadowUseColor || bFirst )
+			g_tex_ShadowDepth_Proj_LOD1[i].Init( materials->CreateNamedRenderTargetTextureEx2(
+				VarArgs( "%s%02i", DEFRTNAME_SHADOWDEPTH_PROJ_LOD1, i ),
+				res, res,
+				RT_SIZE_NO_CHANGE,
+				fmt_depth,
+				MATERIAL_RT_DEPTH_NONE,
+				depthFlags, 0 ) );
+		else
+			g_tex_ShadowDepth_Proj_LOD1[i].Init( g_tex_ShadowDepth_Proj_LOD1[0] );
+
+		if ( bShadowUseColor || bFirst )
+			g_tex_ShadowColor_Proj_LOD1[i].Init( materials->CreateNamedRenderTargetTextureEx2(
+				VarArgs( "%s%02i", DEFRTNAME_SHADOWCOLOR_PROJ_LOD1, i ),
+				res, res,
+				RT_SIZE_NO_CHANGE,
+				fmt_depthColor,
+				MATERIAL_RT_DEPTH_NONE,
+				shadowColorFlags, 0 ) );
+		else
+			g_tex_ShadowColor_Proj_LOD1[i].Init( g_tex_ShadowColor_Proj_LOD1[0] );
+
+		Assert( res == g_tex_ShadowDepth_Proj_LOD1[i]->GetActualHeight() );
+		Assert( res == g_tex_ShadowColor_Proj_LOD1[i]->GetActualHeight() );
+		Assert( res == g_tex_ShadowDepth_Proj_LOD1[i]->GetActualWidth() );
+		Assert( res == g_tex_ShadowColor_Proj_LOD1[i]->GetActualWidth() );
+
+		res = GetShadowResolution_Spot_LOD2();
+		generalShadowData.iPROJ_Res_LOD2 = res;
+
+		if ( !bShadowUseColor || bFirst )
+			g_tex_ShadowDepth_Proj_LOD2[i].Init( materials->CreateNamedRenderTargetTextureEx2(
+				VarArgs( "%s%02i", DEFRTNAME_SHADOWDEPTH_PROJ_LOD2, i ),
+				res, res,
+				RT_SIZE_NO_CHANGE,
+				fmt_depth,
+				MATERIAL_RT_DEPTH_NONE,
+				depthFlags, 0 ) );
+		else
+			g_tex_ShadowDepth_Proj_LOD2[i].Init( g_tex_ShadowDepth_Proj_LOD2[0] );
+
+		if ( bShadowUseColor || bFirst )
+			g_tex_ShadowColor_Proj_LOD2[i].Init( materials->CreateNamedRenderTargetTextureEx2(
+				VarArgs( "%s%02i", DEFRTNAME_SHADOWCOLOR_PROJ_LOD2, i ),
+				res, res,
+				RT_SIZE_NO_CHANGE,
+				fmt_depthColor,
+				MATERIAL_RT_DEPTH_NONE,
+				shadowColorFlags, 0 ) );
+		else
+			g_tex_ShadowColor_Proj_LOD2[i].Init( g_tex_ShadowColor_Proj_LOD2[0] );
+
+		Assert( res == g_tex_ShadowDepth_Proj_LOD2[i]->GetActualHeight() );
+		Assert( res == g_tex_ShadowColor_Proj_LOD2[i]->GetActualHeight() );
+		Assert( res == g_tex_ShadowDepth_Proj_LOD2[i]->GetActualWidth() );
+		Assert( res == g_tex_ShadowColor_Proj_LOD2[i]->GetActualWidth() );
+#endif	
 	}
 
 	for ( int i = 0; i < MAX_SHADOW_DP; i++ )
@@ -333,12 +404,14 @@ void InitDeferredRTs( bool bInitial )
 		Assert( res_x == g_tex_ShadowColor_DP[i]->GetActualWidth() );
 	}
 
+	
+
 	materials->EndRenderTargetAllocation();
 
 	GetDeferredExt()->CommitTexture_General( g_tex_Normals, g_tex_Depth,
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 		g_tex_LightCtrl,
-#elif DEFCFG_DEFERRED_SHADING
+#elif DEFCFG_DEFERRED_SHADING == 1
 		g_tex_Albedo,
 		g_tex_Specular,
 #endif
@@ -377,10 +450,34 @@ int GetShadowResolution_Spot()
 	return deferred_rt_shadowspot_res.GetInt();
 }
 
+#if DEFCFG_ADAPTIVE_SHADOWMAP_LOD
+int GetShadowResolution_Spot_LOD1()
+{
+	return deferred_rt_shadowspot_lod1_res.GetInt();
+}
+
+int GetShadowResolution_Spot_LOD2()
+{
+	return deferred_rt_shadowspot_lod2_res.GetInt();
+}
+#endif
+
 int GetShadowResolution_Point()
 {
 	return deferred_rt_shadowpoint_res.GetInt();
 }
+
+#if DEFCFG_ADAPTIVE_SHADOWMAP_LOD
+int GetShadowResolution_Point_LOD1()
+{
+	return deferred_rt_shadowpoint_lod1_res.GetInt();
+}
+
+int GetShadowResolution_Point_LOD2()
+{
+	return deferred_rt_shadowpoint_lod2_res.GetInt();
+}
+#endif
 
 ITexture *GetDefRT_Normals()
 {

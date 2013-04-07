@@ -13,6 +13,8 @@
 
 using namespace vgui;
 
+ConVar deferred_lighteditor_defaultvmfpath( "deferred_lighteditor_defaultvmfpath", "", FCVAR_ARCHIVE );
+
 CVGUILightEditor_Controls::CVGUILightEditor_Controls( Panel *pParent )
 	: BaseClass( pParent, "LightEditorControls" )
 {
@@ -179,8 +181,16 @@ void CVGUILightEditor_Controls::BuildVmfPath( char *pszOut, int maxlen, bool bMa
 	char tmp[MAX_PATH*4];
 	char tmp2[MAX_PATH*4];
 
-	Q_snprintf( tmp, sizeof(tmp), "%s/mapsrc", engine->GetGameDirectory() );
-	Q_FixSlashes( tmp );
+	if( Q_strcmp( deferred_lighteditor_defaultvmfpath.GetString(), "" ) != 0 &&
+		g_pFullFileSystem->IsDirectory( deferred_lighteditor_defaultvmfpath.GetString() ) )
+	{
+		Q_strcpy( tmp, deferred_lighteditor_defaultvmfpath.GetString() );
+	}
+	else
+	{
+		Q_snprintf( tmp, sizeof(tmp), "%s/mapsrc", engine->GetGameDirectory() );
+		Q_FixSlashes( tmp );
+	}
 
 	if ( bMakeRelative && g_pFullFileSystem->FullPathToRelativePath( tmp, tmp2, sizeof(tmp2) ) )
 		Q_strcpy( tmp, tmp2 );

@@ -126,6 +126,204 @@ FORCEINLINE void DrawFrustum( VMatrix &invScreenToWorld )
 }
 
 // returns false when no intersection
+#if DEFCFG_USE_SSE
+FORCEINLINE bool IntersectFrustumWithFrustum( VMatrix &invScreenToWorld_a, VMatrix &invScreenToWorld_b )
+{
+	static bool bSIMDDataInitialised = false;
+	static fltx4 _normPos[8];
+
+	if( !bSIMDDataInitialised )
+	{
+		const float pNormPos0[4] = { -1, 1, 0, 1 },
+			pNormPos1[4] = { 1, 1, 0, 1 },
+			pNormPos2[4] = { 1, -1, 0, 1 },
+			pNormPos3[4] = { -1, -1, 0, 1 },
+			pNormPos4[4] = { -1, 1, 1, 1 },
+			pNormPos5[4] = { 1, 1, 1, 1 },
+			pNormPos6[4] = { 1, -1, 1, 1 },
+			pNormPos7[4] = { -1, -1, 1, 1 };
+
+		_normPos[0] = LoadUnalignedSIMD( pNormPos0 );
+		_normPos[1] = LoadUnalignedSIMD( pNormPos1 );
+		_normPos[2] = LoadUnalignedSIMD( pNormPos2 );
+		_normPos[3] = LoadUnalignedSIMD( pNormPos3 );
+		_normPos[4] = LoadUnalignedSIMD( pNormPos4 );
+		_normPos[5] = LoadUnalignedSIMD( pNormPos5 );
+		_normPos[6] = LoadUnalignedSIMD( pNormPos6 );
+		_normPos[7] = LoadUnalignedSIMD( pNormPos7 );
+	}
+
+	fltx4 _pointx4[2][8];
+	fltx4 axes[22];
+	fltx4 on_frustum_directions[2][6];
+
+	fltx4 _invScreenToWorldAInSSE[4], _invScreenToWorldBInSSE[4];
+
+	_invScreenToWorldAInSSE[0] =	LoadUnalignedSIMD( invScreenToWorld_a[0] );
+	_invScreenToWorldAInSSE[1] =	LoadUnalignedSIMD( invScreenToWorld_a[1] );
+	_invScreenToWorldAInSSE[2] =	LoadUnalignedSIMD( invScreenToWorld_a[2] );
+	_invScreenToWorldAInSSE[3] =	LoadUnalignedSIMD( invScreenToWorld_a[3] );
+
+	TransposeSIMD
+		(
+			_invScreenToWorldAInSSE[0],
+			_invScreenToWorldAInSSE[1],
+			_invScreenToWorldAInSSE[2],
+			_invScreenToWorldAInSSE[3]
+		);
+
+	_invScreenToWorldBInSSE[0] =	LoadUnalignedSIMD( invScreenToWorld_b[0] );
+	_invScreenToWorldBInSSE[1] =	LoadUnalignedSIMD( invScreenToWorld_b[1] );
+	_invScreenToWorldBInSSE[2] =	LoadUnalignedSIMD( invScreenToWorld_b[2] );
+	_invScreenToWorldBInSSE[3] =	LoadUnalignedSIMD( invScreenToWorld_b[3] );
+
+	TransposeSIMD
+		(
+			_invScreenToWorldBInSSE[0],
+			_invScreenToWorldBInSSE[1],
+			_invScreenToWorldBInSSE[2],
+			_invScreenToWorldBInSSE[3]
+		);
+
+	for ( int i = 0; i < 8; i++ )
+	{
+		_pointx4[0][i] = FourDotProducts( _invScreenToWorldAInSSE, _normPos[i] );
+
+		float _w = SubFloat( _pointx4[0][i], 3 );
+		if( _w != 0 )
+		{
+			_w = 1.0f / _w;
+		}
+
+		fltx4 _fourWs = ReplicateX4( _w );
+		_pointx4[0][i] = _pointx4[0][i] * _fourWs;
+
+		_pointx4[1][i] = FourDotProducts( _invScreenToWorldAInSSE, _normPos[i] );
+
+		_w = SubFloat( _pointx4[1][i], 3 );
+		if( _w != 0 )
+		{
+			_w = 1.0f / _w;
+		}
+
+		_fourWs = ReplicateX4( _w );
+		_pointx4[1][i] = _pointx4[1][i] * _fourWs;
+	}
+
+	for ( int i = 0; i < 2; i++ ) // build minimal frustum frame
+	{
+		on_frustum_directions[i][0] = _pointx4[i][1] - _pointx4[i][0]; // viewplane x
+		on_frustum_directions[i][1] = _pointx4[i][3] - _pointx4[i][0]; // viewplane y
+
+		on_frustum_directions[i][2] = _pointx4[i][0] - _pointx4[i][4]; // frustum 0 0
+		on_frustum_directions[i][3] = _pointx4[i][1] - _pointx4[i][5]; // frustum 1 0
+		on_frustum_directions[i][4] = _pointx4[i][2] - _pointx4[i][6]; // frustum 1 1
+		on_frustum_directions[i][5] = _pointx4[i][3] - _pointx4[i][7]; // frustum 0 1
+	}
+
+	for ( int x = 0; x < 2; x++ )
+	{
+		NormalizeInPlaceSIMD( on_frustum_directions[x][0] );
+		NormalizeInPlaceSIMD( on_frustum_directions[x][1] );
+
+		NormaliseFourInPlace
+			( 
+				on_frustum_directions[x][2],
+				on_frustum_directions[x][3],
+				on_frustum_directions[x][4],
+				on_frustum_directions[x][5]
+			);
+	}
+
+	for ( int i = 0; i < 2; i++ ) // build axes
+	{
+		fltx4* pAxes = &axes[ i * 11 + 0 ];
+
+		FourCrossProducts //TODO: this function uses transpose heavily, should do transposing manually
+			(
+				on_frustum_directions[i][0], // viewplane
+				on_frustum_directions[i][2], // left
+				on_frustum_directions[i][2], // up
+				on_frustum_directions[i][4], // right
+
+				on_frustum_directions[i][1], 
+				on_frustum_directions[i][5],
+				on_frustum_directions[i][3],
+				on_frustum_directions[i][3],
+
+				pAxes[0],
+				pAxes[1],
+				pAxes[2],
+				pAxes[3]
+			);
+
+		FourCrossProducts
+			(
+				on_frustum_directions[i][4], // down
+				pAxes[1], // cross prod along local Z
+				pAxes[3],
+				pAxes[1],
+
+				on_frustum_directions[i][5], 
+				pAxes[3],
+				pAxes[2],
+				pAxes[2],
+
+				pAxes[4],
+				pAxes[5],
+				pAxes[6],
+				pAxes[7]
+			);
+
+		fltx4 _dummy;
+
+		FourCrossProducts
+			(
+				pAxes[1],
+				pAxes[2], // cross prod along local Y
+				pAxes[3],
+				LoadZeroSIMD(),
+
+				pAxes[4],
+				pAxes[4],
+				pAxes[4],
+				LoadZeroSIMD(),
+
+				pAxes[8],
+				pAxes[9],
+				pAxes[10],
+				_dummy
+			);
+	}
+
+	for ( int i = 0; i < 22; i++ ) // project points onto axes, compare sets
+	{
+		float bounds_frusta[2][2]; // frustum, min/max
+		// project starting points
+		bounds_frusta[0][0] = bounds_frusta[0][1] = Dot4SIMD2( _pointx4[0][0], axes[i] );
+		bounds_frusta[1][0] = bounds_frusta[1][1] = Dot4SIMD2( _pointx4[1][0], axes[i] );
+
+		for ( int x = 1; x < 8; x++ )
+		{
+			//TODO: Implement optimised solution using FourDotProducts function
+			float point_frustum_a = Dot4SIMD2( _pointx4[0][x], axes[i] );
+			float point_frustum_b = Dot4SIMD2( _pointx4[1][x], axes[i] );
+
+			bounds_frusta[0][0] = MIN( bounds_frusta[0][0], point_frustum_a );
+			bounds_frusta[0][1] = MAX( bounds_frusta[0][1], point_frustum_a );
+
+			bounds_frusta[1][0] = MIN( bounds_frusta[1][0], point_frustum_b );
+			bounds_frusta[1][1] = MAX( bounds_frusta[1][1], point_frustum_b );
+		}
+
+		if ( bounds_frusta[0][1] < bounds_frusta[1][0] ||
+			bounds_frusta[0][0] > bounds_frusta[1][1] )
+			return true;
+	}
+
+	return false;
+}
+#else
 FORCEINLINE bool IntersectFrustumWithFrustum( VMatrix &invScreenToWorld_a, VMatrix &invScreenToWorld_b )
 {
 	const Vector normalized_points[8] = {
@@ -214,6 +412,7 @@ FORCEINLINE bool IntersectFrustumWithFrustum( VMatrix &invScreenToWorld_a, VMatr
 
 	return false;
 }
+#endif
 
 FORCEINLINE void VectorDeviceToSourceSpace( Vector &v )
 {

@@ -23,6 +23,27 @@ ITexture *GetDefRT_RadiosityNormal( int index );
 int GetShadowResolution_Spot();
 int GetShadowResolution_Point();
 
+#if DEFCFG_ADAPTIVE_SHADOWMAP_LOD
+int GetShadowResolution_Spot_LOD1();
+int GetShadowResolution_Spot_LOD2();
+
+
+int GetShadowResolution_Point_LOD1();
+int GetShadowResolution_Point_LOD2();
+#endif
+
+#if DEFCFG_ADAPTIVE_SHADOWMAP_LOD
+int GetShadowResolution_Point_LOD1()
+{
+	return deferred_rt_shadowpoint_lod1_res.GetInt();
+}
+
+int GetShadowResolution_Point_LOD2()
+{
+	return deferred_rt_shadowpoint_lod2_res.GetInt();
+}
+#endif
+
 ITexture *GetShadowColorRT_Ortho( int index );
 ITexture *GetShadowDepthRT_Ortho( int index );
 

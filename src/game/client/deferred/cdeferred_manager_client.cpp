@@ -329,7 +329,7 @@ void CDeferredManagerClient::InitializeDeferredMaterials()
 	if ( m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLEND ] != NULL )
 		m_pMat_Def[ DEF_MAT_LIGHT_RADIOSITY_BLEND ] = materials->CreateMaterial( "__radpass_blend", m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLEND ] );
 
-#if DEFCFG_DEFERRED_SHADING
+#if DEFCFG_DEFERRED_SHADING == 1
 	/*
 
 	deferred shading

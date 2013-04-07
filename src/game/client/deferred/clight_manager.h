@@ -5,6 +5,9 @@
 
 class CViewSetup;
 class CDeferredViewRender;
+#if DEFCFG_USE_SSE
+struct def_light_presortdatax4_t;
+#endif
 
 class CLightingManager : public CAutoGameSystemPerFrame
 {
@@ -36,6 +39,11 @@ public:
 	bool RemoveLight( def_light_t *l );
 	bool IsLightRendered( def_light_t *l );
 
+#if DEFCFG_USE_SSE
+	void AllocateSortDataBuffer();
+	void BuildLightSortDataBuffer();
+#endif
+
 	void ClearTmpLists();
 
 	// update volatile data - internal xforms, final light col bleh
@@ -66,13 +74,29 @@ private:
 
 	enum
 	{
+#if DEFCFG_EXTRA_SORT
+		LSORT_POINT_WORLD_SIMPLE = 0,
+		LSORT_POINT_WORLD_ADVANCED,
+		LSORT_POINT_FULLSCREEN_SIMPLE,
+		LSORT_POINT_FULLSCREEN_ADVANCED,
+		LSORT_SPOT_WORLD_SIMPLE,
+		LSORT_SPOT_WORLD_ADVANCED,
+		LSORT_SPOT_FULLSCREEN_SIMPLE,
+		LSORT_SPOT_FULLSCREEN_ADVANCED,
+#else
 		LSORT_POINT_WORLD = 0,
 		LSORT_POINT_FULLSCREEN,
 		LSORT_SPOT_WORLD,
 		LSORT_SPOT_FULLSCREEN,
+#endif
 
 		LSORT_COUNT,
 	};
+
+#if DEFCFG_USE_SSE
+	def_light_presortdatax4_t* m_pSortDataX4;
+	unsigned int m_uiSortDataCount;			
+#endif
 
 	CUtlVector< def_light_t* > m_hDeferredLights;
 

@@ -88,7 +88,11 @@ private:
 	Vector GetDragWorldPos( int x, int y );
 
 	CVGUILightEditor_Properties *m_pEditorProps;
+#if DEFCG_LIGHTEDITOR_ALTERNATESETUP
+	MenuBar*	m_pMenuBar;
+#else
 	CVGUILightEditor_Controls *m_pMainControls;
+#endif
 	KeyValues *m_pCurrentProperties;
 
 	Label *m_pCurrentMapName;
@@ -168,9 +172,27 @@ CVGUILightEditor::CVGUILightEditor( VPANEL pParent )
 
 	m_vecLastDragWorldPos.Init();
 
+#if DEFCG_LIGHTEDITOR_ALTERNATESETUP
+	m_pMenuBar = new MenuBar( this, "MenuBar" );
+	
+	Menu* pMenu = new Menu( m_pMenuBar, "FileMenu" );
+	pMenu->AddMenuItem( "OpenVMF", "Open VMF", "loadvmf", this );
+	pMenu->AddMenuItem( "SaveVMF", "Save VMF", "savevmf", this );
+
+	m_pMenuBar->AddMenu( "File", pMenu );
+
+	pMenu = new Menu( m_pMenuBar, "PreferencesMenu" );
+	pMenu->AddMenuItem( "SetDefaultVMFPath", "Default VMF Director", "setdefaultvmfpath", this );
+
+	m_pMenuBar->AddMenu( "Preferences", pMenu );
+
+	GetLightingEditor()->SetEditorInteractionMode( CLightingEditor::EDITORINTERACTION_SELECT );
+	GetLightingEditor()->SetEditorActive( true, false );
+#else
 	m_pMainControls = new CVGUILightEditor_Controls( this );
 	m_pMainControls->Activate();
 	m_pMainControls->AddActionSignalTarget( this );
+#endif
 
 	m_pEditorProps = new CVGUILightEditor_Properties( this );
 	m_pEditorProps->AddActionSignalTarget( this );
@@ -238,6 +260,10 @@ void CVGUILightEditor::PerformLayout()
 	int w,h;
 	engine->GetScreenSize( w, h );
 	SetBounds( 0, 0, w, h );
+
+#if DEFCG_LIGHTEDITOR_ALTERNATESETUP
+	m_pMenuBar->SetWide( w );
+#endif
 
 	m_pCurrentMapName->SetBounds( 12, h - 24, w, 24 );
 }
@@ -670,6 +696,7 @@ void CVGUILightEditor::OnKeyCodePressed_Internal( KeyCode code )
 		case KEY_LSHIFT:
 			vecEditorMoveDir.z = 1;
 			break;
+
 		}
 	}
 
@@ -780,6 +807,7 @@ bool CVGUILightEditor::ActivateEditorInteractionMode( CLightingEditor::EDITORINT
 
 	if ( pszTargetRadioButton != NULL )
 	{
+#if !DEFCG_LIGHTEDITOR_ALTERNATESETUP
 		RadioButton *pButton = assert_cast<RadioButton*>( m_pMainControls->FindChildByName( pszTargetRadioButton ) );
 		Assert( pButton );
 
@@ -790,6 +818,9 @@ bool CVGUILightEditor::ActivateEditorInteractionMode( CLightingEditor::EDITORINT
 
 			return true;
 		}
+#else
+		m_pEditorSystem->SetEditorInteractionMode( mode );
+#endif
 	}
 
 	return false;

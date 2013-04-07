@@ -5,6 +5,7 @@
 #include "view_shared.h"
 #include "BSPTreeData.h"
 #include "CollisionUtils.h"
+#include "RayTrace.h"
 
 class CLightLeafEnum : public ISpatialLeafEnumerator
 {
@@ -46,6 +47,15 @@ BEGIN_DATADESC_NO_BASE( def_light_t )
 	DEFINE_KEYFIELD( flStyle_Random, FIELD_FLOAT, GetLightParamName( LPARAM_STYLE_RANDOM ) ),
 	DEFINE_KEYFIELD( iStyleSeed, FIELD_SHORT, GetLightParamName( LPARAM_STYLE_SEED ) ),
 
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+	DEFINE_KEYFIELD( flVolumeLOD0Dist, FIELD_FLOAT, GetLightParamName( LPARAM_VOLUME_LOD0_DIST ) ),
+	DEFINE_KEYFIELD( flVolumeLOD1Dist, FIELD_FLOAT, GetLightParamName( LPARAM_VOLUME_LOD1_DIST ) ),
+	DEFINE_KEYFIELD( flVolumeLOD2Dist, FIELD_FLOAT, GetLightParamName( LPARAM_VOLUME_LOD2_DIST ) ),
+	DEFINE_KEYFIELD( flVolumeLOD3Dist, FIELD_FLOAT, GetLightParamName( LPARAM_VOLUME_LOD3_DIST ) ),
+#endif
+#if DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+	DEFINE_KEYFIELD( iVolumeSamples, FIELD_SHORT, GetLightParamName( LPARAM_VOLUME_SAMPLES ) ),
+#endif
 END_DATADESC()
 
 IMesh *def_light_t::pMeshUnitSphere = NULL;
@@ -87,6 +97,17 @@ def_light_t::def_light_t( bool bWorld )
 	flLastRandomValue = 0;
 
 	iNumLeaves = 0;
+
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+	flVolumeLOD0Dist = 128;
+	flVolumeLOD1Dist = 256;
+	flVolumeLOD2Dist = 512;
+	flVolumeLOD3Dist = 1024;
+#endif
+
+#if DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+	iVolumeSamples= 50;
+#endif
 
 	worldTransform.Identity();
 
@@ -165,7 +186,7 @@ KeyValues *def_light_t::AllocateAsKeyValues()
 			!Q_stricmp( pszFieldName, GetLightParamName( LPARAM_AMBIENT ) ) )
 		{
 			Vector col;
-			Q_memcpy( col.Base(), (void*)((int)this + (int)pField.fieldOffset), pField.fieldSizeInBytes );
+			Q_memcpy( col.Base(), (void*)((int)this + pField.fieldOffset), pField.fieldSizeInBytes );
 
 			char tmp[256] = {0};
 			vecToStringCol( col, tmp, sizeof( tmp ) );
@@ -473,7 +494,55 @@ void def_light_t::UpdateXForms()
 		{
 			Vector points[5];
 			const int numPoints = ARRAYSIZE( points );
+#if DEFCFG_USE_SSE
+			static bool bSIMDDataInitialised = false;
+			static fltx4 _normPos[4];
+			
+			if( !bSIMDDataInitialised )
+			{
+				_normPos[0] = LoadOneSIMD();
 
+				const float pNormPos1[4] = { -1, 1, 1, 1 },
+					pNormPos2[4] = { -1, -1, 1, 1 },
+					pNormPos3[4] = { 1, -1, 1, 1 };
+
+				_normPos[1] = _mm_loadu_ps( pNormPos1 );
+				_normPos[2] = _mm_loadu_ps( pNormPos2 );
+				_normPos[3] = _mm_loadu_ps( pNormPos3 );
+
+				bSIMDDataInitialised = true;
+			}
+
+			fltx4 _spotMVPInvSSE[4];
+
+			_spotMVPInvSSE[0] =	_mm_loadu_ps( spotMVPInv[0] );
+			_spotMVPInvSSE[1] =	_mm_loadu_ps( spotMVPInv[1] );
+			_spotMVPInvSSE[2] =	_mm_loadu_ps( spotMVPInv[2] );
+			_spotMVPInvSSE[3] =	_mm_loadu_ps( spotMVPInv[3] );
+
+			TransposeSIMD
+				( 
+					_spotMVPInvSSE[0],
+					_spotMVPInvSSE[1],
+					_spotMVPInvSSE[2],
+					_spotMVPInvSSE[3] 
+				);
+
+			for( int i = 0; i < 4; i++ )
+			{
+				fltx4 pointx4 = FourDotProducts( _spotMVPInvSSE, _normPos[i] );
+
+				float _w = SubFloat( pointx4, 3 );
+				if( _w != 0 )
+				{
+					_w = 1.0f / _w;
+				}
+
+				pointx4 = MulSIMD( pointx4, ReplicateX4( _w ) );
+
+				Q_memcpy( points[i].Base(), &SubFloat( pointx4, 0 ), 3 * sizeof(float) );
+			}
+#else
 			static const Vector _normPos[4] = {
 				Vector( 1, 1, 1 ),
 				Vector( -1, 1, 1 ),
@@ -485,14 +554,17 @@ void def_light_t::UpdateXForms()
 
 			for ( int i = 0; i < 4; i++ )
 				Vector3DMultiplyPositionProjective( spotMVPInv, _normPos[i], points[i] );
+#endif
+			points[4] = pos;
 
 			Vector list[6];
-			Q_memcpy( list, points, sizeof( _normPos ) );
+			Q_memcpy( list, points, sizeof( Vector ) * 4 );
 			list[4] = pos + fwd * flRadius;
 			list[5] = pos;
 
 			for ( int i = 0; i < 5; i++ )
 			{
+				RayTracingEnvironment environment;
 				UTIL_TraceLine( pos, list[i], MASK_SOLID, NULL, COLLISION_GROUP_DEBRIS, &tr );
 				list[ i ] = tr.endpos;
 			}

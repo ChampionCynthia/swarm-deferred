@@ -735,7 +735,7 @@ void CDeferredViewRender::ViewDrawSceneDeferred( const CViewSetup &view, int nCl
 		DebugRadiosity( view );
 #endif
 
-#if DEFCFG_DEFERRED_SHADING
+#if DEFCFG_DEFERRED_SHADING == 1
 	CPostLightingView::PushDeferredShadingFrameBuffer();
 #endif
 
@@ -774,7 +774,7 @@ void CDeferredViewRender::ViewDrawSceneDeferred( const CViewSetup &view, int nCl
 	// Invoke post-render methods
 	IGameSystem::PostRenderAllSystems();
 
-#if DEFCFG_DEFERRED_SHADING
+#if DEFCFG_DEFERRED_SHADING == 1
 	CPostLightingView::PopDeferredShadingFrameBuffer();
 
 	ViewOutputDeferredShading( view );
@@ -863,7 +863,7 @@ void CDeferredViewRender::ViewDrawComposite( const CViewSetup &view, bool &bDrew
 
 void CDeferredViewRender::ViewCombineDeferredShading( const CViewSetup &view, view_id_t viewID )
 {
-#if DEFCFG_DEFERRED_SHADING
+#if DEFCFG_DEFERRED_SHADING == 1
 
 	DrawLightPassFullscreen( GetDeferredManager()->GetDeferredMaterial( DEF_MAT_SCREENSPACE_SHADING ),
 		view.width, view.height );
@@ -886,6 +886,8 @@ void CDeferredViewRender::ViewCombineDeferredShading( const CViewSetup &view, vi
 
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->ClearBuffers( false, true );
+
+#else
 
 #endif
 }
@@ -1431,6 +1433,7 @@ void CDeferredViewRender::DrawLightShadowView( const CViewSetup &view, int iDesi
 	case DEFLIGHTTYPE_SPOT:
 		{
 			CRefPtr<CSpotLightShadowView> pProjView = new CSpotLightShadowView( this, l, iDesiredShadowmap );
+			
 			pProjView->Setup( setup, GetShadowDepthRT_Proj( iDesiredShadowmap ), GetShadowColorRT_Proj( iDesiredShadowmap ) );
 			AddViewToScene( pProjView );
 		}
@@ -1947,6 +1950,9 @@ public:
 	Vector orig, fwd;
 	float zDists[2];
 	VMatrix frustumDeltas;
+#if DEFCFG_BILATERAL_DEPTH_TEST
+	VMatrix worldCameraDepthTex;
+#endif
 
 	static void Fire( defData_setGlobals d )
 	{
@@ -1955,6 +1961,9 @@ public:
 		pDef->CommitViewForward( d.fwd );
 		pDef->CommitZDists( d.zDists[0], d.zDists[1] );
 		pDef->CommitFrustumDeltas( d.frustumDeltas );
+#if DEFCFG_BILATERAL_DEPTH_TEST
+		pDef->CommitWorldToCameraDepthTex( d.worldCameraDepthTex );
+#endif
 	};
 };
 
@@ -2006,6 +2015,15 @@ void CDeferredViewRender::ProcessDeferredGlobals( const CViewSetup &view )
 	data.frustumDeltas.Identity();
 	data.frustumDeltas.SetBasisVectors( frustum_cc, frustum_right, frustum_up );
 	data.frustumDeltas = data.frustumDeltas.Transpose3x3();
+
+#if DEFCFG_BILATERAL_DEPTH_TEST
+	VMatrix matWorldToCameraDepthTex;
+	MatrixBuildScale( matWorldToCameraDepthTex, 0.5f, -0.5f, 1.0f );
+	matWorldToCameraDepthTex[0][3] = matWorldToCameraDepthTex[1][3] = 0.5f;
+	MatrixMultiply( matWorldToCameraDepthTex, matViewProj, matWorldToCameraDepthTex );
+
+	data.worldCameraDepthTex = matWorldToCameraDepthTex.Transpose();
+#endif
 
 	QUEUE_FIRE( defData_setGlobals, Fire, data );
 }
@@ -2166,7 +2184,7 @@ static void DrawClippedDepthBox( IClientRenderable *pEnt, float *pClipPlane )
 		if( j == 3 ) //not enough lines to even form a triangle
 			continue;
 
-		float *pStartPoint;
+		float *pStartPoint = static_cast<float *>(0);
 		float *pTriangleFanPoints[4]; //at most, one of our fans will have 5 points total, with the first point being stored separately as pStartPoint
 		int iTriangleFanPointCount = 1; //the switch below creates the first for sure
 		
@@ -2949,7 +2967,7 @@ void CGBufferView::PushGBuffer( bool bInitial, float zScale, bool bClearDepth )
 		pRenderContext->PopRenderTargetAndViewport();
 	}
 
-#if DEFCFG_DEFERRED_SHADING
+#if DEFCFG_DEFERRED_SHADING == 1
 	pRenderContext->PushRenderTargetAndViewport( GetDefRT_Albedo() );
 #else
 	pRenderContext->PushRenderTargetAndViewport( pNormals );
@@ -2960,7 +2978,7 @@ void CGBufferView::PushGBuffer( bool bInitial, float zScale, bool bClearDepth )
 
 	pRenderContext->SetRenderTargetEx( 1, pDepth );
 
-#if DEFCFG_DEFERRED_SHADING
+#if DEFCFG_DEFERRED_SHADING == 1
 	pRenderContext->SetRenderTargetEx( 2, pNormals );
 	pRenderContext->SetRenderTargetEx( 3, GetDefRT_Specular() );
 #endif
