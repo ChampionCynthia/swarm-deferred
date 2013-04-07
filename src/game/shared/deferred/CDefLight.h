@@ -2,6 +2,7 @@
 #define CDEF_LIGHT_H
 
 #include "cbase.h"
+#include "deferred_shared_common.h"
 
 #ifdef CLIENT_DLL
 struct def_light_t;
@@ -57,6 +58,14 @@ public:
 	inline int GetLight_Flags();
 	inline int GetCookieIndex();
 
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+	inline void GetVolumeLODDistances( float& lod0, float& lod1, float& lod2, float& lod3 );
+#endif
+
+#if DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+	inline int GetVolumeSamples();
+#endif
+
 #ifdef GAME_DLL
 	void SetRadius( float r );
 #endif
@@ -99,6 +108,17 @@ private:
 	CNetworkVar( int, m_iLightType );
 	CNetworkVar( int, m_iDefFlags );
 	CNetworkVar( int, m_iCookieIndex );
+
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+	CNetworkVar( float, m_flVolumeLOD0Dist );
+	CNetworkVar( float, m_flVolumeLOD1Dist );
+	CNetworkVar( float, m_flVolumeLOD2Dist );
+	CNetworkVar( float, m_flVolumeLOD3Dist );
+#endif
+
+#if DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+	CNetworkVar( int, m_iVolumeSamples );
+#endif
 };
 
 
@@ -180,5 +200,21 @@ int CDeferredLight::GetCookieIndex()
 {
 	return m_iCookieIndex;
 }
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+void CDeferredLight::GetVolumeLODDistances( float& lod0,  float& lod1,  float& lod2, float& lod3 )
+{
+	lod0 = m_flVolumeLOD0Dist;
+	lod1 = m_flVolumeLOD1Dist;
+	lod2 = m_flVolumeLOD2Dist;
+	lod3 = m_flVolumeLOD3Dist;
+}
+#endif
+
+#if DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+int CDeferredLight::GetVolumeSamples()
+{
+	return m_iVolumeSamples;
+}
+#endif
 
 #endif

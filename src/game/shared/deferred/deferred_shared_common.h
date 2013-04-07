@@ -96,6 +96,7 @@ void UTIL_StringToIntArray( int *pVector, int count, const char *pString );
 #define NETWORK_MASK_COOKIE		0x007F
 #define NETWORK_MASK_SEED		0xFFFF
 
+#include "../../materialsystem/swarmshaders/deferred_global_common.h"
 
 enum LIGHT_PARAM_ID
 {
@@ -124,6 +125,17 @@ enum LIGHT_PARAM_ID
 	LPARAM_AMBIENT_LOW,
 	LPARAM_AMBIENT_HIGH,
 
+#if DEFCFG_ADAPTIVE_VOLUMETRIC_LOD
+	LPARAM_VOLUME_LOD0_DIST,
+	LPARAM_VOLUME_LOD1_DIST,
+	LPARAM_VOLUME_LOD2_DIST,
+	LPARAM_VOLUME_LOD3_DIST,
+#endif
+
+#if DEFCFG_CONFIGURABLE_VOLUMETRIC_LOD
+	LPARAM_VOLUME_SAMPLES,
+#endif
+
 	LPARAM_COUNT,
 };
 const char *GetLightParamName( LIGHT_PARAM_ID id );
@@ -134,8 +146,6 @@ const char *GetLightParamName( LIGHT_PARAM_ID id );
 #include "deferred/CDefLight.h"
 #include "deferred/CDefLightContainer.h"
 #include "deferred/CDefLightGlobal.h"
-
-#include "../../materialsystem/swarmshaders/deferred_global_common.h"
 
 #ifdef GAME_DLL
 #include "deferred/deferred_server_common.h"
