@@ -22,6 +22,7 @@ enum DEFLIGHT_FLAGS
 
 	DEFLIGHT_DIRTY_XFORMS =				( 1 << 6 ),
 	DEFLIGHT_DIRTY_RENDERMESH =			( 1 << 7 ),
+	DEFLIGHT_DIRTY_CONFIGURATION =		( 1 << 8 ),
 };
 #define DEFLIGHT_FLAGS_MAX_SHARED_BITS 5
 
@@ -146,6 +147,7 @@ const char *GetLightParamName( LIGHT_PARAM_ID id );
 #include "deferred/CDefLight.h"
 #include "deferred/CDefLightContainer.h"
 #include "deferred/CDefLightGlobal.h"
+#include "deferred/ssemath_ext.h"
 
 #ifdef GAME_DLL
 #include "deferred/deferred_server_common.h"
