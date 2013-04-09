@@ -53,6 +53,7 @@ FORCEINLINE fltx4 FourDotProducts( fltx4* m, fltx4 v )
 	return dot;
 }
 
+// assumes that all are transposed before hand
 FORCEINLINE void FourCrossProducts
 (
 	fltx4& a0,
@@ -69,6 +70,7 @@ FORCEINLINE void FourCrossProducts
 	fltx4& out3
 )
 {
+	/*The required transpose
 	fltx4 x0 = a0;
 	fltx4 x1 = a1;
 	fltx4 x2 = a2;
@@ -79,7 +81,7 @@ FORCEINLINE void FourCrossProducts
 	fltx4 y3 = b3;
 
 	TransposeSIMD( x0, x1, x2, x3 );
-	TransposeSIMD( y0, y1, y2, y3 );
+	TransposeSIMD( y0, y1, y2, y3 );*/
 
 	out0 =SubSIMD(MulSIMD(a1,b2),MulSIMD(a2,b1));
 	out1 =SubSIMD(MulSIMD(a2,b0),MulSIMD(a0,b2));
